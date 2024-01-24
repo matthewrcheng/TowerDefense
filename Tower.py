@@ -1,4 +1,6 @@
 class Tower:
+    """Base Tower Class
+    """
 
     def __init__(self) -> None:
         self.cost           # game currency
@@ -6,9 +8,10 @@ class Tower:
         self.attack_delay   # milliseconds
         self.range          # grid squares
         self.invisible_flag # camo
-        self.tough_flag     # lead
+        self.metal_flag     # lead
         self.boss_flag      # blimp
         self.sprite         # sprite source file
+        self.current_delay  # attack delay counter
 
     def place(self, x, y) -> None:
         self.x = x
