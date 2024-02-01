@@ -10,10 +10,10 @@ import pygame
 
 pygame.init()
 
-grid = [[0 for w in range(GRID_WIDTH)] for h in range(GRID_HEIGHT)]
+WIDTH = GRID_WIDTH*CELL_SIZE + SIDEBAR_WIDTH
+HEIGHT = GRID_HEIGHT*CELL_SIZE
 
-screen = pygame.display.set_mode((GRID_WIDTH*CELL_SIZE + SIDEBAR_WIDTH,
-                                  GRID_HEIGHT*CELL_SIZE))
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Tower Defense")
 
 running = True
@@ -34,7 +34,8 @@ while running:
         else:
             current_state = GameState.MENU
     elif current_state == GameState.GAME:
-        win = game_screen(screen, map)
+        current_state,win = game_screen(screen, map, WIDTH, HEIGHT)
+        pygame.display.set_caption("Tower Defense")
     elif current_state == GameState.COLLECTION:
         current_state = collection_screen(screen)
     elif current_state == GameState.ACHIEVEMENTS:

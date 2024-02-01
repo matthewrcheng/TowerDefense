@@ -15,7 +15,7 @@ def selection_screen(screen):
     current_selection_button = pygame.Rect(300, 50, 350, 50) 
     quit_button = pygame.Rect(600, 500, 100, 50)
 
-    map = Map.Beach
+    map = Map.Field
 
     while True:
         for event in pygame.event.get():
@@ -48,13 +48,13 @@ def selection_screen(screen):
         screen.blit(play_text, (play_button.x + 48, play_button.y + 25))
         pygame.draw.rect(screen, COLOR.LIGHT, field_button)
         collection_text = fonts.render("Field", True, COLOR.GREEN)
-        screen.blit(collection_text, (field_button.x + 35, field_button.y + 10))
+        screen.blit(collection_text, (field_button.x + 66, field_button.y + 10))
         pygame.draw.rect(screen, COLOR.BLUE, beach_button)
         achievements_text = fonts.render("Beach", True, COLOR.TEAL)
-        screen.blit(achievements_text, (beach_button.x + 15, beach_button.y + 10))
+        screen.blit(achievements_text, (beach_button.x + 60, beach_button.y + 10))
         pygame.draw.rect(screen, COLOR.FAINT, moon_button)
         achievements_text = fonts.render("Moon", True, COLOR.GRAY)
-        screen.blit(achievements_text, (moon_button.x + 15, moon_button.y + 10))
+        screen.blit(achievements_text, (moon_button.x + 62, moon_button.y + 10))
         pygame.draw.rect(screen, map.secondary, current_selection_button)
         current_selection_text = fonts.render(f"Current Selection: {map.name}", True, map.primary)
         screen.blit(current_selection_text, (current_selection_button.x + 15, current_selection_button.y + 10))
