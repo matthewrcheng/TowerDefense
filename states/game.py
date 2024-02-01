@@ -3,6 +3,7 @@ import numpy as np
 from constants import GRID_HEIGHT,GRID_WIDTH,CELL_SIZE,SIDEBAR_WIDTH
 from utils import COLOR, GameState, Map
 from Tower import Soldier, Archer, Deadeye, Berserker, Assassin
+from Enemy import Basic, Speedy, Tough
 
 def validate_tower_placement(mouse_pos, selected_tower, grid, WIDTH, HEIGHT):
     extrax = selected_tower.width//2
@@ -68,9 +69,16 @@ def game_screen(screen, map, WIDTH, HEIGHT):
     placing = False
     selected_tower = None
     level = 1
+    enemy_timer = 0
+    enemy_spawn_time = FPS*5
+
+    # trackers
+    towers = []
+    enemies = []
 
     # conversion
-    tower_color = {0: map.background, 1:COLOR.GREEN, 2:COLOR.RED, 3:COLOR.PURPLE, 4:COLOR.BLUE, 5:COLOR.BLACK}
+    tower_color = {0: map.background, 1:COLOR.GREEN, 2:COLOR.RED, 3:COLOR.PURPLE, 4:COLOR.BLUE, 5:COLOR.BLACK,
+                   101:COLOR.DARK_GREEN, 102:COLOR.DARK_BLUE, 103:COLOR.DARK_RED}
 
     while not game_over and not won:
         for event in pygame.event.get():
@@ -128,6 +136,12 @@ def game_screen(screen, map, WIDTH, HEIGHT):
             assassin_text = fonts.render(Assassin.name, True, COLOR.WHITE)
             screen.blit(assassin_text, (assassin_button.x+13, assassin_button.y+10))
 
+            if enemy_timer == enemy_spawn_time:
+                new_enemy = Basic()
+                new_enemy.place((0,GRID_HEIGHT//2), grid)
+                enemies.append(new_enemy)
+                enemy_timer = 0
+
             for row in range(GRID_HEIGHT):
                 for col in range(GRID_WIDTH):
                     cell_value = grid[row, col]
@@ -135,6 +149,17 @@ def game_screen(screen, map, WIDTH, HEIGHT):
 
             if placing:
                 pygame.draw.rect(screen, selected_tower.color, placing_tower_rect)
+
+            to_remove = []
+            for i in range(len(enemies)):
+                success = enemies[i].walk(grid)
+                if not success:
+                    to_remove.append(i)
+
+            for i in to_remove:
+                enemies.pop(i)
+
+            enemy_timer+=1
 
         else:
             screen.fill(COLOR.BLACK)
@@ -163,9 +188,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
             # Check if the left mouse button is released to place the tower
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if valid:
-                    print("Placement cells:", grids)
                     place_tower(grids, grid, selected_tower)
-                    print("All cells:", grid)
 
                 placing = False
 

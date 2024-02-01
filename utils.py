@@ -17,11 +17,16 @@ class COLOR:
     GRAY = (128, 128, 128)
     LIGHT = (200, 200, 0)
     FAINT = (220, 220, 220)
-    LIGHT_BLUE = (0, 0, 200)
-    LIGHT_GREEN = (0, 200, 0)
-    LIGHT_RED = (0, 200, 0)
+    LIGHT_BLUE = (100, 180, 250)
+    LIGHT_GREEN = (100, 250, 150)
+    GRASS = (130, 225, 100)
+    LIGHT_RED = (100, 250, 100)
     ORANGE = (128, 190, 0)
     YELLOW = (128, 128, 0)
+    PINK = (250, 180, 250)
+    DARK_GREEN = (0, 64, 0)
+    DARK_BLUE = (0, 0, 64)
+    DARK_RED = (64, 0, 0)
 
 class GameState(Enum):
     MENU = 0
@@ -36,7 +41,7 @@ class Map():
     class Field():
         primary = COLOR.GREEN
         secondary = COLOR.LIGHT
-        background = COLOR.LIGHT_GREEN
+        background = COLOR.GRASS
         name = "Field"
 
 
