@@ -1,10 +1,10 @@
 from enum import Enum
 
-class Direction(Enum):
-    up = 1
-    down = 2
-    left = 3
-    right = 4
+class Direction:
+    up = (0,-1)
+    down = (0,1)
+    left = (-1,0)
+    right = (1,0)
 
 class COLOR:
     BLACK = (0, 0, 0)
@@ -27,6 +27,8 @@ class COLOR:
     DARK_GREEN = (0, 64, 0)
     DARK_BLUE = (0, 0, 64)
     DARK_RED = (64, 0, 0)
+    CAN_PLACE = (255,255,255,80)
+    CANT_PLACE = (128,0,0,80)
 
 class GameState(Enum):
     MENU = 0

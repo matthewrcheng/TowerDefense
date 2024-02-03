@@ -2,8 +2,41 @@ import pygame
 import numpy as np
 from constants import GRID_HEIGHT,GRID_WIDTH,CELL_SIZE,SIDEBAR_WIDTH
 from utils import COLOR, GameState, Map
-from Tower import Soldier, Archer, Deadeye, Berserker, Assassin
-from Enemy import Basic, Speedy, Tough
+from Tower import Warrior, Archer, Deadeye, Berserker, Assassin
+from Enemy import Enemy, Speedy, Tough
+
+def draw_rect_alpha(surface, color, rect):
+    shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
+    pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
+    surface.blit(shape_surf, rect)
+
+def draw_circle_alpha(surface, color, center, radius):
+    target_rect = pygame.Rect(center, (0, 0)).inflate((radius * 2, radius * 2))
+    shape_surf = pygame.Surface(target_rect.size, pygame.SRCALPHA)
+    pygame.draw.circle(shape_surf, color, (radius, radius), radius)
+    surface.blit(shape_surf, target_rect)
+
+def draw_polygon_alpha(surface, color, points):
+    lx, ly = zip(*points)
+    min_x, min_y, max_x, max_y = min(lx), min(ly), max(lx), max(ly)
+    target_rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
+    shape_surf = pygame.Surface(target_rect.size, pygame.SRCALPHA)
+    pygame.draw.polygon(shape_surf, color, [(x - min_x, y - min_y) for x, y in points])
+    surface.blit(shape_surf, target_rect)
+
+def find_target(tower, enemies):
+    distances = {
+        k: np.sqrt(((enemy.x+(enemy.width//2))-tower.x)**2 +
+                   ((enemy.y+(enemy.height//2))-tower.x)**2)
+        for k, enemy in enemies.items()
+    }
+
+    targets_in_range = [k for k, distance in distances.items() if distance <= tower.range]
+    if targets_in_range:
+        target_key = max(targets_in_range, key=lambda k: enemies[k].x)
+        return enemies[target_key]
+
+    return None  # No target found within the tower's range
 
 def validate_tower_placement(mouse_pos, selected_tower, grid, WIDTH, HEIGHT):
     extrax = selected_tower.width//2
@@ -26,12 +59,14 @@ def validate_tower_placement(mouse_pos, selected_tower, grid, WIDTH, HEIGHT):
 
     return True,(gridx,gridy)
 
-def place_tower(grids, grid, selected_tower):
+def place_tower(grids, grid, selected_tower, num):
     extrax = selected_tower.width//2
     extray = selected_tower.height//2
 
     gridx = grids[0]
     gridy = grids[1]
+
+    selected_tower.place(gridx,gridy,num)
 
     grid[gridy-extray:gridy+extray+1, gridx-extrax:gridx+extrax+1] = selected_tower.id
 
@@ -56,11 +91,16 @@ def game_screen(screen, map, WIDTH, HEIGHT):
     placing_tower_rect = pygame.Rect(0,0,3*CELL_SIZE,3*CELL_SIZE)
 
     # Towers
-    soldier_button = pygame.Rect(WIDTH-125, 100, 100, 50)
+    warrior_button = pygame.Rect(WIDTH-125, 100, 100, 50)
     archer_button = pygame.Rect(WIDTH-125, 175, 100, 50)
     deadeye_button = pygame.Rect(WIDTH-125, 250, 100, 50)
     berserker_button = pygame.Rect(WIDTH-125, 325, 100, 50)
     assassin_button = pygame.Rect(WIDTH-125, 400, 100, 50)
+    warrior = Warrior()
+    archer = Archer()
+    deadeye = Deadeye()
+    berserker = Berserker()
+    assassin = Assassin()
 
     # States
     game_over = False
@@ -73,8 +113,10 @@ def game_screen(screen, map, WIDTH, HEIGHT):
     enemy_spawn_time = FPS*5
 
     # trackers
-    towers = []
-    enemies = []
+    tower_num = 0
+    enemy_num = 0
+    towers = dict()
+    enemies = dict()
 
     # conversion
     tower_color = {0: map.background, 1:COLOR.GREEN, 2:COLOR.RED, 3:COLOR.PURPLE, 4:COLOR.BLUE, 5:COLOR.BLACK,
@@ -92,9 +134,9 @@ def game_screen(screen, map, WIDTH, HEIGHT):
                     paused = True
                 elif quit_button.collidepoint(event.pos):  # Handle the "Quit" button
                     return GameState.MENU,False
-                elif soldier_button.collidepoint(event.pos):
+                elif warrior_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = Soldier
+                    selected_tower = Warrior
                 elif archer_button.collidepoint(event.pos):
                     placing = True
                     selected_tower = Archer
@@ -110,6 +152,22 @@ def game_screen(screen, map, WIDTH, HEIGHT):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     paused = True
+                elif event.key == pygame.K_1:
+                    placing = True
+                    selected_tower = Warrior
+                elif event.key == pygame.K_2:
+                    placing = True
+                    selected_tower = Archer
+                elif event.key == pygame.K_3:
+                    placing = True
+                    selected_tower = Deadeye
+                elif event.key == pygame.K_4:
+                    placing = True
+                    selected_tower = Berserker
+                elif event.key == pygame.K_5:
+                    placing = True
+                    selected_tower = Assassin
+                
         
         pygame.display.set_caption(f"{map.name}: LEVEL {level}")
 
@@ -120,44 +178,49 @@ def game_screen(screen, map, WIDTH, HEIGHT):
             pygame.draw.rect(screen, COLOR.GRAY, pause_button)
             pause_text = fonts.render("Pause", True, COLOR.BLACK)
             screen.blit(pause_text, (pause_button.x+13, pause_button.y+10))
-            pygame.draw.rect(screen, Soldier.color, soldier_button)
-            soldier_text = fonts.render(Soldier.name, True, COLOR.WHITE)
-            screen.blit(soldier_text, (soldier_button.x+13, soldier_button.y+10))
-            pygame.draw.rect(screen, Archer.color, archer_button)
-            archer_text = fonts.render(Archer.name, True, COLOR.WHITE)
+            pygame.draw.rect(screen, COLOR.GREEN, warrior_button)
+            warrior_text = fonts.render("Warrior", True, COLOR.WHITE)
+            screen.blit(warrior_text, (warrior_button.x+13, warrior_button.y+10))
+            pygame.draw.rect(screen, COLOR.RED, archer_button)
+            archer_text = fonts.render("Archer", True, COLOR.WHITE)
             screen.blit(archer_text, (archer_button.x+13, archer_button.y+10))
-            pygame.draw.rect(screen, Deadeye.color, deadeye_button)
-            deadeye_text = fonts.render(Deadeye.name, True, COLOR.WHITE)
+            pygame.draw.rect(screen, COLOR.PURPLE, deadeye_button)
+            deadeye_text = fonts.render("Deadeye", True, COLOR.WHITE)
             screen.blit(deadeye_text, (deadeye_button.x+13, deadeye_button.y+10))
-            pygame.draw.rect(screen, Berserker.color, berserker_button)
-            berserker_text = fonts.render(Berserker.name, True, COLOR.WHITE)
+            pygame.draw.rect(screen, COLOR.BLUE, berserker_button)
+            berserker_text = fonts.render("Berserker", True, COLOR.WHITE)
             screen.blit(berserker_text, (berserker_button.x+13, berserker_button.y+10))
-            pygame.draw.rect(screen, Assassin.color, assassin_button)
-            assassin_text = fonts.render(Assassin.name, True, COLOR.WHITE)
+            pygame.draw.rect(screen, COLOR.BLACK, assassin_button)
+            assassin_text = fonts.render("Assassin", True, COLOR.WHITE)
             screen.blit(assassin_text, (assassin_button.x+13, assassin_button.y+10))
 
-            if enemy_timer == enemy_spawn_time:
-                new_enemy = Basic()
-                new_enemy.place((0,GRID_HEIGHT//2), grid)
-                enemies.append(new_enemy)
+            if enemy_timer >= enemy_spawn_time:
+                new_enemy = Enemy()
+                new_enemy.place((0,GRID_HEIGHT//2), grid, enemy_num)
+                enemies[enemy_num] = new_enemy
+                enemy_num += 1
                 enemy_timer = 0
+                print(f"Spawned new enemy, enemy count: {len(enemies)}")
 
             for row in range(GRID_HEIGHT):
                 for col in range(GRID_WIDTH):
                     cell_value = grid[row, col]
                     pygame.draw.rect(screen, tower_color[cell_value], (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
-            if placing:
-                pygame.draw.rect(screen, selected_tower.color, placing_tower_rect)
+            for tower in towers.values():
+                target = find_target(tower, enemies)
+                if target:
+                    killed = tower.attack(target)
+                    if killed:
+                        killed.kill(grid)
+                        enemies.pop(killed.num)
 
             to_remove = []
-            for i in range(len(enemies)):
-                success = enemies[i].walk(grid)
+            for k,enemy in enemies.items():
+                success = enemy.walk(grid)
                 if not success:
-                    to_remove.append(i)
-
-            for i in to_remove:
-                enemies.pop(i)
+                    enemy.kill(grid)
+                    enemies.pop(k)
 
             enemy_timer+=1
 
@@ -176,19 +239,26 @@ def game_screen(screen, map, WIDTH, HEIGHT):
             mouse_pos = pygame.mouse.get_pos()
             placing_tower_rect.topleft = (mouse_pos[0] - placing_tower_rect.width // 2,
                                           mouse_pos[1] - placing_tower_rect.height // 2)
+            tower = selected_tower()
+            
 
             # Check if the placement is valid (not on the track and no overlap with existing towers)
             # Implement your own validation logic
-            valid,grids = validate_tower_placement(mouse_pos, selected_tower, grid, WIDTH, HEIGHT)
+            valid,grids = validate_tower_placement(mouse_pos, tower, grid, WIDTH, HEIGHT)
 
             # Draw tower in red if placement is not valid
             if not valid:
-                pygame.draw.rect(screen, COLOR.RED, placing_tower_rect)
+                draw_circle_alpha(screen, COLOR.CANT_PLACE, mouse_pos, tower.range*CELL_SIZE)
+            else:
+                draw_circle_alpha(screen, COLOR.CAN_PLACE, mouse_pos, tower.range*CELL_SIZE)
+            draw_rect_alpha(screen, tower.color, placing_tower_rect)
 
             # Check if the left mouse button is released to place the tower
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if valid:
-                    place_tower(grids, grid, selected_tower)
+                    towers[tower_num] = tower
+                    place_tower(grids, grid, tower, tower_num)
+                    tower_num += 1
 
                 placing = False
 
