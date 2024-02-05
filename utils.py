@@ -6,6 +6,13 @@ class Direction:
     left = (-1,0)
     right = (1,0)
 
+class Targeting:
+    FIRST = "First"
+    STRONG = "Strong"
+    LAST = "Last"
+    WEAK = "Weak"
+    RANDOM = "Random"
+
 class COLOR:
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
@@ -27,8 +34,20 @@ class COLOR:
     DARK_GREEN = (0, 64, 0)
     DARK_BLUE = (0, 0, 64)
     DARK_RED = (64, 0, 0)
+    DARK_PURPLE = (64, 0, 64)
+    DARK_TEAL = (0, 100, 75)
+    DARK_GRAY = (64, 64, 64)
+    DARK_ORANGE = (64, 95, 0)
+    DARK_YELLOW = (64, 64, 0)
+    DARK_PINK = (125, 90, 125)
+    LIGHT_PURPLE = (192, 0, 192)
+    LIGHT_GRAY = (192, 192, 192)
+    LIGHT_ORANGE = (192, 255, 0)
+    LIGHT_YELLOW = (190, 190, 0)
+    BROWN = (165, 42, 42)
     CAN_PLACE = (255,255,255,80)
     CANT_PLACE = (128,0,0,80)
+    FADE = (0, 0, 0, 80)
 
 class GameState(Enum):
     MENU = 0
