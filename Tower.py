@@ -26,15 +26,17 @@ class Tower:
         self.attack_color = COLOR.BLACK
         self.attack_type = 0
         self.upgrade_level = 0
-        self.max_upgrade = 0
+        self.upgrade_cost = 0
         self.rect = pygame.Rect(0, 0, self.width * CELL_SIZE, self.height * CELL_SIZE)
+        self.total_damage = 0
+        # self.attack_sound = pygame.mixer.Sound('sounds/temp.ogg')
 
     def place(self, x, y, num) -> None:
         self.x = x
         self.y = y
         self.num = num
 
-        self.rect.topleft = (self.x * CELL_SIZE, self.y * CELL_SIZE)
+        self.rect.center = (self.x * CELL_SIZE, self.y * CELL_SIZE)
 
     def attack(self, screen, enemy: Enemy) -> None:
         start_pos = ((self.x+0.5)*CELL_SIZE, self.y*CELL_SIZE)
@@ -49,24 +51,29 @@ class Tower:
     def reset_delay(self):
         self.current_delay = self.attack_delay
 
-    def upgrade_next(self):
-        if self.upgrade_level == 0 and self.max_upgrade >= 1:
+    def upgrade_next(self, money):
+        if self.upgrade_level == 0 and 0 < self.upgrade_cost <= money:
+            cost = self.upgrade_cost
             self.upgrade1()
-            return True
-        elif self.upgrade_level == 1 and self.max_upgrade >= 2:
+            return cost
+        elif self.upgrade_level == 1 and 0 < self.upgrade_cost <= money:
+            cost = self.upgrade_cost
             self.upgrade2()
-            return True
-        elif self.upgrade_level == 2 and self.max_upgrade >= 3:
+            return cost
+        elif self.upgrade_level == 2 and 0 < self.upgrade_cost <= money:
+            cost = self.upgrade_cost
             self.upgrade3()
-            return True
-        elif self.upgrade_level == 3 and self.max_upgrade >= 4:
+            return cost
+        elif self.upgrade_level == 3 and 0 < self.upgrade_cost <= money:
+            cost = self.upgrade_cost
             self.upgrade4()
-            return True
-        elif self.upgrade_level == 4 and self.max_upgrade >= 5:
+            return cost
+        elif self.upgrade_level == 4 and 0 < self.upgrade_cost <= money:
+            cost = self.upgrade_cost
             self.upgrade5()
-            return True
+            return cost
         else:
-            return False
+            return 0
 
     def upgrade1(self):
         self.upgrade_level = 1
@@ -90,10 +97,27 @@ class Tower:
 class Warrior(Tower):
     def __init__(self) -> None:
         super().__init__()
-        self.max_upgrade = 3
+        self.upgrade_cost = 50
 
     def upgrade1(self):
-        return super().upgrade1()
+        super().upgrade1()
+        self.upgrade_cost = 200
+        self.range = 23
+        self.attack_delay = 16
+
+    def upgrade2(self):
+        super().upgrade2()
+        self.upgrade_cost = 500
+        self.damage = 2
+        self.range = 25
+
+    def upgrade3(self):
+        super().upgrade3()
+        self.upgrade_cost = 0
+        self.damage = 4
+        self.attack_delay = 10
+        self.range = 27
+
 
 class Archer(Tower):
     def __init__(self) -> None:
@@ -105,10 +129,19 @@ class Archer(Tower):
         self.range = 25
         self.color = COLOR.RED
         self.id = 2
-        self.max_upgrade = 3
+        self.upgrade_cost = 150
 
     def upgrade1(self):
-        return super().upgrade1()
+        super().upgrade1()
+        self.upgrade_cost = 350
+
+    def upgrade2(self):
+        super().upgrade2()
+        self.upgrade_cost = 1000
+
+    def upgrade3(self):
+        super().upgrade3()
+        self.upgrade_cost = 0
     
 
 class Deadeye(Tower):
@@ -122,10 +155,23 @@ class Deadeye(Tower):
         self.invisible_flag = True
         self.color = COLOR.GRAY
         self.id = 3
-        self.max_upgrade = 3
+        self.upgrade_cost = 400
 
     def upgrade1(self):
-        return super().upgrade1()
+        super().upgrade1()
+        self.upgrade_cost = 1000
+
+    def upgrade2(self):
+        super().upgrade2()
+        self.upgrade_cost = 2000
+
+    def upgrade3(self):
+        super().upgrade3()
+        self.upgrade_cost = 4000
+
+    def upgrade4(self):
+        super().upgrade4()
+        self.upgrade_cost = 0
 
 class Berserker(Tower):
     def __init__(self) -> None:
@@ -137,10 +183,23 @@ class Berserker(Tower):
         self.range = 10
         self.color = COLOR.BLUE
         self.id = 4
-        self.max_upgrade = 3
+        self.upgrade_cost = 200
 
     def upgrade1(self):
-        return super().upgrade1()
+        super().upgrade1()
+        self.upgrade_cost = 200
+
+    def upgrade2(self):
+        super().upgrade2()
+        self.upgrade_cost = 500
+
+    def upgrade3(self):
+        super().upgrade3()
+        self.upgrade_cost = 0
+
+    def upgrade4(self):
+        super().upgrade4()
+        self.upgrade_cost = 0
 
 class Assassin(Tower):
     def __init__(self) -> None:
@@ -154,10 +213,23 @@ class Assassin(Tower):
         self.invisible_flag = True
         self.color = COLOR.BLACK
         self.id = 5
-        self.max_upgrade = 3
+        self.upgrade_cost = 200
 
     def upgrade1(self):
-        return super().upgrade1()
+        super().upgrade1()
+        self.upgrade_cost = 200
+
+    def upgrade2(self):
+        super().upgrade2()
+        self.upgrade_cost = 500
+
+    def upgrade3(self):
+        super().upgrade3()
+        self.upgrade_cost = 0
+
+    def upgrade4(self):
+        super().upgrade4()
+        self.upgrade_cost = 0
 
 class Gunslinger(Tower):
     def __init__(self) -> None:
@@ -170,10 +242,27 @@ class Gunslinger(Tower):
         self.boss_flag = True
         self.color = COLOR.ORANGE
         self.id = 6
-        self.max_upgrade = 3
+        self.upgrade_cost = 200
 
     def upgrade1(self):
-        return super().upgrade1()
+        super().upgrade1()
+        self.upgrade_cost = 200
+
+    def upgrade2(self):
+        super().upgrade2()
+        self.upgrade_cost = 500
+
+    def upgrade3(self):
+        super().upgrade3()
+        self.upgrade_cost = 0
+
+    def upgrade4(self):
+        super().upgrade4()
+        self.upgrade_cost = 0
+
+    def upgrade5(self):
+        super().upgrade4()
+        self.upgrade_cost = 0
 
 class Dragoon(Tower):
     def __init__(self) -> None:
@@ -186,10 +275,27 @@ class Dragoon(Tower):
         self.metal_flag = True
         self.color = COLOR.PURPLE
         self.id = 7
-        self.max_upgrade = 3
+        self.upgrade_cost = 200
 
     def upgrade1(self):
-        return super().upgrade1()
+        super().upgrade1()
+        self.upgrade_cost = 200
+
+    def upgrade2(self):
+        super().upgrade2()
+        self.upgrade_cost = 500
+
+    def upgrade3(self):
+        super().upgrade3()
+        self.upgrade_cost = 0
+
+    def upgrade4(self):
+        super().upgrade4()
+        self.upgrade_cost = 0
+
+    def upgrade5(self):
+        super().upgrade4()
+        self.upgrade_cost = 0
 
 class Farm(Tower):
     def __init__(self) -> None:
@@ -198,13 +304,36 @@ class Farm(Tower):
         self.cost = 200
         self.damage = 0
         self.attack_delay = -1
-        self.range = -1
+        self.range = 3
         self.color = COLOR.WHITE
         self.id = 8
-        self.max_upgrade = 3
+        self.upgrade_cost = 200
+        self.money = 100
 
     def upgrade1(self):
-        return super().upgrade1()
+        super().upgrade1()
+        self.upgrade_cost = 200
+        self.money = 200
+
+    def upgrade2(self):
+        super().upgrade2()
+        self.upgrade_cost = 750
+        self.money = 500
+
+    def upgrade3(self):
+        super().upgrade3()
+        self.upgrade_cost = 2500
+        self.money = 1000
+
+    def upgrade4(self):
+        super().upgrade4()
+        self.upgrade_cost = 7500
+        self.money = 2000
+
+    def upgrade5(self):
+        super().upgrade5()
+        self.upgrade_cost = 15000
+        self.money = 5000
 
 if __name__ == "__main__":
     print(Warrior().color)

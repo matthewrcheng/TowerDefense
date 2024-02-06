@@ -26,6 +26,18 @@ def draw_polygon_alpha(surface, color, points):
     pygame.draw.polygon(shape_surf, color, [(x - min_x, y - min_y) for x, y in points])
     surface.blit(shape_surf, target_rect)
 
+def draw_enemy_bar(screen, enemy, font):
+    enemy_name_text = font.render(enemy.name, True, COLOR.WHITE)
+    screen.blit(enemy_name_text, (enemy.x * CELL_SIZE, enemy.y * CELL_SIZE - 20))
+
+    # Draw health bar
+    health_bar_rect = pygame.Rect(enemy.x * CELL_SIZE, enemy.y * CELL_SIZE - 10,
+                                  enemy.width * CELL_SIZE, 5)
+    pygame.draw.rect(screen, COLOR.GREEN, health_bar_rect)  # Assuming green for health
+    red_width = int((1 - enemy.health / enemy.max_health) * health_bar_rect.width)
+    red_part_rect = health_bar_rect.inflate(red_width, 0)
+    pygame.draw.rect(screen, COLOR.RED, red_part_rect)
+
 def find_target(tower, enemies, type=0):
     # distances = {
     #     k: np.sqrt(((enemy.x+(enemy.width//2))-tower.x)**2 +
@@ -117,7 +129,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
 
     placing_tower_rect = pygame.Rect(0,0,3*CELL_SIZE,3*CELL_SIZE)
     darken_screen_rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
-    menu_rect = pygame.Rect(50, 50, 300, 300)
+    menu_rect = pygame.Rect(150, 150, 300, 300)
     tower_display_rect = pygame.Rect(menu_rect.centerx - 50, menu_rect.centery - 50, 100, 100)
     tower_info_exit_button = pygame.Rect(menu_rect.right - 20, menu_rect.top, 20, 20)
     tower_info_upgrade_button = pygame.Rect(menu_rect.left + 20, menu_rect.bottom - 40, 100, 30)
@@ -160,6 +172,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
     enemy_num = 0
     towers = dict()
     enemies = dict()
+    farms = []
 
     # conversion
     tower_color = {0: map.background, 1:COLOR.GREEN, 2:COLOR.RED, 3:COLOR.PURPLE, 4:COLOR.BLUE, 5:COLOR.BLACK,
@@ -169,7 +182,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                return GameState.MENU
+                return GameState.MENU,False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if resume_button.collidepoint(event.pos):
                     paused = False
@@ -207,8 +220,10 @@ def game_screen(screen, map, WIDTH, HEIGHT):
                             tower_info_menu = False
                             print("Closed info menu")
                         elif tower_info_upgrade_button.collidepoint(event.pos):
-                            success = tower_info_menu.upgrade_next()
+                            cost = tower_info_menu.upgrade_next(money)
                             print("Attempted to upgrade")
+                            if cost:
+                                money -= cost
                         elif tower_info_target_button.collidepoint(event.pos):
                             tower_info_menu.targeting = target_cycle.get(tower_info_menu.targeting)
                             print("Attempted to change targeting")
@@ -218,6 +233,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
                                 tower_info_menu = tower
                                 print("Opened info menu")
                                 break
+                    
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     paused = True
@@ -355,13 +371,55 @@ def game_screen(screen, map, WIDTH, HEIGHT):
                     enemy_spawn_time = seed.get(level)[0][1]
                     enemy_timer = enemy_spawn_time
 
-            for row in range(GRID_HEIGHT):
-                for col in range(GRID_WIDTH):
-                    cell_value = grid[row, col]
-                    pygame.draw.rect(screen, tower_color[cell_value], (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+            pygame.draw.rect(screen, tower_color[0], (0, 0, WIDTH-SIDEBAR_WIDTH, HEIGHT))
+            # for row in range(GRID_HEIGHT):
+            #     for col in range(GRID_WIDTH):
+            #         cell_value = grid[row, col]
+            #         pygame.draw.rect(screen, tower_color[cell_value], (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
             for tower in towers.values():
                 pygame.draw.rect(screen, tower.color, tower.rect)
+
+            for tower in towers.values():
+                if tower.current_delay <= 0 and tower.damage:
+                    target = find_target(tower, enemies, tower.attack_type)
+                    if target:
+                        print(f"{tower.name} {tower.num} attacked {target.name} {target.num}!")
+                        if type(target) is list:
+                            total_damage = sum(min(tower.damage, t.health) for t in target)                            
+                        else:
+                            total_damage = min(tower.damage, target.health)
+                        money += total_damage
+                        killed = tower.attack(screen, target)
+                        tower.total_damage += total_damage
+                        if killed:
+                            killed.kill(grid)
+                            enemies.pop(killed.num)
+                else:
+                    tower.current_delay -= 1
+
+            to_remove = []
+            for k,enemy in enemies.items():
+                success = enemy.walk(grid)
+                if not success:
+                    health -= enemy.health
+                    enemy.kill(grid)
+                    to_remove.append(k)
+                else:
+                    pygame.draw.rect(screen, enemy.color, enemy.rect)
+                
+            if not placing and not tower_info_menu:
+                mouse_pos = pygame.mouse.get_pos()
+                for tower in towers.values():
+                    if tower.rect.collidepoint(mouse_pos):
+                        draw_circle_alpha(screen, COLOR.CAN_PLACE, (tower.x*CELL_SIZE, tower.y*CELL_SIZE), tower.range*CELL_SIZE)
+                for enemy in enemies.values():
+                    if enemy.rect.collidepoint(mouse_pos):
+                        draw_enemy_bar(screen, enemy, fonts)
+
+            
+            for k in to_remove:
+                enemies.pop(k)
 
             if tower_info_menu:
                 draw_rect_alpha(screen, COLOR.FADE, darken_screen_rect)
@@ -382,34 +440,9 @@ def game_screen(screen, map, WIDTH, HEIGHT):
                 pygame.draw.rect(screen, COLOR.FAINT, tower_info_target_button)
                 target_text = fonts.render(f"{tower_info_menu.targeting}", True, COLOR.BLACK)
                 screen.blit(target_text, (tower_info_target_button.x + 5, tower_info_target_button.y + 5))
+                total_damage_text = fonts.render(f"Total Damage: {tower_info_menu.total_damage}", True, COLOR.BLACK)
+                screen.blit(total_damage_text, (tower_display_rect.x, tower_display_rect.y + 100))
 
-            for tower in towers.values():
-                if tower.current_delay <= 0:
-                    target = find_target(tower, enemies, tower.attack_type)
-                    if target:
-                        if type(target) is list:
-                            money += sum(min(tower.damage, t.health) for t in target)
-                            killed = tower.attack(screen, target)
-                            tower.current_delay = tower.attack_delay
-                        print(f"{tower.name} {tower.num} attacked {target.name} {target.num}!")
-                        money += min(tower.damage, target.health)
-                        killed = tower.attack(screen, target)
-                        if killed:
-                            killed.kill(grid)
-                            enemies.pop(killed.num)
-                else:
-                    tower.current_delay -= 1
-
-            to_remove = []
-            for k,enemy in enemies.items():
-                success = enemy.walk(grid)
-                if not success:
-                    health -= enemy.health
-                    enemy.kill(grid)
-                    to_remove.append(k)
-            
-            for k in to_remove:
-                enemies.pop(k)
 
             enemy_timer-=1
 
@@ -447,6 +480,8 @@ def game_screen(screen, map, WIDTH, HEIGHT):
                 if valid and tower.cost <= money:
                     money -= tower.cost
                     towers[tower_num] = tower
+                    if type(tower) == Farm:
+                        farms.append(tower)
                     place_tower(grids, grid, tower, tower_num)
                     tower_num += 1
                     print(f"Placed new tower: {tower.name}, tower count: {len(towers)}")
@@ -455,7 +490,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
 
         if not seed.get(level) and not enemies:
             level += 1
-            money += 100 + int(level**1.5)
+            money += 100 + int(level**1.5) + sum(farm.money for farm in farms)
             enemy_spawn_time = None
 
         if level == 7:
