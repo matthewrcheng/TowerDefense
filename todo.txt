@@ -1,0 +1,5 @@
+1. Add sound
+2. Create more towers
+3. Create more enemies
+4. Create more difficulty seeds
+5. Playtest
