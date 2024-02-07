@@ -2,29 +2,10 @@ import pygame
 import numpy as np
 import random
 from constants import GRID_HEIGHT,GRID_WIDTH,CELL_SIZE,SIDEBAR_WIDTH
-from utils import COLOR, GameState, Map, Targeting
-from Tower import Tower, Warrior, Archer, Deadeye, Berserker, Assassin, Gunslinger, Dragoon, Farm
-from Enemy import Enemy, Basic, Speedy, Slow, Tough
+from utils import COLOR, GameState, Map, Targeting, draw_circle_alpha, draw_polygon_alpha, draw_rect_alpha
+from Tower import Tower, Warrior, Archer, Deadeye, Berserker, Assassin, Gunslinger, Dragoon, Farm, Electrocutioner
+# from Enemy import Enemy, , Speedy, Slow, Tough
 from enemy_seeds.normal import seed
-
-def draw_rect_alpha(surface, color, rect):
-    shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
-    pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
-    surface.blit(shape_surf, rect)
-
-def draw_circle_alpha(surface, color, center, radius):
-    target_rect = pygame.Rect(center, (0, 0)).inflate((radius * 2, radius * 2))
-    shape_surf = pygame.Surface(target_rect.size, pygame.SRCALPHA)
-    pygame.draw.circle(shape_surf, color, (radius, radius), radius)
-    surface.blit(shape_surf, target_rect)
-
-def draw_polygon_alpha(surface, color, points):
-    lx, ly = zip(*points)
-    min_x, min_y, max_x, max_y = min(lx), min(ly), max(lx), max(ly)
-    target_rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
-    shape_surf = pygame.Surface(target_rect.size, pygame.SRCALPHA)
-    pygame.draw.polygon(shape_surf, color, [(x - min_x, y - min_y) for x, y in points])
-    surface.blit(shape_surf, target_rect)
 
 def draw_enemy_bar(screen, enemy, font):
     enemy_name_text = font.render(enemy.name, True, COLOR.WHITE)
@@ -38,37 +19,37 @@ def draw_enemy_bar(screen, enemy, font):
     red_part_rect = health_bar_rect.inflate(red_width, 0)
     pygame.draw.rect(screen, COLOR.RED, red_part_rect)
 
-def find_target(tower, enemies, type=0):
-    # distances = {
-    #     k: np.sqrt(((enemy.x+(enemy.width//2))-tower.x)**2 +
-    #                ((enemy.y+(enemy.height//2))-tower.x)**2)
-    #     for k, enemy in enemies.items()
-    # }
-    distances = {
-        k: np.sqrt(((max(enemy.x, min(tower.x, enemy.x + enemy.width))) - tower.x) ** 2 +
-                   ((max(enemy.y, min(tower.y, enemy.y + enemy.height))) - tower.y) ** 2)
-        for k, enemy in enemies.items()
-    }
+# def find_target(tower, enemies, type=0):
+#     # distances = {
+#     #     k: np.sqrt(((enemy.x+(enemy.width//2))-tower.x)**2 +
+#     #                ((enemy.y+(enemy.height//2))-tower.x)**2)
+#     #     for k, enemy in enemies.items()
+#     # }
+#     distances = {
+#         k: np.sqrt(((max(enemy.x, min(tower.x, enemy.x + enemy.width))) - tower.x) ** 2 +
+#                    ((max(enemy.y, min(tower.y, enemy.y + enemy.height))) - tower.y) ** 2)
+#         for k, enemy in enemies.items()
+#     }
 
-    if not type:
-        targets_in_range = [k for k, distance in distances.items() if distance <= tower.range]
-        if targets_in_range:
-            if tower.targeting == Targeting.FIRST:
-                target_key = max(targets_in_range, key=lambda k: enemies[k].x)
-            elif tower.targeting == Targeting.STRONG:
-                target_key = max(targets_in_range, key=lambda k: enemies[k].health)
-            elif tower.targeting == Targeting.LAST:
-                target_key = min(targets_in_range, key=lambda k: enemies[k].x)
-            elif tower.targeting == Targeting.WEAK:
-                target_key = min(targets_in_range, key=lambda k: enemies[k].health)
-            else:
-                target_key = random.choice(targets_in_range)
-            return enemies[target_key]
-    else:
-        if type == 1:
-            return targets_in_range.values()
+#     if not type:
+#         targets_in_range = [k for k, distance in distances.items() if distance <= tower.range]
+#         if targets_in_range:
+#             if tower.targeting == Targeting.FIRST:
+#                 target_key = max(targets_in_range, key=lambda k: enemies[k].x)
+#             elif tower.targeting == Targeting.STRONG:
+#                 target_key = max(targets_in_range, key=lambda k: enemies[k].health)
+#             elif tower.targeting == Targeting.LAST:
+#                 target_key = min(targets_in_range, key=lambda k: enemies[k].x)
+#             elif tower.targeting == Targeting.WEAK:
+#                 target_key = min(targets_in_range, key=lambda k: enemies[k].health)
+#             else:
+#                 target_key = random.choice(targets_in_range)
+#             return enemies[target_key]
+#     else:
+#         if type == 1:
+#             return targets_in_range.values()
 
-    return None  # No target found within the tower's range
+#     return None  # No target found within the tower's range
 
 def validate_tower_placement(mouse_pos, selected_tower, grid, WIDTH, HEIGHT):
     extrax = selected_tower.width//2
@@ -144,6 +125,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
     gunslinger_button = pygame.Rect(WIDTH-125, 355, 100, 50)
     dragoon_button = pygame.Rect(WIDTH-125, 410, 100, 50)
     farm_button = pygame.Rect(WIDTH-125, 465, 100, 50)
+    electrocutioner_button = pygame.Rect(WIDTH-125, 520, 100, 50)
     warrior = Warrior()
     archer = Archer()
     deadeye = Deadeye()
@@ -152,6 +134,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
     gunslinger = Gunslinger()
     dragoon = Dragoon()
     farm = Farm()
+    electrocutioner = Electrocutioner()
 
     # States
     game_over = False
@@ -165,7 +148,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
     enemy_spawn_time = None
     autorun = False
     health = 100
-    money = 500
+    money = 5000 # 500
 
     # trackers
     tower_num = 0
@@ -182,6 +165,26 @@ def game_screen(screen, map, WIDTH, HEIGHT):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                # States
+                game_over = False
+                won = False
+                paused = False
+                placing = False
+                tower_info_menu = None
+                selected_tower = None
+                level = 1
+                enemy_timer = 0
+                enemy_spawn_time = None
+                autorun = False
+                health = 100
+                money = 500
+
+                # trackers
+                tower_num = 0
+                enemy_num = 0
+                towers = dict()
+                enemies = dict()
+                farms = []
                 return GameState.MENU,False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if resume_button.collidepoint(event.pos):
@@ -189,6 +192,26 @@ def game_screen(screen, map, WIDTH, HEIGHT):
                 elif pause_button.collidepoint(event.pos):
                     paused = True
                 elif quit_button.collidepoint(event.pos):  # Handle the "Quit" button
+                    # States
+                    game_over = False
+                    won = False
+                    paused = False
+                    placing = False
+                    tower_info_menu = None
+                    selected_tower = None
+                    level = 1
+                    enemy_timer = 0
+                    enemy_spawn_time = None
+                    autorun = False
+                    health = 100
+                    money = 500
+
+                    # trackers
+                    tower_num = 0
+                    enemy_num = 0
+                    towers = dict()
+                    enemies = dict()
+                    farms = []
                     return GameState.MENU,False
                 elif warrior_button.collidepoint(event.pos):
                     placing = True
@@ -214,6 +237,9 @@ def game_screen(screen, map, WIDTH, HEIGHT):
                 elif farm_button.collidepoint(event.pos):
                     placing = True
                     selected_tower = Farm
+                elif electrocutioner_button.collidepoint(event.pos):
+                    placing = True
+                    selected_tower = Electrocutioner
                 else:
                     if tower_info_menu:
                         if tower_info_exit_button.collidepoint(event.pos):
@@ -261,10 +287,33 @@ def game_screen(screen, map, WIDTH, HEIGHT):
                 elif event.key == pygame.K_8:
                     placing = True
                     selected_tower = Farm
+                elif event.key == pygame.K_9:
+                    placing = True
+                    selected_tower = Electrocutioner
                 elif event.key == pygame.K_q:
                     placing = False
 
         if health <= 0:
+            # States
+            game_over = False
+            won = False
+            paused = False
+            placing = False
+            tower_info_menu = None
+            selected_tower = None
+            level = 1
+            enemy_timer = 0
+            enemy_spawn_time = None
+            autorun = False
+            health = 100
+            money = 5000 # 500
+
+            # trackers
+            tower_num = 0
+            enemy_num = 0
+            towers = dict()
+            enemies = dict()
+            farms = []
             return GameState.MENU,won    
         
         pygame.display.set_caption(f"{map.name}: LEVEL {level}")
@@ -355,6 +404,13 @@ def game_screen(screen, map, WIDTH, HEIGHT):
             farm_cost = fonts.render(f"${farm.cost}", True, COLOR.BLACK) 
             screen.blit(farm_cost, (farm_button.x + 13, farm_button.y + 30))
 
+            # Farm
+            pygame.draw.rect(screen, COLOR.DARK_TEAL, electrocutioner_button)
+            electrocutioner_text = fonts.render("Electrocutioner", True, COLOR.WHITE)
+            screen.blit(electrocutioner_text, (electrocutioner_button.x + 13, electrocutioner_button.y + 10))
+            electrocutioner_cost = fonts.render(f"${electrocutioner.cost}", True, COLOR.WHITE) 
+            screen.blit(electrocutioner_cost, (electrocutioner_button.x + 13, electrocutioner_button.y + 30))
+
 
             if seed.get(level) and enemy_timer <= 0:
                 if enemy_spawn_time:
@@ -382,19 +438,21 @@ def game_screen(screen, map, WIDTH, HEIGHT):
 
             for tower in towers.values():
                 if tower.current_delay <= 0 and tower.damage:
-                    target = find_target(tower, enemies, tower.attack_type)
+                    target = tower.find_target(screen, enemies)
                     if target:
-                        print(f"{tower.name} {tower.num} attacked {target.name} {target.num}!")
+                        print(f"{tower.name} {tower.num} attacked!")
+                        print(target)
                         if type(target) is list:
                             total_damage = sum(min(tower.damage, t.health) for t in target)                            
                         else:
                             total_damage = min(tower.damage, target.health)
                         money += total_damage
-                        killed = tower.attack(screen, target)
+                        killed_list = tower.attack(screen, target)
                         tower.total_damage += total_damage
-                        if killed:
-                            killed.kill(grid)
-                            enemies.pop(killed.num)
+                        if killed_list:
+                            for killed in killed_list:
+                                killed.kill(grid)
+                                enemies.pop(killed.num)
                 else:
                     tower.current_delay -= 1
 
@@ -493,10 +551,30 @@ def game_screen(screen, map, WIDTH, HEIGHT):
             money += 100 + int(level**1.5) + sum(farm.money for farm in farms)
             enemy_spawn_time = None
 
-        if level == 7:
+        if level == 10:
             won = True
 
         pygame.display.flip()
         clock.tick(FPS)
     
+    # States
+    game_over = False
+    won = False
+    paused = False
+    placing = False
+    tower_info_menu = None
+    selected_tower = None
+    level = 1
+    enemy_timer = 0
+    enemy_spawn_time = None
+    autorun = False
+    health = 100
+    money = 500
+
+    # trackers
+    tower_num = 0
+    enemy_num = 0
+    towers = dict()
+    enemies = dict()
+    farms = []
     return GameState.MENU,won

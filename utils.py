@@ -1,4 +1,24 @@
+import pygame
 from enum import Enum
+
+def draw_rect_alpha(surface, color, rect):
+    shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
+    pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
+    surface.blit(shape_surf, rect)
+
+def draw_circle_alpha(surface, color, center, radius):
+    target_rect = pygame.Rect(center, (0, 0)).inflate((radius * 2, radius * 2))
+    shape_surf = pygame.Surface(target_rect.size, pygame.SRCALPHA)
+    pygame.draw.circle(shape_surf, color, (radius, radius), radius)
+    surface.blit(shape_surf, target_rect)
+
+def draw_polygon_alpha(surface, color, points):
+    lx, ly = zip(*points)
+    min_x, min_y, max_x, max_y = min(lx), min(ly), max(lx), max(ly)
+    target_rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
+    shape_surf = pygame.Surface(target_rect.size, pygame.SRCALPHA)
+    pygame.draw.polygon(shape_surf, color, [(x - min_x, y - min_y) for x, y in points])
+    surface.blit(shape_surf, target_rect)
 
 class Direction:
     up = (0,-1)
@@ -48,6 +68,8 @@ class COLOR:
     CAN_PLACE = (255,255,255,80)
     CANT_PLACE = (128,0,0,80)
     FADE = (0, 0, 0, 80)
+    FAINT_BLUE = (0, 0, 128, 80)
+    FAINT_DARK_PURPLE = (64, 0, 64, 80)
 
 class GameState(Enum):
     MENU = 0

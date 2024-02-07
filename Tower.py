@@ -1,6 +1,9 @@
 import pygame.draw
+import copy
+from numpy import sqrt
+from random import choice
 from Enemy import Enemy
-from utils import COLOR,Targeting
+from utils import COLOR,Targeting,draw_circle_alpha
 from constants import CELL_SIZE
 
 class Tower:
@@ -43,13 +46,36 @@ class Tower:
         end_pos = ((enemy.x + 0.5 + enemy.width // 2)*CELL_SIZE, (enemy.y + enemy.height // 2)*CELL_SIZE)
         pygame.draw.line(screen, self.attack_color, start_pos, end_pos, 2)
         self.current_delay = self.attack_delay
-        return enemy.damage(self.damage)
+        killed = enemy.damage(self.damage)
+        if killed:
+            return [killed]
+        return None
+    
+    def find_target(self, screen, enemies):
+        distances = {
+            k: sqrt(((max(enemy.x, min(self.x, enemy.x + enemy.width))) - self.x) ** 2 +
+                    ((max(enemy.y, min(self.y, enemy.y + enemy.height))) - self.y) ** 2)
+            for k, enemy in enemies.items()
+        }
+
+        targets_in_range = [k for k, distance in distances.items() if distance <= self.range]
+        if targets_in_range:
+            if self.targeting == Targeting.FIRST:
+                target_key = max(targets_in_range, key=lambda k: enemies[k].x)
+            elif self.targeting == Targeting.STRONG:
+                target_key = max(targets_in_range, key=lambda k: enemies[k].health)
+            elif self.targeting == Targeting.LAST:
+                target_key = min(targets_in_range, key=lambda k: enemies[k].x)
+            elif self.targeting == Targeting.WEAK:
+                target_key = min(targets_in_range, key=lambda k: enemies[k].health)
+            else:
+                target_key = choice(targets_in_range)
+            return enemies[target_key]
+
+        return None  # No target found within the tower's range
         
     def set_targeting(self, targeting: Targeting):
         self.targeting = targeting
-
-    def reset_delay(self):
-        self.current_delay = self.attack_delay
 
     def upgrade_next(self, money):
         if self.upgrade_level == 0 and 0 < self.upgrade_cost <= money:
@@ -178,12 +204,51 @@ class Berserker(Tower):
         super().__init__()
         self.name = 'Berserker'
         self.cost = 800
-        self.damage = 10
+        self.damage = 1
+        self.delay_changes = {6: 30, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
+        self.range_changes = {15: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11, 11: 12, 12: 13, 13: 14, 14: 15} # {30: 3, 3: 6, 6: 9, 9: 12, 12: 15, 15: 18, 18: 21, 21: 24, 24: 27, 27: 30}
         self.attack_delay = 30
         self.range = 10
+        self.temp_range = 6
         self.color = COLOR.BLUE
         self.id = 4
         self.upgrade_cost = 200
+        self.attack_color = COLOR.FAINT_BLUE
+
+    def attack_round(self, screen):
+        draw_circle_alpha(screen, self.attack_color, (self.x*CELL_SIZE, self.y*CELL_SIZE), self.temp_range*CELL_SIZE)
+        self.temp_range = self.range_changes.get(self.temp_range)
+        self.attack_delay = self.delay_changes.get(self.temp_range)
+        self.current_delay = self.attack_delay
+
+    def attack(self, screen, enemies: list) -> list:
+        self.attack_round(screen)
+
+        killed_list = []
+        for enemy in enemies:
+            killed = enemy.damage(self.damage)
+            if killed:
+                killed_list.append(killed)
+        return killed_list
+    
+    def find_target(self, screen, enemies):
+        # distances = {
+        #     k: sqrt(((max(enemy.x, min(self.x, enemy.x + enemy.width))) - self.x) ** 2 +
+        #             ((max(enemy.y, min(self.y, enemy.y + enemy.height))) - self.y) ** 2)
+        #     for k, enemy in enemies.items()
+        # }
+        targets_in_range = [enemy for k, enemy in enemies.items() if sqrt(((max(enemy.x, min(self.x, enemy.x + enemy.width))) - self.x) ** 2 +
+                    ((max(enemy.y, min(self.y, enemy.y + enemy.height))) - self.y) ** 2) <= self.range]
+
+        # targets_in_range = [k for k, distance in distances.items() if distance <= self.range]
+
+        if targets_in_range:
+            return targets_in_range
+
+        if self.temp_range != 6:
+            self.attack_round(screen)
+
+        return None  # No target found within the tower's range
 
     def upgrade1(self):
         super().upgrade1()
@@ -271,11 +336,62 @@ class Dragoon(Tower):
         self.cost = 1500
         self.damage = 10
         self.attack_delay = 60
+        self.attack_radius = 5
         self.range = 32
         self.metal_flag = True
         self.color = COLOR.PURPLE
+        self.attack_color = COLOR.DARK_PURPLE
         self.id = 7
         self.upgrade_cost = 200
+
+    def attack(self, screen, enemies: list) -> None:
+        enemy = enemies[0]
+        start_pos = ((self.x+0.5)*CELL_SIZE, self.y*CELL_SIZE)
+        end_pos = ((enemy.x + 0.5 + enemy.width // 2)*CELL_SIZE, (enemy.y + enemy.height // 2)*CELL_SIZE)
+        pygame.draw.line(screen, self.attack_color, start_pos, end_pos, 2)
+        draw_circle_alpha(screen, self.attack_color, end_pos, self.attack_radius*CELL_SIZE)
+        self.current_delay = self.attack_delay
+        killed_list = []
+        for enemy in enemies:
+            killed = enemy.damage(self.damage)
+            if killed:
+                killed_list.append(killed)
+        return killed_list
+
+    def find_target(self, screen, enemies):
+        distances = {
+            k: sqrt(((max(enemy.x, min(self.x, enemy.x + enemy.width))) - self.x) ** 2 +
+                    ((max(enemy.y, min(self.y, enemy.y + enemy.height))) - self.y) ** 2)
+            for k, enemy in enemies.items()
+        }
+        target = None
+
+        targets_in_range = [k for k, distance in distances.items() if distance <= self.range]
+        if targets_in_range:
+            if self.targeting == Targeting.FIRST:
+                target_key = max(targets_in_range, key=lambda k: enemies[k].x)
+            elif self.targeting == Targeting.STRONG:
+                target_key = max(targets_in_range, key=lambda k: enemies[k].health)
+            elif self.targeting == Targeting.LAST:
+                target_key = min(targets_in_range, key=lambda k: enemies[k].x)
+            elif self.targeting == Targeting.WEAK:
+                target_key = min(targets_in_range, key=lambda k: enemies[k].health)
+            else:
+                target_key = choice(targets_in_range)
+            target = enemies[target_key]
+        if target:
+            targets = [target]
+            targetx = target.x + target.width // 2
+            targety = target.y + target.height // 2
+            new_distances = {
+                k: sqrt(((max(enemy.x, min(targetx, enemy.x + enemy.width))) - targetx) ** 2 +
+                        ((max(enemy.y, min(targety, enemy.y + enemy.height))) - targety) ** 2)
+                for k, enemy in enemies.items()
+            }
+            new_targets_in_range = [k for k, distance in new_distances.items() if distance <= self.attack_radius and k != target.num]
+            return targets + [enemies[k] for k in new_targets_in_range]
+
+        return None  # No target found within the tower's range
 
     def upgrade1(self):
         super().upgrade1()
@@ -334,6 +450,107 @@ class Farm(Tower):
         super().upgrade5()
         self.upgrade_cost = 15000
         self.money = 5000
+
+class Electrocutioner(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Electrocutioner"
+        self.cost = 750
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 8
+        self.range = 15
+        self.color = COLOR.DARK_TEAL
+        self.attack_color = COLOR.TEAL
+        self.id = 9
+        self.upgrade_cost = 200
+
+    def attack(self, screen, enemies: list) -> None:
+        enemy = enemies[0]
+        start_pos = ((self.x+0.5)*CELL_SIZE, self.y*CELL_SIZE)
+        killed_list = []
+        for enemy in enemies:
+            enemy.current_delay += 10
+            end_pos = ((enemy.x + 0.5 + enemy.width // 2)*CELL_SIZE, (enemy.y + enemy.height // 2)*CELL_SIZE)
+            pygame.draw.line(screen, self.attack_color, start_pos, end_pos, 2)
+            killed = enemy.damage(self.damage)
+            if killed:
+                killed_list.append(killed)
+            start_pos = end_pos
+        self.current_delay = self.attack_delay
+        return killed_list
+
+    def find_target(self, screen, enemies):
+        enemies = copy.deepcopy(enemies)
+        print("Finding target")
+        distances = {
+            k: sqrt(((max(enemy.x, min(self.x, enemy.x + enemy.width))) - self.x) ** 2 +
+                    ((max(enemy.y, min(self.y, enemy.y + enemy.height))) - self.y) ** 2)
+            for k, enemy in enemies.items()
+        }
+        target = None
+
+        targets_in_range = [k for k, distance in distances.items() if distance <= self.range]
+        if targets_in_range:
+            if self.targeting == Targeting.FIRST:
+                target_key = max(targets_in_range, key=lambda k: enemies[k].x)
+            elif self.targeting == Targeting.STRONG:
+                target_key = max(targets_in_range, key=lambda k: enemies[k].health)
+            elif self.targeting == Targeting.LAST:
+                target_key = min(targets_in_range, key=lambda k: enemies[k].x)
+            elif self.targeting == Targeting.WEAK:
+                target_key = min(targets_in_range, key=lambda k: enemies[k].health)
+            else:
+                target_key = choice(targets_in_range)
+            target = enemies[target_key]
+            print(f"Found target {target.num}")
+            enemies.pop(target_key)
+        if target:
+            targets = [target]
+            done = False
+            while not done and len(enemies):
+                targetx = target.x + target.width // 2
+                targety = target.y + target.height // 2
+                new_distances = {
+                    k: sqrt(((max(enemy.x, min(targetx, enemy.x + enemy.width))) - targetx) ** 2 +
+                            ((max(enemy.y, min(targety, enemy.y + enemy.height))) - targety) ** 2)
+                    for k, enemy in enemies.items() if k != target.num
+                }
+                if new_distances:
+                    closest = min(new_distances, key=new_distances.get)
+                    if new_distances[closest] <= self.attack_radius:
+                        target = enemies[closest]
+                        print(f"Found target {target.num}")
+                        targets.append(target)
+                        enemies.pop(target.num)
+                    else:
+                        done = True
+                else:
+                    done = True
+            return targets
+
+        return None  # No target found within the tower's range
+
+
+    def upgrade1(self):
+        super().upgrade1()
+        self.upgrade_cost = 200
+
+    def upgrade2(self):
+        super().upgrade2()
+        self.upgrade_cost = 500
+
+    def upgrade3(self):
+        super().upgrade3()
+        self.upgrade_cost = 0
+
+    def upgrade4(self):
+        super().upgrade4()
+        self.upgrade_cost = 0
+
+    def upgrade5(self):
+        super().upgrade4()
+        self.upgrade_cost = 0
 
 if __name__ == "__main__":
     print(Warrior().color)

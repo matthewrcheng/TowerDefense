@@ -7,7 +7,7 @@ class Enemy:
     """
 
     def __init__(self) -> None:
-        self.name = "Basic"
+        self.name = "Pirate"
         self.speed_delay = 5
         self.max_health = 5
         self.health = self.max_health
@@ -73,34 +73,34 @@ class Enemy:
     def __str__(self):
         return self.name
 
-class Basic(Enemy):
+class Pirate(Enemy):
     def __init__(self) -> None:
         super().__init__()
 
-class Speedy(Enemy):
+class Bandit(Enemy):
     def __init__(self) -> None:
         super().__init__()
-        self.name = "Speedy"
+        self.name = "Bandit"
         self.speed_delay = 3
         self.max_health = 3
         self.health = self.max_health
         self.color = COLOR.DARK_BLUE
         self.id = 102
 
-class Slow(Enemy):
+class Thug(Enemy):
     def __init__(self) -> None:
         super().__init__()
-        self.name = "Slow"
+        self.name = "Thug"
         self.speed_delay = 8
         self.max_health = 8
         self.health = self.max_health
         self.color = COLOR.DARK_RED
         self.id = 103
 
-class Tough(Enemy):
+class Brute(Enemy):
     def __init__(self) -> None:
         super().__init__()
-        self.name = "Tough"
+        self.name = "Brute"
         self.speed_delay = 8
         self.max_health = 40
         self.health = self.max_health
@@ -130,10 +130,10 @@ class Phantom(Enemy):
         self.color = COLOR.WHITE
         self.id = 106
 
-class Metallic(Enemy):
+class Armored(Enemy):
     def __init__(self) -> None:
         super().__init__()
-        self.name = "Metallic"
+        self.name = "Armored"
         self.speed_delay = 8
         self.max_health = 60
         self.health = self.max_health
@@ -141,10 +141,10 @@ class Metallic(Enemy):
         self.color = COLOR.GRAY
         self.id = 107
 
-class Airborne(Enemy):
+class Paratrooper(Enemy):
     def __init__(self) -> None:
         super().__init__()
-        self.name = "Airborne"
+        self.name = "Paratrooper"
         self.speed_delay = 4
         self.max_health = 30
         self.health = self.max_health
@@ -152,10 +152,10 @@ class Airborne(Enemy):
         self.color = COLOR.LIGHT_BLUE
         self.id = 108
 
-class FlyBot(Enemy):
+class Drone(Enemy):
     def __init__(self) -> None:
         super().__init__()
-        self.name = "FlyBot"
+        self.name = "Drone"
         self.speed_delay = 7
         self.max_health = 250
         self.health = self.max_health
@@ -189,15 +189,114 @@ class UFO(Enemy):
         self.color = COLOR.LIGHT_GRAY
         self.id = 111
 
-class Captain(Enemy):
+class Juggernaut(Enemy):
     def __init__(self) -> None:
         super().__init__()
-        self.name = "Captain"
+        self.name = "Juggernaut"
+        self.speed_delay = 5
+        self.max_health = 1000
+        self.health = self.max_health
+        self.color = COLOR.DARK_GREEN
+        self.id = 112
+
+class Marauder(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Marauder"
+        self.speed_delay = 3
+        self.max_health = 250
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_GRAY
+        self.id = 113
+
+class Smuggler(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Smuggler"
+        self.speed_delay = 2
+        self.max_health = 100
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_GRAY
+        self.id = 114
+
+class Raider(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Raider"
+        self.speed_delay = 3
+        self.max_health = 1000
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_GRAY
+        self.id = 115
+
+class Saboteur(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Saboteur"
+        self.speed_delay = 5
+        self.max_health = 250
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_GRAY
+        self.id = 116
+
+class Hooligan(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Hooligan"
+        self.speed_delay = 8
+        self.max_health = 500
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_GRAY
+        self.id = 117
+
+class PirateGunner(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Pirate Gunner"
         self.max_health = 100
         self.health = self.max_health
         self.boss_flag = True
         self.color = COLOR.DARK_GREEN
-        self.id = 112
+        self.id = 118
+        self.height = 3
+        self.width = 4
+
+class PirateMate(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Pirate Mate"
+        self.max_health = 200
+        self.health = self.max_health
+        self.invisible_flag = True
+        self.boss_flag = True
+        self.color = COLOR.PURPLE
+        self.id = 119
+        self.height = 3
+        self.width = 4
+
+class PirateCaptain(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Pirate Captain"
+        self.max_health = 200
+        self.health = self.max_health
+        self.invisible_flag = True
+        self.boss_flag = True
+        self.color = COLOR.PURPLE
+        self.id = 120
+        self.height = 3
+        self.width = 4
+
+class DreadPirate(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Dread Pirate"
+        self.max_health = 200
+        self.health = self.max_health
+        self.invisible_flag = True
+        self.boss_flag = True
+        self.color = COLOR.PURPLE
+        self.id = 121
         self.height = 3
         self.width = 4
 
@@ -210,6 +309,19 @@ class GhostPirate(Enemy):
         self.invisible_flag = True
         self.boss_flag = True
         self.color = COLOR.PURPLE
-        self.id = 113
+        self.id = 122
+        self.height = 3
+        self.width = 4
+
+class BruteEnforcer(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Brute Enforcer"
+        self.max_health = 200
+        self.health = self.max_health
+        self.invisible_flag = True
+        self.boss_flag = True
+        self.color = COLOR.PURPLE
+        self.id = 123
         self.height = 3
         self.width = 4
