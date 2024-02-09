@@ -458,7 +458,7 @@ class Electrocutioner(Tower):
         self.cost = 750
         self.damage = 1
         self.attack_delay = 60
-        self.attack_radius = 8
+        self.attack_radius = 5
         self.range = 15
         self.color = COLOR.DARK_TEAL
         self.attack_color = COLOR.TEAL
@@ -481,12 +481,12 @@ class Electrocutioner(Tower):
         return killed_list
 
     def find_target(self, screen, enemies):
-        enemies = copy.deepcopy(enemies)
+        temp_enemies = copy.deepcopy(enemies)
         print("Finding target")
         distances = {
             k: sqrt(((max(enemy.x, min(self.x, enemy.x + enemy.width))) - self.x) ** 2 +
                     ((max(enemy.y, min(self.y, enemy.y + enemy.height))) - self.y) ** 2)
-            for k, enemy in enemies.items()
+            for k, enemy in temp_enemies.items()
         }
         target = None
 
@@ -504,17 +504,17 @@ class Electrocutioner(Tower):
                 target_key = choice(targets_in_range)
             target = enemies[target_key]
             print(f"Found target {target.num}")
-            enemies.pop(target_key)
+            temp_enemies.pop(target_key)
         if target:
             targets = [target]
             done = False
-            while not done and len(enemies):
+            while not done and len(temp_enemies):
                 targetx = target.x + target.width // 2
                 targety = target.y + target.height // 2
                 new_distances = {
                     k: sqrt(((max(enemy.x, min(targetx, enemy.x + enemy.width))) - targetx) ** 2 +
                             ((max(enemy.y, min(targety, enemy.y + enemy.height))) - targety) ** 2)
-                    for k, enemy in enemies.items() if k != target.num
+                    for k, enemy in temp_enemies.items() if k != target.num
                 }
                 if new_distances:
                     closest = min(new_distances, key=new_distances.get)
@@ -522,7 +522,7 @@ class Electrocutioner(Tower):
                         target = enemies[closest]
                         print(f"Found target {target.num}")
                         targets.append(target)
-                        enemies.pop(target.num)
+                        temp_enemies.pop(target.num)
                     else:
                         done = True
                 else:
