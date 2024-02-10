@@ -51,6 +51,11 @@ class Tower:
             return [killed]
         return None
     
+    def can_attack(self, enemy: Enemy):
+        if enemy.invisible_flag or enemy.air_flag or enemy.metal_flag:
+            return False
+        return True
+
     def find_target(self, screen, enemies):
         distances = {
             k: sqrt(((max(enemy.x, min(self.x, enemy.x + enemy.width))) - self.x) ** 2 +
@@ -58,7 +63,7 @@ class Tower:
             for k, enemy in enemies.items()
         }
 
-        targets_in_range = [k for k, distance in distances.items() if distance <= self.range]
+        targets_in_range = [k for k, distance in distances.items() if distance <= self.range and self.can_attack(enemies[k])]
         if targets_in_range:
             if self.targeting == Targeting.FIRST:
                 target_key = max(targets_in_range, key=lambda k: enemies[k].x)
@@ -153,6 +158,7 @@ class Archer(Tower):
         self.damage = 2
         self.attack_delay = 45
         self.range = 25
+        self.air_flag = True
         self.color = COLOR.RED
         self.id = 2
         self.upgrade_cost = 150
@@ -160,14 +166,21 @@ class Archer(Tower):
     def upgrade1(self):
         super().upgrade1()
         self.upgrade_cost = 350
+        self.damage = 3
+        self.attack_delay = 35
+        self.range = 30
 
     def upgrade2(self):
         super().upgrade2()
         self.upgrade_cost = 1000
+        self.damage = 7
 
     def upgrade3(self):
         super().upgrade3()
         self.upgrade_cost = 0
+        self.damage = 25
+        self.attack_delay = 45
+        self.range = 35
     
 
 class Deadeye(Tower):
@@ -179,25 +192,39 @@ class Deadeye(Tower):
         self.attack_delay = 120
         self.range = 45
         self.invisible_flag = True
+        self.air_flag = True
         self.color = COLOR.GRAY
         self.id = 3
         self.upgrade_cost = 400
 
+    def can_attack(self, enemy: Enemy):
+        if enemy.metal_flag:
+            return False
+        return True
+
     def upgrade1(self):
         super().upgrade1()
         self.upgrade_cost = 1000
+        self.damage = 15
+        self.attack_delay = 110
 
     def upgrade2(self):
         super().upgrade2()
         self.upgrade_cost = 2000
+        self.damage = 35
+        self.attack_delay = 95
 
     def upgrade3(self):
         super().upgrade3()
         self.upgrade_cost = 4000
+        self.damage = 50
+        self.attack_delay = 65
 
     def upgrade4(self):
         super().upgrade4()
         self.upgrade_cost = 0
+        self.damage = 250
+        self.attack_delay = 90
 
 class Berserker(Tower):
     def __init__(self) -> None:
@@ -205,9 +232,9 @@ class Berserker(Tower):
         self.name = 'Berserker'
         self.cost = 800
         self.damage = 1
-        self.delay_changes = {6: 30, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
-        self.range_changes = {15: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11, 11: 12, 12: 13, 13: 14, 14: 15} # {30: 3, 3: 6, 6: 9, 9: 12, 12: 15, 15: 18, 18: 21, 21: 24, 24: 27, 27: 30}
-        self.attack_delay = 30
+        self.delay_changes = {6: 30, 7: 0, 8: 0, 9: 0, 10: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
+        self.range_changes = {10: 6, 6: 7, 7: 8, 8: 9, 9: 10} # {30: 3, 3: 6, 6: 9, 9: 12, 12: 15, 15: 18, 18: 21, 21: 24, 24: 27, 27: 30}
+        self.attack_delay = 45
         self.range = 10
         self.temp_range = 6
         self.color = COLOR.BLUE
@@ -237,7 +264,7 @@ class Berserker(Tower):
         #             ((max(enemy.y, min(self.y, enemy.y + enemy.height))) - self.y) ** 2)
         #     for k, enemy in enemies.items()
         # }
-        targets_in_range = [enemy for k, enemy in enemies.items() if sqrt(((max(enemy.x, min(self.x, enemy.x + enemy.width))) - self.x) ** 2 +
+        targets_in_range = [enemy for k, enemy in enemies.items() if self.can_attack(enemy) and sqrt(((max(enemy.x, min(self.x, enemy.x + enemy.width))) - self.x) ** 2 +
                     ((max(enemy.y, min(self.y, enemy.y + enemy.height))) - self.y) ** 2) <= self.range]
 
         # targets_in_range = [k for k, distance in distances.items() if distance <= self.range]
@@ -252,19 +279,29 @@ class Berserker(Tower):
 
     def upgrade1(self):
         super().upgrade1()
-        self.upgrade_cost = 200
+        self.upgrade_cost = 500
+        self.delay_changes = {6: 30, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
+        self.range_changes = {12: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11, 11: 12} # {30: 3, 3: 6, 6: 9, 9: 12, 12: 15, 15: 18, 18: 21, 21: 24, 24: 27, 27: 30}
 
     def upgrade2(self):
         super().upgrade2()
-        self.upgrade_cost = 500
+        self.upgrade_cost = 3500
+        self.attack_delay = 40
+        self.range = 12
 
     def upgrade3(self):
         super().upgrade3()
-        self.upgrade_cost = 0
+        self.upgrade_cost = 7000
+        self.damage = 2
+        self.delay_changes = {6: 30, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
+        self.range_changes = {15: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11, 11: 12, 12: 13, 13: 14, 14: 15} # {30: 3, 3: 6, 6: 9, 9: 12, 12: 15, 15: 18, 18: 21, 21: 24, 24: 27, 27: 30}
 
     def upgrade4(self):
         super().upgrade4()
         self.upgrade_cost = 0
+        self.damage = 5
+        self.delay_changes = {6: 30, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
+        self.range_changes = {20: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20} # {30: 3, 3: 6, 6: 9, 9: 12, 12: 15, 15: 18, 18: 21, 21: 24, 24: 27, 27: 30}
 
 class Assassin(Tower):
     def __init__(self) -> None:
@@ -275,26 +312,39 @@ class Assassin(Tower):
         self.attack_delay = 10
         self.invisible_flag = True
         self.range = 15
-        self.invisible_flag = True
         self.color = COLOR.BLACK
         self.id = 5
-        self.upgrade_cost = 200
+        self.upgrade_cost = 100
+
+    def can_attack(self, enemy: Enemy):
+        if enemy.air_flag or enemy.metal_flag:
+            return False
+        return True
 
     def upgrade1(self):
         super().upgrade1()
-        self.upgrade_cost = 200
+        self.upgrade_cost = 500
+        self.range = 17
+        self.attack_delay = 9
 
     def upgrade2(self):
         super().upgrade2()
-        self.upgrade_cost = 500
+        self.upgrade_cost = 2000
+        self.damage = 2
+        self.attack_delay = 8
 
     def upgrade3(self):
         super().upgrade3()
-        self.upgrade_cost = 0
+        self.upgrade_cost = 4000
+        self.damage = 4
+        self.range = 20
+        self.attack_delay = 7
 
     def upgrade4(self):
         super().upgrade4()
         self.upgrade_cost = 0
+        self.damage = 8
+        self.attack_delay = 3
 
 class Gunslinger(Tower):
     def __init__(self) -> None:
@@ -344,6 +394,11 @@ class Dragoon(Tower):
         self.id = 7
         self.upgrade_cost = 200
 
+    def can_attack(self, enemy: Enemy):
+        if enemy.invisible_flag or enemy.air_flag:
+            return False
+        return True
+
     def attack(self, screen, enemies: list) -> None:
         enemy = enemies[0]
         start_pos = ((self.x+0.5)*CELL_SIZE, self.y*CELL_SIZE)
@@ -366,7 +421,7 @@ class Dragoon(Tower):
         }
         target = None
 
-        targets_in_range = [k for k, distance in distances.items() if distance <= self.range]
+        targets_in_range = [k for k, distance in distances.items() if distance <= self.range and self.can_attack(enemies[k])]
         if targets_in_range:
             if self.targeting == Targeting.FIRST:
                 target_key = max(targets_in_range, key=lambda k: enemies[k].x)
@@ -460,10 +515,16 @@ class Electrocutioner(Tower):
         self.attack_delay = 60
         self.attack_radius = 5
         self.range = 15
+        self.metal_flag = True
         self.color = COLOR.DARK_TEAL
         self.attack_color = COLOR.TEAL
         self.id = 9
         self.upgrade_cost = 200
+
+    def can_attack(self, enemy: Enemy):
+        if enemy.invisible_flag or enemy.air_flag:
+            return False
+        return True
 
     def attack(self, screen, enemies: list) -> None:
         enemy = enemies[0]

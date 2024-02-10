@@ -148,7 +148,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
     enemy_spawn_time = None
     autorun = False
     health = 100
-    money = 5000 # 500
+    money = 500 # 500
 
     # trackers
     tower_num = 0
@@ -551,7 +551,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
             money += 100 + int(level**1.5) + sum(farm.money for farm in farms)
             enemy_spawn_time = None
 
-        if level == 10:
+        if level == 16:
             won = True
 
         pygame.display.flip()
