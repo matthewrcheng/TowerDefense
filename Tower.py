@@ -1,10 +1,10 @@
-import pygame.draw
+import pygame
 import copy
 from numpy import sqrt
 from random import choice
 from Enemy import Enemy
-from utils import COLOR,Targeting,draw_circle_alpha
-from constants import CELL_SIZE
+from utils import COLOR,Targeting,draw_circle_alpha,Unicode
+from constants import CELL_SIZE,FPS
 
 class Tower:
     """Base Tower Class
@@ -19,7 +19,7 @@ class Tower:
         self.invisible_flag = False     # camo
         self.metal_flag = False         # lead
         self.air_flag = False           # flying
-        self.boss_flag = False          # blimp
+        self.boss_multiplier = 0          # blimp
         self.color = COLOR.GREEN        # look
         self.current_delay = self.attack_delay # attack delay counter
         self.width = 3                  # number of cells wide
@@ -32,7 +32,23 @@ class Tower:
         self.upgrade_cost = 0
         self.rect = pygame.Rect(0, 0, self.width * CELL_SIZE, self.height * CELL_SIZE)
         self.total_damage = 0
-        # self.attack_sound = pygame.mixer.Sound('sounds/temp.ogg')
+        self.attack_size = 2
+        self.attack_sound = pygame.mixer.Sound('sounds/throw.ogg')
+
+    @property
+    def info(self):
+        first_line = ""
+        if self.invisible_flag:
+            first_line += Unicode.invisible_detection  
+        if self.metal_flag:
+            first_line += Unicode.metal
+        if self.air_flag:
+            first_line += Unicode.air 
+        if self.boss_multiplier:
+            first_line += Unicode.boss
+        if first_line:
+            first_line += "\n"
+        return f"{first_line}{Unicode.damage} {self.damage}\n{Unicode.delay} {round(self.attack_delay/FPS, 2)}\n{Unicode.range} {self.range}"
 
     def place(self, x, y, num) -> None:
         self.x = x
@@ -44,15 +60,23 @@ class Tower:
     def attack(self, screen, enemy: Enemy) -> None:
         start_pos = ((self.x+0.5)*CELL_SIZE, self.y*CELL_SIZE)
         end_pos = ((enemy.x + 0.5 + enemy.width // 2)*CELL_SIZE, (enemy.y + enemy.height // 2)*CELL_SIZE)
-        pygame.draw.line(screen, self.attack_color, start_pos, end_pos, 2)
+        self.attack_sound.play()
+        pygame.draw.line(screen, self.attack_color, start_pos, end_pos, self.attack_size)
         self.current_delay = self.attack_delay
-        killed = enemy.damage(self.damage)
+        damage = self.damage
+        if enemy.boss_flag:
+            damage *= self.boss_multiplier
+        killed = enemy.damage(damage)
         if killed:
             return [killed]
         return None
     
     def can_attack(self, enemy: Enemy):
-        if enemy.invisible_flag or enemy.air_flag or enemy.metal_flag:
+        if enemy.invisible_flag and not self.invisible_flag:
+            return False
+        if enemy.air_flag and not self.air_flag:
+            return False
+        if enemy.metal_flag and not self.metal_flag:
             return False
         return True
 
@@ -148,6 +172,8 @@ class Warrior(Tower):
         self.damage = 4
         self.attack_delay = 10
         self.range = 27
+        self.invisible_flag = True
+        self.attack_sound = pygame.mixer.Sound('sounds/auto.ogg')
 
 
 class Archer(Tower):
@@ -162,6 +188,7 @@ class Archer(Tower):
         self.color = COLOR.RED
         self.id = 2
         self.upgrade_cost = 150
+        self.attack_sound = pygame.mixer.Sound('sounds/hit1.ogg')
 
     def upgrade1(self):
         super().upgrade1()
@@ -196,11 +223,7 @@ class Deadeye(Tower):
         self.color = COLOR.GRAY
         self.id = 3
         self.upgrade_cost = 400
-
-    def can_attack(self, enemy: Enemy):
-        if enemy.metal_flag:
-            return False
-        return True
+        self.attack_sound = pygame.mixer.Sound('sounds/hit3.ogg')
 
     def upgrade1(self):
         super().upgrade1()
@@ -213,6 +236,7 @@ class Deadeye(Tower):
         self.upgrade_cost = 2000
         self.damage = 35
         self.attack_delay = 95
+        self.attack_size = 3
 
     def upgrade3(self):
         super().upgrade3()
@@ -225,6 +249,8 @@ class Deadeye(Tower):
         self.upgrade_cost = 0
         self.damage = 250
         self.attack_delay = 90
+        self.attack_size = 4
+        self.metal_flag = True
 
 class Berserker(Tower):
     def __init__(self) -> None:
@@ -232,7 +258,8 @@ class Berserker(Tower):
         self.name = 'Berserker'
         self.cost = 800
         self.damage = 1
-        self.delay_changes = {6: 30, 7: 0, 8: 0, 9: 0, 10: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
+        self.base_delay = 45
+        self.delay_changes = {6: self.base_delay, 7: 0, 8: 0, 9: 0, 10: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
         self.range_changes = {10: 6, 6: 7, 7: 8, 8: 9, 9: 10} # {30: 3, 3: 6, 6: 9, 9: 12, 12: 15, 15: 18, 18: 21, 21: 24, 24: 27, 27: 30}
         self.attack_delay = 45
         self.range = 10
@@ -241,8 +268,25 @@ class Berserker(Tower):
         self.id = 4
         self.upgrade_cost = 200
         self.attack_color = COLOR.FAINT_BLUE
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_zap.ogg')
+
+    @property
+    def info(self):
+        first_line = ""
+        if self.invisible_flag:
+            first_line += Unicode.invisible_detection  
+        if self.metal_flag:
+            first_line += Unicode.metal
+        if self.air_flag:
+            first_line += Unicode.air 
+        if self.boss_multiplier:
+            first_line += Unicode.boss
+        if first_line:
+            first_line += "\n"
+        return f"{first_line}{Unicode.damage} {self.damage}\n{Unicode.delay} {round(self.base_delay/FPS, 2)}\n{Unicode.range} {self.range}\n{Unicode.pulse_range} {len(self.delay_changes)}"
 
     def attack_round(self, screen):
+        self.attack_sound.play()
         draw_circle_alpha(screen, self.attack_color, (self.x*CELL_SIZE, self.y*CELL_SIZE), self.temp_range*CELL_SIZE)
         self.temp_range = self.range_changes.get(self.temp_range)
         self.attack_delay = self.delay_changes.get(self.temp_range)
@@ -280,28 +324,31 @@ class Berserker(Tower):
     def upgrade1(self):
         super().upgrade1()
         self.upgrade_cost = 500
-        self.delay_changes = {6: 30, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
+        self.delay_changes = {6: self.base_delay, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
         self.range_changes = {12: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11, 11: 12} # {30: 3, 3: 6, 6: 9, 9: 12, 12: 15, 15: 18, 18: 21, 21: 24, 24: 27, 27: 30}
 
     def upgrade2(self):
         super().upgrade2()
         self.upgrade_cost = 3500
-        self.attack_delay = 40
+        self.base_delay = 40
         self.range = 12
+        self.air_flag = True
 
     def upgrade3(self):
         super().upgrade3()
         self.upgrade_cost = 7000
         self.damage = 2
-        self.delay_changes = {6: 30, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
+        self.delay_changes = {6: self.base_delay, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
         self.range_changes = {15: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11, 11: 12, 12: 13, 13: 14, 14: 15} # {30: 3, 3: 6, 6: 9, 9: 12, 12: 15, 15: 18, 18: 21, 21: 24, 24: 27, 27: 30}
+        self.metal_flag = True
 
     def upgrade4(self):
         super().upgrade4()
         self.upgrade_cost = 0
         self.damage = 5
-        self.delay_changes = {6: 30, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
+        self.delay_changes = {6: self.base_delay, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
         self.range_changes = {20: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11, 11: 12, 12: 13, 13: 14, 14: 15, 15: 16, 16: 17, 17: 18, 18: 19, 19: 20} # {30: 3, 3: 6, 6: 9, 9: 12, 12: 15, 15: 18, 18: 21, 21: 24, 24: 27, 27: 30}
+        self.boss_multiplier = 2
 
 class Assassin(Tower):
     def __init__(self) -> None:
@@ -315,17 +362,14 @@ class Assassin(Tower):
         self.color = COLOR.BLACK
         self.id = 5
         self.upgrade_cost = 100
-
-    def can_attack(self, enemy: Enemy):
-        if enemy.air_flag or enemy.metal_flag:
-            return False
-        return True
+        self.attack_sound = pygame.mixer.Sound('sounds/hit4.ogg')
 
     def upgrade1(self):
         super().upgrade1()
         self.upgrade_cost = 500
         self.range = 17
         self.attack_delay = 9
+        self.air_flag = True
 
     def upgrade2(self):
         super().upgrade2()
@@ -339,6 +383,7 @@ class Assassin(Tower):
         self.damage = 4
         self.range = 20
         self.attack_delay = 7
+        self.attack_sound = pygame.mixer.Sound('sounds/hit6.ogg')
 
     def upgrade4(self):
         super().upgrade4()
@@ -354,30 +399,67 @@ class Gunslinger(Tower):
         self.damage = 5
         self.attack_delay = 50
         self.range = 20
-        self.boss_flag = True
+        self.money = 3
+        self.boss_multiplier = 2
         self.color = COLOR.ORANGE
         self.id = 6
-        self.upgrade_cost = 200
+        self.upgrade_cost = 100
+        self.attack_sound = pygame.mixer.Sound('sounds/pistol1.ogg')
+
+    @property
+    def info(self):
+        first_line = ""
+        if self.invisible_flag:
+            first_line += Unicode.invisible_detection  
+        if self.metal_flag:
+            first_line += Unicode.metal
+        if self.air_flag:
+            first_line += Unicode.air 
+        if self.boss_multiplier:
+            first_line += Unicode.boss
+        if first_line:
+            first_line += "\n"
+        return f"{first_line}{Unicode.damage} {self.damage}\n{Unicode.delay} {round(self.attack_delay/FPS, 2)}\n{Unicode.range} {self.range}\n{Unicode.dollar} {self.money}"
 
     def upgrade1(self):
         super().upgrade1()
-        self.upgrade_cost = 200
+        self.upgrade_cost = 250
+        self.money = 5
+        self.attack_sound = pygame.mixer.Sound('sounds/pistol2.ogg')
 
     def upgrade2(self):
         super().upgrade2()
-        self.upgrade_cost = 500
+        self.upgrade_cost = 2000
+        self.air_flag = True
+        self.damage = 7
+        self.boss_multiplier = 3
+        self.attack_sound = pygame.mixer.Sound('sounds/shotgun1.ogg')
 
     def upgrade3(self):
         super().upgrade3()
-        self.upgrade_cost = 0
+        self.upgrade_cost = 5000
+        self.damage = 15
+        self.attack_delay = 40
+        self.range = 23
+        self.boss_multiplier = 5
+        self.attack_sound = pygame.mixer.Sound('sounds/shotugnreload1.ogg')
 
     def upgrade4(self):
         super().upgrade4()
-        self.upgrade_cost = 0
+        self.upgrade_cost = 7500
+        self.range = 25
+        self.money = 15
+        self.attack_sound = pygame.mixer.Sound('sounds/shotgunreload2.ogg')
 
     def upgrade5(self):
         super().upgrade4()
         self.upgrade_cost = 0
+        self.damage = 30
+        self.attack_delay = 30
+        self.range = 30
+        self.money = 30
+        self.boss_multiplier = 10
+        self.attack_sound = pygame.mixer.Sound('sounds/shotgunreload3.ogg')
 
 class Dragoon(Tower):
     def __init__(self) -> None:
@@ -392,18 +474,30 @@ class Dragoon(Tower):
         self.color = COLOR.PURPLE
         self.attack_color = COLOR.DARK_PURPLE
         self.id = 7
-        self.upgrade_cost = 200
+        self.upgrade_cost = 750
+        self.attack_sound = pygame.mixer.Sound('sounds/firework.ogg')
 
-    def can_attack(self, enemy: Enemy):
-        if enemy.invisible_flag or enemy.air_flag:
-            return False
-        return True
+    @property
+    def info(self):
+        first_line = ""
+        if self.invisible_flag:
+            first_line += Unicode.invisible_detection  
+        if self.metal_flag:
+            first_line += Unicode.metal
+        if self.air_flag:
+            first_line += Unicode.air 
+        if self.boss_multiplier:
+            first_line += Unicode.boss
+        if first_line:
+            first_line += "\n"
+        return f"{first_line}{Unicode.damage} {self.damage}\n{Unicode.delay} {round(self.attack_delay/FPS, 2)}\n{Unicode.range} {self.range}\n{Unicode.explosion} {self.attack_radius}"
 
     def attack(self, screen, enemies: list) -> None:
         enemy = enemies[0]
         start_pos = ((self.x+0.5)*CELL_SIZE, self.y*CELL_SIZE)
         end_pos = ((enemy.x + 0.5 + enemy.width // 2)*CELL_SIZE, (enemy.y + enemy.height // 2)*CELL_SIZE)
         pygame.draw.line(screen, self.attack_color, start_pos, end_pos, 2)
+        self.attack_sound.play()
         draw_circle_alpha(screen, self.attack_color, end_pos, self.attack_radius*CELL_SIZE)
         self.current_delay = self.attack_delay
         killed_list = []
@@ -450,23 +544,37 @@ class Dragoon(Tower):
 
     def upgrade1(self):
         super().upgrade1()
-        self.upgrade_cost = 200
+        self.upgrade_cost = 1500
+        self.attack_delay = 50
+        self.range = 35
 
     def upgrade2(self):
         super().upgrade2()
-        self.upgrade_cost = 500
+        self.upgrade_cost = 4000
+        self.damage = 20
+        self.attack_radius = 8
 
     def upgrade3(self):
         super().upgrade3()
-        self.upgrade_cost = 0
+        self.upgrade_cost = 10000
+        self.damage = 45
+        self.range = 38
+        self.attack_sound = pygame.mixer.Sound('sounds/proton.ogg')
 
     def upgrade4(self):
         super().upgrade4()
-        self.upgrade_cost = 0
+        self.upgrade_cost = 25000
+        self.air_flag = True
+        self.damage = 90
+        self.attack_delay = 90
+        self.attack_radius = 13
 
     def upgrade5(self):
         super().upgrade4()
         self.upgrade_cost = 0
+        self.damage = 200
+        self.attack_radius = 15
+        self.range = 40
 
 class Farm(Tower):
     def __init__(self) -> None:
@@ -478,33 +586,37 @@ class Farm(Tower):
         self.range = 3
         self.color = COLOR.WHITE
         self.id = 8
-        self.upgrade_cost = 200
-        self.money = 100
+        self.upgrade_cost = 150
+        self.money = 50
+
+    @property
+    def info(self):
+        return f"{Unicode.money} {self.money}"
 
     def upgrade1(self):
         super().upgrade1()
         self.upgrade_cost = 200
-        self.money = 200
+        self.money = 100
 
     def upgrade2(self):
         super().upgrade2()
         self.upgrade_cost = 750
-        self.money = 500
+        self.money = 200
 
     def upgrade3(self):
         super().upgrade3()
         self.upgrade_cost = 2500
-        self.money = 1000
+        self.money = 500
 
     def upgrade4(self):
         super().upgrade4()
         self.upgrade_cost = 7500
-        self.money = 2000
+        self.money = 1000
 
     def upgrade5(self):
         super().upgrade5()
-        self.upgrade_cost = 15000
-        self.money = 5000
+        self.upgrade_cost = 0
+        self.money = 2500
 
 class Electrocutioner(Tower):
     def __init__(self) -> None:
@@ -513,27 +625,41 @@ class Electrocutioner(Tower):
         self.cost = 750
         self.damage = 1
         self.attack_delay = 60
-        self.attack_radius = 5
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
         self.range = 15
         self.metal_flag = True
         self.color = COLOR.DARK_TEAL
         self.attack_color = COLOR.TEAL
         self.id = 9
-        self.upgrade_cost = 200
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
 
-    def can_attack(self, enemy: Enemy):
-        if enemy.invisible_flag or enemy.air_flag:
-            return False
-        return True
+    @property
+    def info(self):
+        first_line = ""
+        if self.invisible_flag:
+            first_line += Unicode.invisible_detection  
+        if self.metal_flag:
+            first_line += Unicode.metal
+        if self.air_flag:
+            first_line += Unicode.air 
+        if self.boss_multiplier:
+            first_line += Unicode.boss
+        if first_line:
+            first_line += "\n"
+        return f"{first_line}{Unicode.damage} {self.damage}\n{Unicode.delay} {round(self.attack_delay/FPS, 2)}\n{Unicode.range} {self.range}\n{Unicode.link} {self.max_targets}\n{Unicode.targets} {self.attack_radius}\n{Unicode.stun} {round(self.stun_delay/FPS, 2)}s"
 
     def attack(self, screen, enemies: list) -> None:
         enemy = enemies[0]
         start_pos = ((self.x+0.5)*CELL_SIZE, self.y*CELL_SIZE)
         killed_list = []
         for enemy in enemies:
-            enemy.current_delay += 10
+            enemy.current_delay += self.stun_delay
             end_pos = ((enemy.x + 0.5 + enemy.width // 2)*CELL_SIZE, (enemy.y + enemy.height // 2)*CELL_SIZE)
             pygame.draw.line(screen, self.attack_color, start_pos, end_pos, 2)
+            self.attack_sound.play()
             killed = enemy.damage(self.damage)
             if killed:
                 killed_list.append(killed)
@@ -543,7 +669,6 @@ class Electrocutioner(Tower):
 
     def find_target(self, screen, enemies):
         temp_enemies = copy.deepcopy(enemies)
-        print("Finding target")
         distances = {
             k: sqrt(((max(enemy.x, min(self.x, enemy.x + enemy.width))) - self.x) ** 2 +
                     ((max(enemy.y, min(self.y, enemy.y + enemy.height))) - self.y) ** 2)
@@ -551,7 +676,7 @@ class Electrocutioner(Tower):
         }
         target = None
 
-        targets_in_range = [k for k, distance in distances.items() if distance <= self.range]
+        targets_in_range = [k for k, distance in distances.items() if distance <= self.range and self.can_attack(enemies[k])]
         if targets_in_range:
             if self.targeting == Targeting.FIRST:
                 target_key = max(targets_in_range, key=lambda k: enemies[k].x)
@@ -564,12 +689,11 @@ class Electrocutioner(Tower):
             else:
                 target_key = choice(targets_in_range)
             target = enemies[target_key]
-            print(f"Found target {target.num}")
             temp_enemies.pop(target_key)
         if target:
             targets = [target]
             done = False
-            while not done and len(temp_enemies):
+            while not done and len(temp_enemies) and len(targets) < self.max_targets:
                 targetx = target.x + target.width // 2
                 targety = target.y + target.height // 2
                 new_distances = {
@@ -581,7 +705,6 @@ class Electrocutioner(Tower):
                     closest = min(new_distances, key=new_distances.get)
                     if new_distances[closest] <= self.attack_radius:
                         target = enemies[closest]
-                        print(f"Found target {target.num}")
                         targets.append(target)
                         temp_enemies.pop(target.num)
                     else:
@@ -595,23 +718,43 @@ class Electrocutioner(Tower):
 
     def upgrade1(self):
         super().upgrade1()
-        self.upgrade_cost = 200
+        self.upgrade_cost = 750
+        self.attack_delay = 55
+        self.attack_radius = 5
+        self.range = 17
 
     def upgrade2(self):
         super().upgrade2()
-        self.upgrade_cost = 500
+        self.upgrade_cost = 3000
+        self.damage = 2
+        self.air_flag = True
+        self.max_targets = 5
 
     def upgrade3(self):
         super().upgrade3()
-        self.upgrade_cost = 0
+        self.upgrade_cost = 7500
+        self.damage = 8
+        self.attack_radius = 7
+        self.stun_delay = 15
+        self.range = 20
+        self.attack_sound = pygame.mixer.Sound('sounds/laser.ogg')
 
     def upgrade4(self):
         super().upgrade4()
-        self.upgrade_cost = 0
+        self.upgrade_cost = 20000
+        self.damage = 12
+        self.max_targets = 10
 
     def upgrade5(self):
         super().upgrade4()
         self.upgrade_cost = 0
+        self.damage = 20
+        self.attack_radius = 10
+        self.max_targets = 10000
+        self.stun_delay = 20
+        self.range = 22
+        self.attack_sound = pygame.mixer.Sound('sounds/strong_laser.ogg')
 
 if __name__ == "__main__":
-    print(Warrior().color)
+    # print(Warrior().color)
+    print(Tower(), Warrior())

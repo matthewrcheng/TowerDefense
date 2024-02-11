@@ -265,40 +265,38 @@ class PirateMate(Enemy):
     def __init__(self) -> None:
         super().__init__()
         self.name = "Pirate Mate"
-        self.max_health = 200
+        self.max_health = 500
         self.health = self.max_health
-        self.invisible_flag = True
         self.boss_flag = True
-        self.color = COLOR.PURPLE
+        self.color = COLOR.DARK_GREEN
         self.id = 119
-        self.height = 3
-        self.width = 4
+        self.height = 4
+        self.width = 5
 
 class PirateCaptain(Enemy):
     def __init__(self) -> None:
         super().__init__()
         self.name = "Pirate Captain"
-        self.max_health = 200
+        self.max_health = 2500
         self.health = self.max_health
-        self.invisible_flag = True
         self.boss_flag = True
-        self.color = COLOR.PURPLE
+        self.color = COLOR.DARK_GREEN
         self.id = 120
-        self.height = 3
-        self.width = 4
+        self.height = 4
+        self.width = 6
 
 class DreadPirate(Enemy):
     def __init__(self) -> None:
         super().__init__()
         self.name = "Dread Pirate"
-        self.max_health = 200
+        self.max_health = 50000
+        self.speed_delay = 10
         self.health = self.max_health
-        self.invisible_flag = True
         self.boss_flag = True
-        self.color = COLOR.PURPLE
+        self.color = COLOR.DARK_GREEN
         self.id = 121
-        self.height = 3
-        self.width = 4
+        self.height = 5
+        self.width = 7
 
 class GhostPirate(Enemy):
     def __init__(self) -> None:
@@ -317,11 +315,22 @@ class BruteEnforcer(Enemy):
     def __init__(self) -> None:
         super().__init__()
         self.name = "Brute Enforcer"
-        self.max_health = 200
+        self.max_health = 20000
+        self.speed_delay = 10
         self.health = self.max_health
-        self.invisible_flag = True
         self.boss_flag = True
-        self.color = COLOR.PURPLE
+        self.color = COLOR.LIGHT
         self.id = 123
         self.height = 3
         self.width = 4
+
+class Infiltrator(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Infiltrator"
+        self.speed_delay = 1
+        self.max_health = 1000
+        self.boss_flag = True
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_GRAY
+        self.id = 115

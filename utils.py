@@ -33,6 +33,32 @@ class Targeting:
     WEAK = "Weak"
     RANDOM = "Random"
 
+class Unicode:
+    damage = "\U0001F5E1"
+    delay = "\U0000231B"
+    range = "\U0001F3F9"
+    targets = "\U0001F3AF"
+    pulse_range = "\U0001F310"
+    heart = "\U00002764"
+    heart_suit = "\U00002665"
+    air = "\U0001FABD"
+    metal = "\U0001F6E1"
+    invisible_detection = "\U0001F441"
+    invisible = "\U0001F47B"
+    boss = "\U0001F451"
+    stun = "\U0001F4AB"
+    explosion = "\U0001F4A5"
+    poison = "\U00002622"
+    biohazard = "\U00002623"
+    skull = "\U00002620"
+    freeze = "\U00002744"
+    fire = "\U0001F525"
+    money = "\U0001F4B0"
+    dollar = "\U0001F4B5"
+    dollar_sign = "\U0001F4B2"
+    medical = "\U00002695"
+    link = "\U0001F517"
+
 class COLOR:
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)

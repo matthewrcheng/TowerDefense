@@ -3,3 +3,4 @@
 3. Create more enemies
 4. Create more difficulty seeds
 5. Playtest
+6. Add upgrades to existing towers through electrocutioner
