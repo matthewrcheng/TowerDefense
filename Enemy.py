@@ -92,7 +92,7 @@ class Thug(Enemy):
         super().__init__()
         self.name = "Thug"
         self.speed_delay = 8
-        self.max_health = 8
+        self.max_health = 12
         self.health = self.max_health
         self.color = COLOR.DARK_RED
         self.id = 103
@@ -333,4 +333,162 @@ class Infiltrator(Enemy):
         self.boss_flag = True
         self.health = self.max_health
         self.color = COLOR.LIGHT_GRAY
-        self.id = 115
+        self.id = 124
+
+################################################################################
+#                                 Sunken                                       #
+################################################################################
+class Drowned(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Drowned"
+        self.speed_delay = 5
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.DARK_BLUE
+        self.id = 201
+
+class DrownedGunner(Enemy):
+    pass
+
+class DrownedMate(Enemy):
+    pass
+
+class DrownedCaptain(Enemy):
+    pass
+
+class AbyssalKing(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Thug"
+        self.speed_delay = 8
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 103
+
+class MonsterOfTheDeep(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Thug"
+        self.speed_delay = 8
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 103
+        
+################################################################################
+#                                  Hell                                        #
+################################################################################
+class Undead(Enemy):
+    pass
+
+class Demon(Enemy):
+    pass
+
+class HellHound(Enemy):
+    def __init__(self) -> None:
+        super().__init__()      
+        self.name = "Thug"
+        self.speed_delay = 8
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 103
+
+class FallenAngel(Enemy):
+    pass
+
+class Immortal(Enemy):
+    pass
+
+class Nightmare(Enemy):
+    pass
+
+class Cerberus(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Thug"
+        self.speed_delay = 8
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 103  
+
+class Conquest(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Thug"
+        self.speed_delay = 8
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.WHITE
+        self.id = 103
+
+class War(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Thug"
+        self.speed_delay = 8
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.RED
+        self.id = 103
+
+class Famine(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Thug"
+        self.speed_delay = 8
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.BLACK
+        self.id = 103
+
+class Death(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Thug"
+        self.speed_delay = 8
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.FAINT
+        self.id = 103
+
+class Hades(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Thug"
+        self.speed_delay = 8
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 103
+        
+################################################################################
+#                                Corrupted                                     #
+################################################################################
+class Corrupted(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Thug"
+        self.speed_delay = 8
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 103
+
+class Diseased(Enemy):
+    pass
+
+class Defect(Enemy):
+    pass
+
+class Aberration(Enemy):
+    pass
+
+class Abomination(Enemy):
+    pass
+
+class Pestilence(Enemy):
+    pass
