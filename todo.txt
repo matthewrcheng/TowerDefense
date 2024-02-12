@@ -1,6 +1,9 @@
-1. Add sound
+1. Add more sound
 2. Create more towers
 3. Create more enemies
 4. Create more difficulty seeds
 5. Playtest
 6. Add upgrades to existing towers through electrocutioner
+7. Fix enemy health bars
+8. Add tower character images
+9. Add collections and achievements
