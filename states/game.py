@@ -14,10 +14,10 @@ def draw_enemy_bar(screen, enemy, font):
     # Draw health bar
     health_bar_rect = pygame.Rect(enemy.x * CELL_SIZE, enemy.y * CELL_SIZE - 10,
                                   enemy.width * CELL_SIZE, 5)
-    pygame.draw.rect(screen, COLOR.GREEN, health_bar_rect)  # Assuming green for health
-    red_width = int((1 - enemy.health / enemy.max_health) * health_bar_rect.width)
-    red_part_rect = health_bar_rect.inflate(red_width, 0)
-    pygame.draw.rect(screen, COLOR.RED, red_part_rect)
+    pygame.draw.rect(screen, COLOR.RED, health_bar_rect)  # Assuming green for health
+    green_width = int((enemy.health / enemy.max_health) * health_bar_rect.width)
+    green_part_rect = pygame.Rect(health_bar_rect.left, health_bar_rect.top, green_width, health_bar_rect.height)
+    pygame.draw.rect(screen, COLOR.GREEN, green_part_rect)
 
 def validate_tower_placement(mouse_pos, selected_tower, grid, WIDTH, HEIGHT):
     extrax = selected_tower.width//2

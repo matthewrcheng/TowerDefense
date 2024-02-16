@@ -395,7 +395,7 @@ class Gunslinger(Tower):
     def __init__(self) -> None:
         super().__init__()
         self.name = 'Gunslinger'
-        self.cost = 1000
+        self.cost = 600
         self.damage = 5
         self.attack_delay = 50
         self.range = 20
@@ -425,7 +425,7 @@ class Gunslinger(Tower):
         super().upgrade1()
         self.upgrade_cost = 250
         self.money = 5
-        self.attack_sound = pygame.mixer.Sound('sounds/pistol2.ogg')
+        self.attack_sound = pygame.mixer.Sound('sounds/shotgun1.ogg')
 
     def upgrade2(self):
         super().upgrade2()
@@ -433,7 +433,7 @@ class Gunslinger(Tower):
         self.air_flag = True
         self.damage = 7
         self.boss_multiplier = 3
-        self.attack_sound = pygame.mixer.Sound('sounds/shotgun1.ogg')
+        self.attack_sound = pygame.mixer.Sound('sounds/pistol2.ogg')
 
     def upgrade3(self):
         super().upgrade3()
@@ -442,7 +442,7 @@ class Gunslinger(Tower):
         self.attack_delay = 40
         self.range = 23
         self.boss_multiplier = 5
-        self.attack_sound = pygame.mixer.Sound('sounds/shotugnreload1.ogg')
+        self.attack_sound = pygame.mixer.Sound('sounds/shotgunreload1.ogg')
 
     def upgrade4(self):
         super().upgrade4()
