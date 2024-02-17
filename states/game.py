@@ -86,6 +86,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
     tower_info_exit_button = pygame.Rect(menu_rect.right - 20, menu_rect.top, 20, 20)
     tower_info_upgrade_button = pygame.Rect(menu_rect.left + 20, menu_rect.bottom - 40, 100, 30)
     tower_info_target_button = pygame.Rect(menu_rect.left + 150, menu_rect.bottom - 40, 100, 30)
+    tower_info_sell_button = pygame.Rect(menu_rect.right - 100, menu_rect.top + 60, 80, 20)
 
     # Towers
     warrior_button = pygame.Rect(WIDTH-125, 80, 100, 50)
@@ -201,6 +202,11 @@ def game_screen(screen, map, WIDTH, HEIGHT):
                         elif tower_info_target_button.collidepoint(event.pos):
                             tower_info_menu.targeting = target_cycle.get(tower_info_menu.targeting)
                             print("Changing targeting")
+                        elif tower_info_sell_button.collidepoint(event.pos):
+                            towers.pop(tower_info_menu.num)
+                            money += tower_info_menu.total_cost//2
+                            tower_info_menu = False
+                            print("Sold tower")
                     elif not placing:
                         for tower in towers.values():
                             if tower.rect.collidepoint(event.pos):
@@ -424,6 +430,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
             pygame.draw.rect(screen, COLOR.BROWN, menu_rect)
             pygame.draw.rect(screen, tower_info_menu.color, tower_display_rect)
             pygame.draw.rect(screen, COLOR.RED, tower_info_exit_button)
+            pygame.draw.rect(screen, COLOR.RED, tower_info_sell_button)
             pygame.draw.line(screen, (0, 0, 0),
                         (tower_info_exit_button.left + 5, tower_info_exit_button.top + 5),
                         (tower_info_exit_button.right - 5, tower_info_exit_button.bottom - 5), 3)
@@ -447,6 +454,8 @@ def game_screen(screen, map, WIDTH, HEIGHT):
             screen.blit(target_text, (tower_info_target_button.x + 5, tower_info_target_button.y + 5))
             total_damage_text = fonts.render(f"Total Damage: {tower_info_menu.total_damage}", True, COLOR.BLACK)
             screen.blit(total_damage_text, (tower_display_rect.x, tower_display_rect.y + 100))
+            sell_text = fonts.render(f"Sell ${tower_info_menu.total_cost//2}", True, COLOR.BLACK)
+            screen.blit(sell_text, (tower_info_sell_button.x + 5, tower_info_sell_button.y + 5))
 
 
         enemy_timer-=1

@@ -13,6 +13,7 @@ class Tower:
     def __init__(self) -> None:
         self.name = 'Warrior'           # name
         self.cost = 250                 # game currency
+        self.total_cost = self.cost
         self.damage = 1                 # health ticks
         self.attack_delay = 20           # milliseconds
         self.range = 20                 # grid squares
@@ -131,18 +132,23 @@ class Tower:
             return 0
 
     def upgrade1(self):
+        self.total_cost += self.upgrade_cost
         self.upgrade_level = 1
 
     def upgrade2(self):
+        self.total_cost += self.upgrade_cost
         self.upgrade_level = 2
 
     def upgrade3(self):
+        self.total_cost += self.upgrade_cost
         self.upgrade_level = 3
 
     def upgrade4(self):
+        self.total_cost += self.upgrade_cost
         self.upgrade_level = 4
 
     def upgrade5(self):
+        self.total_cost += self.upgrade_cost
         self.upgrade_level = 5
 
     def __str__(self):
@@ -165,6 +171,7 @@ class Warrior(Tower):
         self.upgrade_cost = 500
         self.damage = 2
         self.range = 25
+        self.attack_sound = pygame.mixer.Sound('sounds/metalimpact3.ogg')
 
     def upgrade3(self):
         super().upgrade3()
@@ -173,7 +180,7 @@ class Warrior(Tower):
         self.attack_delay = 10
         self.range = 27
         self.invisible_flag = True
-        self.attack_sound = pygame.mixer.Sound('sounds/auto.ogg')
+        self.attack_sound = pygame.mixer.Sound('sounds/metalimpact1.ogg')
 
 
 class Archer(Tower):
@@ -181,6 +188,7 @@ class Archer(Tower):
         super().__init__()
         self.name = 'Archer'
         self.cost = 350
+        self.total_cost = self.cost
         self.damage = 2
         self.attack_delay = 45
         self.range = 25
@@ -208,6 +216,7 @@ class Archer(Tower):
         self.damage = 25
         self.attack_delay = 45
         self.range = 35
+        self.attack_sound = pygame.mixer.Sound('sounds/auto.ogg')
     
 
 class Deadeye(Tower):
@@ -215,6 +224,7 @@ class Deadeye(Tower):
         super().__init__()
         self.name = 'Deadeye'
         self.cost = 600
+        self.total_cost = self.cost
         self.damage = 5
         self.attack_delay = 120
         self.range = 45
@@ -257,6 +267,7 @@ class Berserker(Tower):
         super().__init__()
         self.name = 'Berserker'
         self.cost = 800
+        self.total_cost = self.cost
         self.damage = 1
         self.base_delay = 45
         self.delay_changes = {6: self.base_delay, 7: 0, 8: 0, 9: 0, 10: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
@@ -341,6 +352,7 @@ class Berserker(Tower):
         self.delay_changes = {6: self.base_delay, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
         self.range_changes = {15: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11, 11: 12, 12: 13, 13: 14, 14: 15} # {30: 3, 3: 6, 6: 9, 9: 12, 12: 15, 15: 18, 18: 21, 21: 24, 24: 27, 27: 30}
         self.metal_flag = True
+        self.attack_sound = pygame.mixer.Sound('sounds/missile-blast.ogg')
 
     def upgrade4(self):
         super().upgrade4()
@@ -355,6 +367,7 @@ class Assassin(Tower):
         super().__init__()
         self.name = 'Assassin'
         self.cost = 400
+        self.total_cost = self.cost
         self.damage = 1
         self.attack_delay = 10
         self.invisible_flag = True
@@ -396,6 +409,7 @@ class Gunslinger(Tower):
         super().__init__()
         self.name = 'Gunslinger'
         self.cost = 600
+        self.total_cost = self.cost
         self.damage = 5
         self.attack_delay = 50
         self.range = 20
@@ -466,6 +480,7 @@ class Dragoon(Tower):
         super().__init__()
         self.name = 'Dragoon'
         self.cost = 1500
+        self.total_cost = self.cost
         self.damage = 10
         self.attack_delay = 60
         self.attack_radius = 5
@@ -581,6 +596,7 @@ class Farm(Tower):
         super().__init__()
         self.name = 'Farm'
         self.cost = 200
+        self.total_cost = self.cost
         self.damage = 0
         self.attack_delay = -1
         self.range = 3
@@ -623,6 +639,7 @@ class Electrocutioner(Tower):
         super().__init__()
         self.name = "Electrocutioner"
         self.cost = 750
+        self.total_cost = self.cost
         self.damage = 1
         self.attack_delay = 60
         self.attack_radius = 3
