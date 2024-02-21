@@ -5,6 +5,7 @@ from states.selection import selection_screen
 from states.game import game_screen
 from states.collection import collection_screen
 from states.achievements import achievements_screen
+from states.results import results_screen
 import pygame
 
 
@@ -19,6 +20,7 @@ pygame.display.set_caption("Tower Defense")
 running = True
 current_state = GameState.MENU
 map = None
+win = None
 
 while running:
     for event in pygame.event.get():
@@ -34,8 +36,10 @@ while running:
         else:
             current_state = GameState.MENU
     elif current_state == GameState.GAME:
-        current_state,win = game_screen(screen, map, WIDTH, HEIGHT)
+        current_state,win,level,time = game_screen(screen, map, WIDTH, HEIGHT)
         pygame.display.set_caption("Tower Defense")
+    elif current_state == GameState.RESULTS:
+        current_state = results_screen(screen, win)
     elif current_state == GameState.COLLECTION:
         current_state = collection_screen(screen)
     elif current_state == GameState.ACHIEVEMENTS:

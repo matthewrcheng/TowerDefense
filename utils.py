@@ -96,6 +96,7 @@ class COLOR:
     FADE = (0, 0, 0, 80)
     FAINT_BLUE = (0, 0, 128, 80)
     FAINT_DARK_PURPLE = (64, 0, 64, 80)
+    GOLD = (128,107,0)
 
 class GameState(Enum):
     MENU = 0
@@ -103,6 +104,7 @@ class GameState(Enum):
     GAME = 2
     COLLECTION = 3
     ACHIEVEMENTS = 4
+    RESULTS = 5
 
 class Map():
 

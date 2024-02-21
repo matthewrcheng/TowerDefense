@@ -121,6 +121,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
     autorun = False
     health = 100
     money = 500 # 500
+    time = 0
 
     # trackers
     tower_num = 0
@@ -137,30 +138,30 @@ def game_screen(screen, map, WIDTH, HEIGHT):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                # States
-                game_over = False
-                won = False
-                paused = False
-                placing = False
-                tower_info_menu = None
-                selected_tower = None
-                level = 1
-                enemy_timer = 0
-                enemy_spawn_time = None
-                autorun = False
-                health = 100
-                money = 500
+                # # States
+                # game_over = False
+                # won = False
+                # paused = False
+                # placing = False
+                # tower_info_menu = None
+                # selected_tower = None
+                # level = 1
+                # enemy_timer = 0
+                # enemy_spawn_time = None
+                # autorun = False
+                # health = 100
+                # money = 500
 
-                # trackers
-                tower_num = 0
-                enemy_num = 0
-                towers = dict()
-                enemies = dict()
-                farms = []
-                return GameState.MENU,False
+                # # trackers
+                # tower_num = 0
+                # enemy_num = 0
+                # towers = dict()
+                # enemies = dict()
+                # farms = []
+                return GameState.MENU,False,0,0
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if exit_button.collidepoint(event.pos):
-                    return GameState.MENU,False
+                    return GameState.MENU,False,0,0
                 elif warrior_button.collidepoint(event.pos):
                     placing = True
                     selected_tower = Warrior
@@ -268,7 +269,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
             towers = dict()
             enemies = dict()
             farms = []
-            return GameState.MENU,won    
+            return GameState.RESULTS,won,level,time   
         
         pygame.display.set_caption(f"{map.name}: LEVEL {level}")
         
@@ -523,4 +524,4 @@ def game_screen(screen, map, WIDTH, HEIGHT):
     towers = dict()
     enemies = dict()
     farms = []
-    return GameState.MENU,won
+    return GameState.RESULTS,won,level,time
