@@ -2,19 +2,17 @@ import pygame
 from utils import COLOR, GameState, Map
 from Tower import Warrior, Archer, Deadeye, Berserker, Assassin, Gunslinger, Dragoon, Farm, Electrocutioner
 
-# Constants for screen dimensions and fonts
-fonts = pygame.font.Font(None, 36)
-fontl = pygame.font.Font(None, 72)
-
 def map_selection_screen(screen):
+    # Constants for screen dimensions and fonts
+    fonts = pygame.font.Font(None, 36)
 
     # Button
-    play_button = pygame.Rect(300, 150, 200, 100)
-    field_button = pygame.Rect(300, 275, 200, 50)
-    beach_button = pygame.Rect(300, 350, 200, 50)
-    moon_button = pygame.Rect(300, 425, 200, 50)
+    field_button = pygame.Rect(300, 150, 200, 50)
+    beach_button = pygame.Rect(300, 225, 200, 50)
+    moon_button = pygame.Rect(300, 300, 200, 50)
     current_selection_button = pygame.Rect(300, 50, 350, 50) 
-    quit_button = pygame.Rect(600, 500, 100, 50)
+    next_button = pygame.Rect(650, 500, 100, 50)
+    quit_button = pygame.Rect(800, 500, 100, 50)
 
     map = Map.Field
 
@@ -23,7 +21,7 @@ def map_selection_screen(screen):
             if event.type == pygame.QUIT:
                 return None
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if play_button.collidepoint(event.pos):
+                if next_button.collidepoint(event.pos):
                     # Transition to the WORLDS screen when "Play" is clicked
                     return map
                 elif field_button.collidepoint(event.pos):
@@ -44,9 +42,9 @@ def map_selection_screen(screen):
         screen.blit(title_text, (50, 50))
 
         # Draw the "Play" button
-        pygame.draw.rect(screen, COLOR.BLACK, play_button)
-        play_text = fontl.render("Play", True, COLOR.WHITE)
-        screen.blit(play_text, (play_button.x + 48, play_button.y + 25))
+        pygame.draw.rect(screen, COLOR.BLACK, next_button)
+        play_text = fonts.render("Next", True, COLOR.WHITE)
+        screen.blit(play_text, (next_button.x + 20, next_button.y + 10))
         pygame.draw.rect(screen, COLOR.LIGHT, field_button)
         collection_text = fonts.render("Field", True, COLOR.GREEN)
         screen.blit(collection_text, (field_button.x + 66, field_button.y + 10))
@@ -66,22 +64,36 @@ def map_selection_screen(screen):
         pygame.display.flip()
 
 def tower_selection_screen(screen):
+    # Constants for screen dimensions and fonts
+    fonts = pygame.font.Font(None, 36)
 
     # util buttons
-    play_button = pygame.Rect(300, 150, 200, 100)
-    quit_button = pygame.Rect(600, 500, 100, 50)
+    play_button = pygame.Rect(650, 500, 100, 50)
+    quit_button = pygame.Rect(800, 500, 100, 50)
     current_selection_display = pygame.Rect(300, 50, 350, 50) 
 
     # tower buttons
-    warrior_button = pygame.Rect(300, 275, 200, 50)
-    archer_button = pygame.Rect(300, 350, 200, 50)
-    deadeye_button = pygame.Rect(300, 425, 200, 50)
-    berserker_button = pygame.Rect(300, 500, 200, 50)
-    assassin_button = pygame.Rect(300, 575, 200, 50)
-    gunslinger_button = pygame.Rect(300, 650, 200, 50)
-    dragoon_button = pygame.Rect(300, 725, 200, 50)
-    farm_button = pygame.Rect(300, 800, 200, 50)
-    electro_button = pygame.Rect(300, 875, 200, 50)
+    warrior_button = pygame.Rect(50, 100, 200, 50)
+    archer_button = pygame.Rect(50, 175, 200, 50)
+    deadeye_button = pygame.Rect(50, 250, 200, 50)
+    berserker_button = pygame.Rect(50, 325, 200, 50)
+    assassin_button = pygame.Rect(50, 400, 200, 50)
+    gunslinger_button = pygame.Rect(300, 100, 200, 50)
+    dragoon_button = pygame.Rect(550, 100, 200, 50)
+    farm_button = pygame.Rect(550, 175, 200, 50)
+    electro_button = pygame.Rect(550, 250, 200, 50)
+    # add others as needed
+
+    # tower classes
+    warrior = Warrior()
+    archer = Archer()
+    deadeye = Deadeye()
+    berserker = Berserker()
+    assassin = Assassin()
+    gunslinger = Gunslinger()
+    dragoon = Dragoon()
+    farm = Farm()
+    electro = Electrocutioner()
     # add others as needed
     
     # tower selection
@@ -112,8 +124,12 @@ def tower_selection_screen(screen):
                     if len(towers) < 8:
                         if Warrior in towers:
                             towers.remove(Warrior)
+                            # unhighlight warrior button
+                            pass
                         else:
                             towers.append(Warrior)
+                            # highlight warrior button
+                            pass
                 elif archer_button.collidepoint(event.pos):
                     if len(towers) < 8:
                         if Archer in towers:
@@ -175,8 +191,8 @@ def tower_selection_screen(screen):
 
         # Draw the "Play" button
         pygame.draw.rect(screen, COLOR.BLACK, play_button)
-        play_text = fontl.render("Play", True, COLOR.WHITE)
-        screen.blit(play_text, (play_button.x + 48, play_button.y + 25))
+        play_text = fonts.render("Play", True, COLOR.WHITE)
+        screen.blit(play_text, (play_button.x + 20, play_button.y + 10))
 
         # Draw the "Quit" button
         pygame.draw.rect(screen, COLOR.BLACK, quit_button) 
@@ -184,40 +200,40 @@ def tower_selection_screen(screen):
         screen.blit(quit_text, (quit_button.x + 20, quit_button.y + 10))
 
         # Draw the tower buttons
-        pygame.draw.rect(screen, COLOR.BLACK, warrior_button)
-        warrior_text = fonts.render("Warrior", True, COLOR.WHITE)
+        pygame.draw.rect(screen, warrior.color, warrior_button)
+        warrior_text = fonts.render(warrior.name, True, warrior.text_color)
         screen.blit(warrior_text, (warrior_button.x + 20, warrior_button.y + 10))
 
-        pygame.draw.rect(screen, COLOR.BLACK, archer_button)
-        archer_text = fonts.render("Archer", True, COLOR.WHITE)
+        pygame.draw.rect(screen, archer.color, archer_button)
+        archer_text = fonts.render(archer.name, True, archer.text_color)
         screen.blit(archer_text, (archer_button.x + 20, archer_button.y + 10))
 
-        pygame.draw.rect(screen, COLOR.BLACK, deadeye_button)
-        deadeye_text = fonts.render("Deadeye", True, COLOR.WHITE)
+        pygame.draw.rect(screen, deadeye.color, deadeye_button)
+        deadeye_text = fonts.render(deadeye.name, True, deadeye.text_color)
         screen.blit(deadeye_text, (deadeye_button.x + 20, deadeye_button.y + 10))
 
-        pygame.draw.rect(screen, COLOR.BLACK, berserker_button)
-        berserker_text = fonts.render("Berserker", True, COLOR.WHITE)
+        pygame.draw.rect(screen, berserker.color, berserker_button)
+        berserker_text = fonts.render(berserker.name, True, berserker.text_color)
         screen.blit(berserker_text, (berserker_button.x + 20, berserker_button.y + 10))
 
-        pygame.draw.rect(screen, COLOR.BLACK, assassin_button)
-        assassin_text = fonts.render("Assassin", True, COLOR.WHITE)
+        pygame.draw.rect(screen, assassin.color, assassin_button)
+        assassin_text = fonts.render(assassin.name, True, assassin.text_color)
         screen.blit(assassin_text, (assassin_button.x + 20, assassin_button.y + 10))
 
-        pygame.draw.rect(screen, COLOR.BLACK, gunslinger_button)
-        gunslinger_text = fonts.render("Gunslinger", True, COLOR.WHITE)
+        pygame.draw.rect(screen, gunslinger.color, gunslinger_button)
+        gunslinger_text = fonts.render(gunslinger.name, True, gunslinger.text_color)
         screen.blit(gunslinger_text, (gunslinger_button.x + 20, gunslinger_button.y + 10))
 
-        pygame.draw.rect(screen, COLOR.BLACK, dragoon_button)
-        dragoon_text = fonts.render("Dragoon", True, COLOR.WHITE)
+        pygame.draw.rect(screen, dragoon.color, dragoon_button)
+        dragoon_text = fonts.render(dragoon.name, True, dragoon.text_color)
         screen.blit(dragoon_text, (dragoon_button.x + 20, dragoon_button.y + 10))
 
-        pygame.draw.rect(screen, COLOR.BLACK, farm_button)
-        farm_text = fonts.render("Farm", True, COLOR.WHITE)
+        pygame.draw.rect(screen, farm.color, farm_button)
+        farm_text = fonts.render(farm.name, True, farm.text_color)
         screen.blit(farm_text, (farm_button.x + 20, farm_button.y + 10))
 
-        pygame.draw.rect(screen, COLOR.BLACK, electro_button)
-        electro_text = fonts.render("Electrocutioner", True, COLOR.WHITE)
+        pygame.draw.rect(screen, electro.color, electro_button)
+        electro_text = fonts.render(electro.name, True, electro.text_color)
         screen.blit(electro_text, (electro_button.x + 20, electro_button.y + 10))
 
         pygame.display.flip()

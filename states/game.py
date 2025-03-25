@@ -51,8 +51,7 @@ def place_tower(grids, grid, selected_tower, num):
 
     grid[gridy-extray:gridy+extray+1, gridx-extrax:gridx+extrax+1] = selected_tower.id
 
-def game_screen(screen: pygame.Surface, map: Map, towers: list[Tower], WIDTH: int, HEIGHT: int):
-
+def game_screen(screen: pygame.Surface, map: Map, selected_towers: list[Tower], WIDTH: int, HEIGHT: int):
     # placements
     grid = np.zeros((GRID_HEIGHT, GRID_WIDTH), dtype=int)
 
@@ -98,14 +97,14 @@ def game_screen(screen: pygame.Surface, map: Map, towers: list[Tower], WIDTH: in
     tower7_button = pygame.Rect(WIDTH-125, 410, 100, 50)
     tower8_button = pygame.Rect(WIDTH-125, 465, 100, 50)
     # last_button = pygame.Rect(WIDTH-125, 520, 100, 50)
-    tower1 = towers[0]()
-    tower2 = towers[1]()
-    tower3 = towers[2]()
-    tower4 = towers[3]()
-    tower5 = towers[4]()
-    tower6 = towers[5]()
-    tower7 = towers[6]()
-    tower8 = towers[7]()
+    tower1 = selected_towers["Tower1"]()
+    tower2 = selected_towers["Tower2"]()
+    tower3 = selected_towers["Tower3"]()
+    tower4 = selected_towers["Tower4"]()
+    tower5 = selected_towers["Tower5"]()
+    tower6 = selected_towers["Tower6"]()
+    tower7 = selected_towers["Tower7"]()
+    tower8 = selected_towers["Tower8"]()
 
     # States
     game_over = False
@@ -163,28 +162,28 @@ def game_screen(screen: pygame.Surface, map: Map, towers: list[Tower], WIDTH: in
                     return GameState.MENU,False,0,0
                 elif tower1_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = towers[0]
+                    selected_tower = selected_towers["Tower1"]
                 elif tower2_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = towers[1]
+                    selected_tower = selected_towers["Tower2"]
                 elif tower3_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = towers[2]
+                    selected_tower = selected_towers["Tower3"]
                 elif tower4_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = towers[3]
+                    selected_tower = selected_towers["Tower4"]
                 elif tower5_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = towers[4]
+                    selected_tower = selected_towers["Tower5"]
                 elif tower6_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = towers[5]
+                    selected_tower = selected_towers["Tower6"]
                 elif tower7_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = towers[6]
+                    selected_tower = selected_towers["Tower7"]
                 elif tower8_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = towers[7]
+                    selected_tower = selected_towers["Tower8"]
                 else:
                     if tower_info_menu:
                         if tower_info_exit_button.collidepoint(event.pos):
@@ -216,28 +215,28 @@ def game_screen(screen: pygame.Surface, map: Map, towers: list[Tower], WIDTH: in
                     paused = True
                 elif event.key == pygame.K_1:
                     placing = True
-                    selected_tower = towers[0]
+                    selected_tower = selected_towers["Tower1"]
                 elif event.key == pygame.K_2:
                     placing = True
-                    selected_tower = towers[1]
+                    selected_tower = selected_towers["Tower2"]
                 elif event.key == pygame.K_3:
-                    placing = True
-                    selected_tower = towers[2]
+                    placing = True  
+                    selected_tower = selected_towers["Tower3"]
                 elif event.key == pygame.K_4:
                     placing = True
-                    selected_tower = towers[3]
+                    selected_tower = selected_towers["Tower4"]
                 elif event.key == pygame.K_5:
                     placing = True
-                    selected_tower = towers[4]
+                    selected_tower = selected_towers["Tower5"]
                 elif event.key == pygame.K_6:
                     placing = True
-                    selected_tower = towers[5]
+                    selected_tower = selected_towers["Tower6"]
                 elif event.key == pygame.K_7:
                     placing = True
-                    selected_tower = towers[6]
+                    selected_tower = selected_towers["Tower7"]
                 elif event.key == pygame.K_8:
                     placing = True
-                    selected_tower = towers[7]
+                    selected_tower = selected_towers["Tower8"]
 
         if health <= 0:
             # States
