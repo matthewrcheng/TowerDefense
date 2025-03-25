@@ -22,6 +22,7 @@ class Tower:
         self.air_flag = False           # flying
         self.boss_multiplier = 0          # blimp
         self.color = COLOR.GREEN        # look
+        self.text_color = COLOR.WHITE   # text display color
         self.current_delay = self.attack_delay # attack delay counter
         self.width = 3                  # number of cells wide
         self.height = 3                 # number of cells tall
@@ -601,6 +602,7 @@ class Farm(Tower):
         self.attack_delay = -1
         self.range = 3
         self.color = COLOR.WHITE
+        self.text_color = COLOR.BLACK
         self.id = 8
         self.upgrade_cost = 150
         self.money = 50

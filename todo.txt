@@ -7,3 +7,4 @@
 7. Fix enemy health bars
 8. Add tower character images
 9. Add collections and achievements
+10. Add play button and pause button and time in between levels

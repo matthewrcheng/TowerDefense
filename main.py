@@ -1,7 +1,7 @@
 from constants import CELL_SIZE, GRID_HEIGHT, GRID_WIDTH, SIDEBAR_WIDTH
 from utils import GameState
 from states.menu import menu_screen
-from states.selection import selection_screen
+from states.selection import map_selection_screen, tower_selection_screen
 from states.game import game_screen
 from states.collection import collection_screen
 from states.achievements import achievements_screen
@@ -30,13 +30,14 @@ while running:
     if current_state == GameState.MENU:
         current_state = menu_screen(screen)
     elif current_state == GameState.SELECTION:
-        map = selection_screen(screen)
-        if map:
+        map = map_selection_screen(screen)
+        towers = tower_selection_screen(screen)
+        if map and towers:
             current_state = GameState.GAME
         else:
             current_state = GameState.MENU
     elif current_state == GameState.GAME:
-        current_state,win,level,time = game_screen(screen, map, WIDTH, HEIGHT)
+        current_state,win,level,time = game_screen(screen, map, towers, WIDTH, HEIGHT)
         pygame.display.set_caption("Tower Defense")
     elif current_state == GameState.RESULTS:
         current_state = results_screen(screen, win)

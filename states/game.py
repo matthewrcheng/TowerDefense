@@ -3,7 +3,7 @@ import numpy as np
 import random
 from constants import GRID_HEIGHT,GRID_WIDTH,CELL_SIZE,SIDEBAR_WIDTH,FPS
 from utils import COLOR, GameState, Map, Targeting, Unicode, draw_circle_alpha, draw_polygon_alpha, draw_rect_alpha
-from Tower import Tower, Warrior, Archer, Deadeye, Berserker, Assassin, Gunslinger, Dragoon, Farm, Electrocutioner
+from Tower import Tower, Gunslinger, Farm
 # from Enemy import Enemy, , Speedy, Slow, Tough
 from enemy_seeds.normal import seed
 
@@ -19,7 +19,7 @@ def draw_enemy_bar(screen, enemy, font):
     green_part_rect = pygame.Rect(health_bar_rect.left, health_bar_rect.top, green_width, health_bar_rect.height)
     pygame.draw.rect(screen, COLOR.GREEN, green_part_rect)
 
-def validate_tower_placement(mouse_pos, selected_tower, grid, WIDTH, HEIGHT):
+def validate_tower_placement(mouse_pos, selected_tower, grid):
     extrax = selected_tower.width//2
     extray = selected_tower.height//2
 
@@ -51,7 +51,7 @@ def place_tower(grids, grid, selected_tower, num):
 
     grid[gridy-extray:gridy+extray+1, gridx-extrax:gridx+extrax+1] = selected_tower.id
 
-def game_screen(screen, map, WIDTH, HEIGHT):
+def game_screen(screen: pygame.Surface, map: Map, towers: list[Tower], WIDTH: int, HEIGHT: int):
 
     # placements
     grid = np.zeros((GRID_HEIGHT, GRID_WIDTH), dtype=int)
@@ -89,24 +89,23 @@ def game_screen(screen, map, WIDTH, HEIGHT):
     tower_info_sell_button = pygame.Rect(menu_rect.right - 100, menu_rect.top + 60, 80, 20)
 
     # Towers
-    warrior_button = pygame.Rect(WIDTH-125, 80, 100, 50)
-    archer_button = pygame.Rect(WIDTH-125, 135, 100, 50)
-    deadeye_button = pygame.Rect(WIDTH-125, 190, 100, 50)
-    berserker_button = pygame.Rect(WIDTH-125, 245, 100, 50)
-    assassin_button = pygame.Rect(WIDTH-125, 300, 100, 50)
-    gunslinger_button = pygame.Rect(WIDTH-125, 355, 100, 50)
-    dragoon_button = pygame.Rect(WIDTH-125, 410, 100, 50)
-    farm_button = pygame.Rect(WIDTH-125, 465, 100, 50)
-    electrocutioner_button = pygame.Rect(WIDTH-125, 520, 100, 50)
-    warrior = Warrior()
-    archer = Archer()
-    deadeye = Deadeye()
-    berserker = Berserker()
-    assassin = Assassin()
-    gunslinger = Gunslinger()
-    dragoon = Dragoon()
-    farm = Farm()
-    electrocutioner = Electrocutioner()
+    tower1_button = pygame.Rect(WIDTH-125, 80, 100, 50)
+    tower2_button = pygame.Rect(WIDTH-125, 135, 100, 50)
+    tower3_button = pygame.Rect(WIDTH-125, 190, 100, 50)
+    tower4_button = pygame.Rect(WIDTH-125, 245, 100, 50)
+    tower5_button = pygame.Rect(WIDTH-125, 300, 100, 50)
+    tower6_button = pygame.Rect(WIDTH-125, 355, 100, 50)
+    tower7_button = pygame.Rect(WIDTH-125, 410, 100, 50)
+    tower8_button = pygame.Rect(WIDTH-125, 465, 100, 50)
+    # last_button = pygame.Rect(WIDTH-125, 520, 100, 50)
+    tower1 = towers[0]()
+    tower2 = towers[1]()
+    tower3 = towers[2]()
+    tower4 = towers[3]()
+    tower5 = towers[4]()
+    tower6 = towers[5]()
+    tower7 = towers[6]()
+    tower8 = towers[7]()
 
     # States
     game_over = False
@@ -138,57 +137,54 @@ def game_screen(screen, map, WIDTH, HEIGHT):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                # # States
-                # game_over = False
-                # won = False
-                # paused = False
-                # placing = False
-                # tower_info_menu = None
-                # selected_tower = None
-                # level = 1
-                # enemy_timer = 0
-                # enemy_spawn_time = None
-                # autorun = False
-                # health = 100
-                # money = 500
+                # States
+                game_over = False
+                won = False
+                paused = False
+                placing = False
+                tower_info_menu = None
+                selected_tower = None
+                level = 1
+                enemy_timer = 0
+                enemy_spawn_time = None
+                autorun = False
+                health = 100
+                money = 500
 
-                # # trackers
-                # tower_num = 0
-                # enemy_num = 0
-                # towers = dict()
-                # enemies = dict()
-                # farms = []
+                # trackers
+                tower_num = 0
+                enemy_num = 0
+                towers = dict()
+                enemies = dict()
+                farms = []
                 return GameState.MENU,False,0,0
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if exit_button.collidepoint(event.pos):
                     return GameState.MENU,False,0,0
-                elif warrior_button.collidepoint(event.pos):
+                elif tower1_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = Warrior
-                elif archer_button.collidepoint(event.pos):
+                    selected_tower = towers[0]
+                elif tower2_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = Archer
-                elif deadeye_button.collidepoint(event.pos):
+                    selected_tower = towers[1]
+                elif tower3_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = Deadeye
-                elif berserker_button.collidepoint(event.pos):
+                    selected_tower = towers[2]
+                elif tower4_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = Berserker
-                elif assassin_button.collidepoint(event.pos):
+                    selected_tower = towers[3]
+                elif tower5_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = Assassin
-                elif gunslinger_button.collidepoint(event.pos):
+                    selected_tower = towers[4]
+                elif tower6_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = Gunslinger
-                elif dragoon_button.collidepoint(event.pos):
+                    selected_tower = towers[5]
+                elif tower7_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = Dragoon
-                elif farm_button.collidepoint(event.pos):
+                    selected_tower = towers[6]
+                elif tower8_button.collidepoint(event.pos):
                     placing = True
-                    selected_tower = Farm
-                elif electrocutioner_button.collidepoint(event.pos):
-                    placing = True
-                    selected_tower = Electrocutioner
+                    selected_tower = towers[7]
                 else:
                     if tower_info_menu:
                         if tower_info_exit_button.collidepoint(event.pos):
@@ -220,33 +216,28 @@ def game_screen(screen, map, WIDTH, HEIGHT):
                     paused = True
                 elif event.key == pygame.K_1:
                     placing = True
-                    selected_tower = Warrior
+                    selected_tower = towers[0]
                 elif event.key == pygame.K_2:
                     placing = True
-                    selected_tower = Archer
+                    selected_tower = towers[1]
                 elif event.key == pygame.K_3:
                     placing = True
-                    selected_tower = Deadeye
+                    selected_tower = towers[2]
                 elif event.key == pygame.K_4:
                     placing = True
-                    selected_tower = Berserker
+                    selected_tower = towers[3]
                 elif event.key == pygame.K_5:
                     placing = True
-                    selected_tower = Assassin
+                    selected_tower = towers[4]
                 elif event.key == pygame.K_6:
                     placing = True
-                    selected_tower = Gunslinger
+                    selected_tower = towers[5]
                 elif event.key == pygame.K_7:
                     placing = True
-                    selected_tower = Dragoon
+                    selected_tower = towers[6]
                 elif event.key == pygame.K_8:
                     placing = True
-                    selected_tower = Farm
-                elif event.key == pygame.K_9:
-                    placing = True
-                    selected_tower = Electrocutioner
-                elif event.key == pygame.K_q:
-                    placing = False
+                    selected_tower = towers[7]
 
         if health <= 0:
             # States
@@ -297,69 +288,61 @@ def game_screen(screen, map, WIDTH, HEIGHT):
         pygame.draw.line(screen, COLOR.BLACK, line1_start, line2_end, 2)
         pygame.draw.line(screen, COLOR.BLACK, line2_start, line1_end, 2)
 
-        # Warrior
-        pygame.draw.rect(screen, COLOR.GREEN, warrior_button)
-        warrior_text = fonts.render("Warrior", True, COLOR.WHITE)
-        screen.blit(warrior_text, (warrior_button.x+13, warrior_button.y+10))
-        warrior_cost = fonts.render(f"${warrior.cost}", True, COLOR.WHITE)
-        screen.blit(warrior_cost, (warrior_button.x+13, warrior_button.y+30))
+        # Tower 1
+        pygame.draw.rect(screen, tower1.color, tower1_button)
+        tower1_text = fonts.render(tower1.name, True, tower1.text_color)
+        screen.blit(tower1_text, (tower1_button.x+13, tower1_button.y+10))
+        tower1_cost = fonts.render(f"${tower1.cost}", True, tower1.text_color)
+        screen.blit(tower1_cost, (tower1_button.x+13, tower1_button.y+30))
 
-        # Archer
-        pygame.draw.rect(screen, COLOR.RED, archer_button)
-        archer_text = fonts.render("Archer", True, COLOR.WHITE)
-        screen.blit(archer_text, (archer_button.x+13, archer_button.y+10))
-        archer_cost = fonts.render(f"${archer.cost}", True, COLOR.WHITE) 
-        screen.blit(archer_cost, (archer_button.x + 13, archer_button.y + 30))
+        # Tower 2
+        pygame.draw.rect(screen, tower2.color, tower2_button)
+        tower2_text = fonts.render(tower2.name, True, tower2.text_color)
+        screen.blit(tower2_text, (tower2_button.x+13, tower2_button.y+10))
+        tower2_cost = fonts.render(f"${tower2.cost}", True, tower2.text_color)
+        screen.blit(tower2_cost, (tower2_button.x+13, tower2_button.y+30))
 
-        # Deadeye
-        pygame.draw.rect(screen, COLOR.PURPLE, deadeye_button)
-        deadeye_text = fonts.render("Deadeye", True, COLOR.WHITE)
-        screen.blit(deadeye_text, (deadeye_button.x+13, deadeye_button.y+10))
-        deadeye_cost = fonts.render(f"${deadeye.cost}", True, COLOR.WHITE)
-        screen.blit(deadeye_cost, (deadeye_button.x + 13, deadeye_button.y + 30))
+        # Tower 3
+        pygame.draw.rect(screen, tower3.color, tower3_button)
+        tower3_text = fonts.render(tower3.name, True, tower3.text_color)
+        screen.blit(tower3_text, (tower3_button.x+13, tower3_button.y+10))
+        tower3_cost = fonts.render(f"${tower3.cost}", True, tower3.text_color)
+        screen.blit(tower3_cost, (tower3_button.x+13, tower3_button.y+30))
 
-        # Berserker
-        pygame.draw.rect(screen, COLOR.BLUE, berserker_button)
-        berserker_text = fonts.render("Berserker", True, COLOR.WHITE)
-        screen.blit(berserker_text, (berserker_button.x+13, berserker_button.y+10))
-        berserker_cost = fonts.render(f"${berserker.cost}", True, COLOR.WHITE) 
-        screen.blit(berserker_cost, (berserker_button.x + 13, berserker_button.y + 30))
+        # Tower 4
+        pygame.draw.rect(screen, tower4.color, tower4_button)
+        tower4_text = fonts.render(tower4.name, True, tower4.text_color)
+        screen.blit(tower4_text, (tower4_button.x+13, tower4_button.y+10))
+        tower4_cost = fonts.render(f"${tower4.cost}", True, tower4.text_color)
+        screen.blit(tower4_cost, (tower4_button.x+13, tower4_button.y+30))
 
-        # Assassin
-        pygame.draw.rect(screen, COLOR.BLACK, assassin_button)
-        assassin_text = fonts.render("Assassin", True, COLOR.WHITE)
-        screen.blit(assassin_text, (assassin_button.x+13, assassin_button.y+10))
-        assassin_cost = fonts.render(f"${assassin.cost}", True, COLOR.WHITE) 
-        screen.blit(assassin_cost, (assassin_button.x + 13, assassin_button.y + 30))
+        # Tower 5
+        pygame.draw.rect(screen, tower5.color, tower5_button)
+        tower5_text = fonts.render(tower5.name, True, tower5.text_color)
+        screen.blit(tower5_text, (tower5_button.x+13, tower5_button.y+10))
+        tower5_cost = fonts.render(f"${tower5.cost}", True, tower5.text_color)
+        screen.blit(tower5_cost, (tower5_button.x+13, tower5_button.y+30))
 
-        # Gunslinger
-        pygame.draw.rect(screen, COLOR.ORANGE, gunslinger_button)
-        gunslinger_text = fonts.render("Gunslinger", True, COLOR.WHITE)
-        screen.blit(gunslinger_text, (gunslinger_button.x + 13, gunslinger_button.y + 10))
-        gunslinger_cost = fonts.render(f"${gunslinger.cost}", True, COLOR.WHITE)  
-        screen.blit(gunslinger_cost, (gunslinger_button.x + 13, gunslinger_button.y + 30))
+        # Tower 6
+        pygame.draw.rect(screen, tower6.color, tower6_button)
+        tower6_text = fonts.render(tower6.name, True, tower6.text_color)
+        screen.blit(tower6_text, (tower6_button.x+13, tower6_button.y+10))
+        tower6_cost = fonts.render(f"${tower6.cost}", True, tower6.text_color)
+        screen.blit(tower6_cost, (tower6_button.x+13, tower6_button.y+30))
 
-        # Dragoon 
-        pygame.draw.rect(screen, COLOR.PURPLE, dragoon_button)
-        dragoon_text = fonts.render("Dragoon", True, COLOR.WHITE)
-        screen.blit(dragoon_text, (dragoon_button.x + 13, dragoon_button.y + 10))
-        dragoon_cost = fonts.render(f"${dragoon.cost}", True, COLOR.WHITE) 
-        screen.blit(dragoon_cost, (dragoon_button.x + 13, dragoon_button.y + 30))
+        # Tower 7
+        pygame.draw.rect(screen, tower7.color, tower7_button)
+        tower7_text = fonts.render(tower7.name, True, tower7.text_color)
+        screen.blit(tower7_text, (tower7_button.x+13, tower7_button.y+10))
+        tower7_cost = fonts.render(f"${tower7.cost}", True, tower7.text_color)
+        screen.blit(tower7_cost, (tower7_button.x+13, tower7_button.y+30))
 
-        # Farm
-        pygame.draw.rect(screen, COLOR.FAINT, farm_button)
-        farm_text = fonts.render("Farm", True, COLOR.BLACK)
-        screen.blit(farm_text, (farm_button.x + 13, farm_button.y + 10))
-        farm_cost = fonts.render(f"${farm.cost}", True, COLOR.BLACK) 
-        screen.blit(farm_cost, (farm_button.x + 13, farm_button.y + 30))
-
-        # Farm
-        pygame.draw.rect(screen, COLOR.DARK_TEAL, electrocutioner_button)
-        electrocutioner_text = fonts.render("Electrocutioner", True, COLOR.WHITE)
-        screen.blit(electrocutioner_text, (electrocutioner_button.x + 13, electrocutioner_button.y + 10))
-        electrocutioner_cost = fonts.render(f"${electrocutioner.cost}", True, COLOR.WHITE) 
-        screen.blit(electrocutioner_cost, (electrocutioner_button.x + 13, electrocutioner_button.y + 30))
-
+        # Tower 8
+        pygame.draw.rect(screen, tower8.color, tower8_button)
+        tower8_text = fonts.render(tower8.name, True, tower8.text_color)
+        screen.blit(tower8_text, (tower8_button.x+13, tower8_button.y+10))
+        tower8_cost = fonts.render(f"${tower8.cost}", True, tower8.text_color)
+        screen.blit(tower8_cost, (tower8_button.x+13, tower8_button.y+30))
 
         if seed.get(level) and enemy_timer <= 0:
             if enemy_spawn_time:
@@ -471,7 +454,7 @@ def game_screen(screen, map, WIDTH, HEIGHT):
 
             # Check if the placement is valid (not on the track and no overlap with existing towers)
             # Implement your own validation logic
-            valid,grids = validate_tower_placement(mouse_pos, tower, grid, WIDTH, HEIGHT)
+            valid,grids = validate_tower_placement(mouse_pos, tower, grid)
 
             # Draw tower in red if placement is not valid
             if not valid:
