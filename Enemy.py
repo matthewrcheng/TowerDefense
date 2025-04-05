@@ -22,6 +22,7 @@ class Enemy:
         self.width = 3
         self.id = 101
         self.rect = pygame.Rect(0, 0, self.width * CELL_SIZE, self.height * CELL_SIZE)
+        self.path_progress = 0
 
     def place(self, location, grid, num) -> None:
         self.x = location[0]
@@ -31,15 +32,22 @@ class Enemy:
 
         self.rect.topleft = (self.x * CELL_SIZE, self.y * CELL_SIZE)
 
-    def walk(self, grid) -> bool:
+    def walk(self, grid, selected_map) -> bool:
         if self.current_delay <= 0:
-            if self.x + self.width >= len(grid[0]):
+            if self.x == selected_map.end[0] and self.y == selected_map.end[1] or self.path_progress == len(selected_map.path):
                 return False
             grid[self.y:self.y+self.height+1, self.x:self.x+self.width+1] = 0
-            self.x += self.direction[0]
-            self.y += self.direction[1]
+            self.direction = selected_map.path[self.path_progress]
+            self.x += selected_map.path[self.path_progress][0]
+            self.y += selected_map.path[self.path_progress][1]
             grid[self.y:self.y+self.height+1, self.x:self.x+self.width+1] = self.id
+            # rotate self.rect if direction is up or down
+            if self.direction == Direction.up:
+                self.rect = pygame.Rect(self.x * CELL_SIZE, self.y * CELL_SIZE, self.width * CELL_SIZE, self.height * CELL_SIZE)
+            elif self.direction == Direction.down:
+                self.rect = pygame.Rect(self.x * CELL_SIZE, self.y * CELL_SIZE, self.width * CELL_SIZE, self.height * CELL_SIZE)
             self.current_delay = self.speed_delay
+            self.path_progress += 1
             return True
         self.current_delay -= 1
         self.rect.topleft = (self.x * CELL_SIZE, self.y * CELL_SIZE)
@@ -330,13 +338,29 @@ class Infiltrator(Enemy):
         self.name = "Infiltrator"
         self.speed_delay = 1
         self.max_health = 1000
-        self.boss_flag = True
+        self.boss_flag = False
         self.health = self.max_health
         self.color = COLOR.LIGHT_GRAY
         self.id = 124
 
+class TrojanHorse(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Trojan Horse"
+        self.speed_delay = 5
+        self.max_health = 500
+        self.health = self.max_health
+        self.color = COLOR.DARK_BROWN
+        self.id = 125
+
+# TODO: something related to prison break
+
+# TODO: magic book guy
+
+# TODO: witch and witchs' coven
+
 ################################################################################
-#                                 Sunken                                       #
+#                                 Drowned                                      #
 ################################################################################
 class Drowned(Enemy):
     def __init__(self) -> None:
@@ -357,10 +381,30 @@ class DrownedMate(Enemy):
 class DrownedCaptain(Enemy):
     pass
 
+class Mermaid(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Mermaid"
+        self.speed_delay = 8
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.DARK_BLUE
+        self.id = 203
+
+class Siren(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Siren"
+        self.speed_delay = 8
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.DARK_BLUE
+        self.id = 204
+
 class AbyssalKing(Enemy):
     def __init__(self) -> None:
         super().__init__()
-        self.name = "Thug"
+        self.name = "Abyssal King"
         self.speed_delay = 8
         self.max_health = 8
         self.health = self.max_health
@@ -370,7 +414,7 @@ class AbyssalKing(Enemy):
 class MonsterOfTheDeep(Enemy):
     def __init__(self) -> None:
         super().__init__()
-        self.name = "Thug"
+        self.name = "Monster of the Deep"
         self.speed_delay = 8
         self.max_health = 8
         self.health = self.max_health
@@ -453,6 +497,26 @@ class Death(Enemy):
         self.max_health = 8
         self.health = self.max_health
         self.color = COLOR.FAINT
+        self.id = 103
+
+class DemonPriest(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Demon Priest"
+        self.speed_delay = 8
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 103
+
+class DemonPrince(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Demon Prince"
+        self.speed_delay = 8
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
         self.id = 103
 
 class Hades(Enemy):

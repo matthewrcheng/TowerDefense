@@ -1,7 +1,7 @@
 import pygame
 from enum import Enum
 
-def draw_rect_alpha(surface, color, rect):
+def draw_rect_alpha(surface, color, rect, alpha=255):
     shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
     pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
     surface.blit(shape_surf, rect)
@@ -60,6 +60,7 @@ class Unicode:
     link = "\U0001F517"
 
 class COLOR:
+    # Main colors
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     RED = (128, 0, 0)
@@ -68,43 +69,70 @@ class COLOR:
     PURPLE = (128, 0, 128)
     TEAL = (0, 200, 150)
     GRAY = (128, 128, 128)
-    LIGHT = (200, 200, 0)
-    FAINT = (220, 220, 220)
-    LIGHT_BLUE = (100, 180, 250)
-    LIGHT_GREEN = (100, 250, 150)
-    GRASS = (130, 225, 100)
-    LIGHT_RED = (100, 250, 100)
     ORANGE = (128, 190, 0)
     YELLOW = (128, 128, 0)
     PINK = (250, 180, 250)
+    GOLD = (128,107,0)
+    BROWN = (145, 110, 50)
+    MAROON = (128, 0, 0)
+    MAGENTA = (128, 0, 128)
+
+    # Light colors
+    LIGHT = (200, 200, 0)
+    LIGHT_BLUE = (100, 180, 250)
+    LIGHT_GREEN = (100, 250, 150)
+    LIGHT_RED = (100, 250, 100)
+    LIGHT_PURPLE = (192, 0, 192)
+    LIGHT_GRAY = (192, 192, 192)
+    LIGHT_ORANGE = (192, 255, 0)
+    LIGHT_YELLOW = (190, 190, 0)
+    LIGHT_BROWN = (186, 128, 60)
+    
+    # Dark colors
     DARK_GREEN = (0, 64, 0)
     DARK_BLUE = (0, 0, 64)
     DARK_RED = (64, 0, 0)
     DARK_PURPLE = (64, 0, 64)
     DARK_TEAL = (0, 100, 75)
     DARK_GRAY = (64, 64, 64)
-    DARK_ORANGE = (64, 95, 0)
+    DARK_ORANGE = (200, 100, 0)
     DARK_YELLOW = (64, 64, 0)
     DARK_PINK = (125, 90, 125)
-    LIGHT_PURPLE = (192, 0, 192)
-    LIGHT_GRAY = (192, 192, 192)
-    LIGHT_ORANGE = (192, 255, 0)
-    LIGHT_YELLOW = (190, 190, 0)
-    BROWN = (165, 42, 42)
-    CAN_PLACE = (255,255,255,80)
-    CANT_PLACE = (128,0,0,80)
-    FADE = (0, 0, 0, 80)
+    DARK_BROWN = (120, 85, 40)
+
+    # Alt colors
     FAINT_BLUE = (0, 0, 128, 80)
     FAINT_DARK_PURPLE = (64, 0, 64, 80)
-    GOLD = (128,107,0)
+    FADE = (0, 0, 0, 80)
+    FAINT = (220, 220, 220)
+
+    # Util colors
+    CAN_PLACE = (255,255,255,80)
+    CANT_PLACE = (128,0,0,80)
+
+    # Terrain colors
+    GRASS = (130, 225, 100)
+    DARK_ROCK = (128, 128, 128)
+    LIGHT_ROCK = (192, 192, 192)
+    WET_SAND = (240, 225, 0)
+    DRY_SAND = (255, 240, 160)
+    WATER = (0, 0, 255)
+    SNOW = (252, 252, 252)
+    ICE = (160, 255, 255)
+    FIRE = (255, 0, 0)
+    LAVA = (255, 128, 0)
+
 
 class GameState(Enum):
     MENU = 0
-    SELECTION = 1
-    GAME = 2
-    COLLECTION = 3
-    ACHIEVEMENTS = 4
-    RESULTS = 5
+    MAP_SELECTION = 1
+    TOWER_SELECTION = 2
+    DIFFICULTY_SELECTION = 3
+    GAME = 4
+    COLLECTION = 5
+    ACHIEVEMENTS = 6
+    RESULTS = 7
+    QUIT = 8
 
 class Map():
 
@@ -113,18 +141,62 @@ class Map():
         primary = COLOR.GREEN
         secondary = COLOR.LIGHT
         background = COLOR.GRASS
+        path_color = COLOR.LIGHT_BROWN
         name = "Field"
+        start = (0, 30)
+        end = (79, 16)
+        path = [(1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (0, -1), (0, -1), (0, -1), (0, -1), (1, 0), (1, 0), (1, 0), (1, 0), \
+                (0, 1), (0, 1), (0, 1), (0, 1), (0, 1), (0, 1), (0, 1), (0, 1), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), \
+                (0, 1), (0, 1), (0, 1), (0, 1), (0, 1), (0, 1), (0, 1), (0, 1), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), \
+                (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), \
+                (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), \
+                (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), \
+                (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), \
+                (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), (0, -1), \
+                (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), (1, 0), \
+                (1, 0), (1, 0)]
 
 
     class Beach():
         primary = COLOR.TEAL
-        secondary = COLOR.BLUE
-        background = COLOR.LIGHT_BLUE
+        secondary = COLOR.WET_SAND
+        background = COLOR.WET_SAND
         name = "Beach"
 
 
     class Moon():
-        primary = COLOR.GRAY
-        secondary = COLOR.FAINT
-        background = COLOR.FAINT
+        primary = COLOR.DARK_ROCK
+        secondary = COLOR.LIGHT_ROCK
+        background = COLOR.LIGHT_ROCK
         name = "Moon"
+
+    class Desert():
+        primary = COLOR.DARK_GREEN
+        secondary = COLOR.DRY_SAND
+        background = COLOR.DRY_SAND
+        name = "Desert"
+
+    class Arctic():
+        primary = COLOR.SNOW
+        secondary = COLOR.ICE
+        background = COLOR.ICE
+        name = "Arctic"
+
+    class Jungle():
+        primary = COLOR.DARK_BROWN
+        secondary = COLOR.DARK_GREEN
+        background = COLOR.GREEN
+        name = "Jungle"
+
+    class Volcano():
+        primary = COLOR.DARK_RED
+        secondary = COLOR.DARK_ORANGE
+        background = COLOR.DARK_ORANGE
+        name = "Volcano"
+if __name__ == "__main__":
+    field_map = Map.Field()
+    cur = field_map.start
+    for i in range(len(field_map.path)):
+        print(cur)
+        cur = cur[0] + field_map.path[i][0], cur[1] + field_map.path[i][1]
+    print(cur)

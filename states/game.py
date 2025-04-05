@@ -3,9 +3,9 @@ import numpy as np
 import random
 from constants import GRID_HEIGHT,GRID_WIDTH,CELL_SIZE,SIDEBAR_WIDTH,FPS
 from utils import COLOR, GameState, Map, Targeting, Unicode, draw_circle_alpha, draw_polygon_alpha, draw_rect_alpha
-from Tower import Tower, Gunslinger, Farm
+from Tower import Tower, Gunslinger, Farm, General, Infantry
+from Enemy import TrojanHorse, Infiltrator
 # from Enemy import Enemy, , Speedy, Slow, Tough
-from enemy_seeds.normal import seed
 
 def draw_enemy_bar(screen, enemy, font):
     enemy_name_text = font.render(enemy.name, True, COLOR.WHITE)
@@ -19,7 +19,52 @@ def draw_enemy_bar(screen, enemy, font):
     green_part_rect = pygame.Rect(health_bar_rect.left, health_bar_rect.top, green_width, health_bar_rect.height)
     pygame.draw.rect(screen, COLOR.GREEN, green_part_rect)
 
-def validate_tower_placement(mouse_pos, selected_tower, grid):
+def draw_path(screen, selected_map):
+    cur = selected_map.start
+    color = selected_map.path_color
+    left = False
+    top = False
+    right = False
+    bottom = False
+    for i in range(len(selected_map.path) - 1): 
+        # color each cell with the path color (each cell is 1 grid square or 10x10 pixels)
+        pygame.draw.rect(screen, color, (cur[0] * CELL_SIZE, cur[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        # color each surrounding cell with the path color as well
+        # check if cell is on the left edge
+        if cur[0] != 0:
+            left = True
+        # check if cell is on the top edge
+        if cur[1] != 0:
+            top = True
+        # check if cell is on the right edge
+        if cur[0] != GRID_WIDTH - 1:
+            right = True
+        # check if cell is on the bottom edge
+        if cur[1] != GRID_HEIGHT - 1:
+            bottom = True
+        if left:
+            pygame.draw.rect(screen, color, ((cur[0] - 1) * CELL_SIZE, cur[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        if top:
+            pygame.draw.rect(screen, color, (cur[0] * CELL_SIZE, (cur[1] - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        if right:
+            pygame.draw.rect(screen, color, ((cur[0] + 1) * CELL_SIZE, cur[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        if bottom:
+            pygame.draw.rect(screen, color, (cur[0] * CELL_SIZE, (cur[1] + 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        if left and top:
+            pygame.draw.rect(screen, color, ((cur[0] - 1) * CELL_SIZE, (cur[1] - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        if right and top:
+            pygame.draw.rect(screen, color, ((cur[0] + 1) * CELL_SIZE, (cur[1] - 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        if left and bottom:
+            pygame.draw.rect(screen, color, ((cur[0] - 1) * CELL_SIZE, (cur[1] + 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        if right and bottom:
+            pygame.draw.rect(screen, color, ((cur[0] + 1) * CELL_SIZE, (cur[1] + 1) * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        cur = (cur[0] + selected_map.path[i][0], cur[1] + selected_map.path[i][1])
+        left = False
+        top = False
+        right = False
+        bottom = False
+
+def validate_tower_placement(mouse_pos, selected_tower, grid, path_coords):
     extrax = selected_tower.width//2
     extray = selected_tower.height//2
 
@@ -35,8 +80,18 @@ def validate_tower_placement(mouse_pos, selected_tower, grid):
     if np.any(tower_cells != 0):
         return False,(gridx,gridy)
 
-    # Add more specific validation checks based on your game rules
-    # For example, check if the tower is not on the track or other restricted areas
+    # Check if the tower overlaps with the path
+    if (gridx,gridy) in path_coords:
+        return False,(gridx,gridy)
+    # Check if the tower extra overlaps with the path
+    if (gridx-extrax,gridy-extray) in path_coords:
+        return False,(gridx,gridy)
+    if (gridx+extrax,gridy-extray) in path_coords:
+        return False,(gridx,gridy)
+    if (gridx-extrax,gridy+extray) in path_coords:
+        return False,(gridx,gridy)
+    if (gridx+extrax,gridy+extray) in path_coords:
+        return False,(gridx,gridy)
 
     return True,(gridx,gridy)
 
@@ -51,7 +106,29 @@ def place_tower(grids, grid, selected_tower, num):
 
     grid[gridy-extray:gridy+extray+1, gridx-extrax:gridx+extrax+1] = selected_tower.id
 
-def game_screen(screen: pygame.Surface, map: Map, selected_towers: list[Tower], WIDTH: int, HEIGHT: int):
+def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Tower], seed: dict, WIDTH: int, HEIGHT: int):
+    cur = selected_map.start
+    path_coords = {cur}
+    for i in range(0, len(selected_map.path)): 
+        cur = (cur[0] + selected_map.path[i][0], cur[1] + selected_map.path[i][1])
+        path_coords.add((cur[0] + selected_map.path[i][0], cur[1] + selected_map.path[i][1]))
+        # add 8 surrounding cells to path_coords
+        if selected_map.path[i][0] != 0:
+            path_coords.add((cur[0] - 1, cur[1] + selected_map.path[i][1]))
+        if selected_map.path[i][0] != GRID_WIDTH - 1:
+            path_coords.add((cur[0] + 1, cur[1] + selected_map.path[i][1]))
+        if selected_map.path[i][1] != 0:
+            path_coords.add((cur[0] + selected_map.path[i][0], cur[1] - 1))
+        if selected_map.path[i][1] != GRID_HEIGHT - 1:
+            path_coords.add((cur[0] + selected_map.path[i][0], cur[1] + 1))
+        if selected_map.path[i][0] != 0 and selected_map.path[i][1] != 0:
+            path_coords.add((cur[0] - 1, cur[1] - 1))
+        if selected_map.path[i][0] != 0 and selected_map.path[i][1] != GRID_HEIGHT - 1:
+            path_coords.add((cur[0] - 1, cur[1] + 1))
+        if selected_map.path[i][0] != GRID_WIDTH - 1 and selected_map.path[i][1] != 0:
+            path_coords.add((cur[0] + 1, cur[1] - 1))
+        if selected_map.path[i][0] != GRID_WIDTH - 1 and selected_map.path[i][1] != GRID_HEIGHT - 1:
+            path_coords.add((cur[0] + 1, cur[1] + 1))
     # placements
     grid = np.zeros((GRID_HEIGHT, GRID_WIDTH), dtype=int)
 
@@ -123,13 +200,15 @@ def game_screen(screen: pygame.Surface, map: Map, selected_towers: list[Tower], 
 
     # trackers
     tower_num = 0
+    troop_num = 0
     enemy_num = 0
     towers = dict()
+    troops = dict()
     enemies = dict()
     farms = []
 
     # conversion
-    tower_color = {0: map.background, 1:COLOR.GREEN, 2:COLOR.RED, 3:COLOR.PURPLE, 4:COLOR.BLUE, 5:COLOR.BLACK,
+    tower_color = {0: selected_map.background, 1:COLOR.GREEN, 2:COLOR.RED, 3:COLOR.PURPLE, 4:COLOR.BLUE, 5:COLOR.BLACK,
                    101:COLOR.DARK_GREEN, 102:COLOR.DARK_BLUE, 103:COLOR.DARK_RED}
 
     while not won:
@@ -152,8 +231,10 @@ def game_screen(screen: pygame.Surface, map: Map, selected_towers: list[Tower], 
 
                 # trackers
                 tower_num = 0
+                troop_num = 0
                 enemy_num = 0
                 towers = dict()
+                troops = dict()
                 enemies = dict()
                 farms = []
                 return GameState.MENU,False,0,0
@@ -251,17 +332,19 @@ def game_screen(screen: pygame.Surface, map: Map, selected_towers: list[Tower], 
             enemy_spawn_time = None
             autorun = False
             health = 100
-            money = 5000 # 500
+            money = 500
 
             # trackers
             tower_num = 0
+            troop_num = 0
             enemy_num = 0
             towers = dict()
+            troops = dict()
             enemies = dict()
             farms = []
             return GameState.RESULTS,won,level,time   
         
-        pygame.display.set_caption(f"{map.name}: LEVEL {level}")
+        pygame.display.set_caption(f"{selected_map.name}: LEVEL {level}")
         
         screen.fill(COLOR.WHITE)
 
@@ -357,13 +440,12 @@ def game_screen(screen: pygame.Surface, map: Map, selected_towers: list[Tower], 
                 enemy_timer = enemy_spawn_time
 
         pygame.draw.rect(screen, tower_color[0], (0, 0, WIDTH-SIDEBAR_WIDTH, HEIGHT))
-        # for row in range(GRID_HEIGHT):
-        #     for col in range(GRID_WIDTH):
-        #         cell_value = grid[row, col]
-        #         pygame.draw.rect(screen, tower_color[cell_value], (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        draw_path(screen, selected_map)
 
         for tower in towers.values():
             pygame.draw.rect(screen, tower.color, tower.rect)
+        for troop in troops.values():
+            pygame.draw.rect(screen, troop.color, troop.rect)
 
         for tower in towers.values():
             if tower.current_delay <= 0 and tower.damage:
@@ -381,18 +463,99 @@ def game_screen(screen: pygame.Surface, map: Map, selected_towers: list[Tower], 
                     if killed_list:
                         for killed in killed_list:
                             killed.kill(grid)
+                            # special case for TrojanHorse
+                            if type(killed) == TrojanHorse:
+                                for i in range(3):
+                                    new_enemy = Infiltrator()
+                                    new_enemy.place((killed.x-i+1,GRID_HEIGHT//2), grid, enemy_num)
+                                    enemies[enemy_num] = new_enemy
+                                    enemy_num += 1
                             enemies.pop(killed.num)
             else:
                 tower.current_delay -= 1
+            if type(tower) == General:
+                if tower.current_spawn_delay <= 0:
+                    infantry = Infantry()
+                    troops[troop_num] = infantry
+                    place_tower(selected_map.end, grid, infantry, troop_num)
+                    troop_num += 1
+                    infantry.set_progress(selected_map.path)
+                    print(f"{infantry.name} spawned at {infantry.x},{infantry.y}")
+                    tower.current_spawn_delay = tower.total_spawn_delay
+                else:
+                    tower.current_spawn_delay -= 1
+
+        to_remove = []
+        for k,troop in troops.items():
+            target = troop.find_target(screen, enemies)
+            if troop.current_delay <= 0 and troop.damage:
+                if target:
+                    print(f"{troop.name} attacks {target}")
+                    if type(target) is list:
+                        total_damage = sum(min(troop.damage, t.health) for t in target)                            
+                    else:
+                        total_damage = min(troop.damage, target.health)
+                    money += total_damage
+                    killed_list = troop.attack(screen, target)
+                    troop.total_damage += total_damage
+                    if killed_list:
+                        for killed in killed_list:
+                            killed.kill(grid)
+                            # special case for TrojanHorse
+                            if type(killed) == TrojanHorse:
+                                for i in range(3):
+                                    new_enemy = Infiltrator()
+                                    new_enemy.place((killed.x-i+1,GRID_HEIGHT//2), grid, enemy_num)
+                                    enemies[enemy_num] = new_enemy
+                                    enemy_num += 1
+                            enemies.pop(killed.num)
+            else:
+                troop.current_delay -= 1
+            if not target:
+                success = troop.walk(grid, selected_map)
+                if not success:
+                    print(f"{troop.name} died")
+                    to_remove.append(k)
+                    killed_troop.kill(grid)
+                else:
+                    # if a troop runs into an enemy
+                    for enemy in enemies.values():
+                        if troop.rect.colliderect(enemy.rect):
+                            print(f"{troop.name} runs into {enemy.name}")
+                            damage = min(troop.health, enemy.health)
+                            killed_troop = troop.take_damage(damage)
+                            killed_enemy = enemy.damage(damage)
+                            if killed_troop:
+                                to_remove.append(k)
+                                killed_troop.kill(grid)
+                            if killed_enemy:
+                                killed_enemy.kill(grid)
+                                enemies.pop(killed_enemy.num)
+
+        for k in to_remove:
+            troops.pop(k.num)
 
         to_remove = []
         for k,enemy in enemies.items():
-            success = enemy.walk(grid)
+            success = enemy.walk(grid, selected_map)
             if not success:
                 health -= enemy.health
                 enemy.kill(grid)
                 to_remove.append(k)
             else:
+                # if an enemy runs into a troop
+                for troop in troops.values():
+                    if troop.rect.colliderect(enemy.rect):
+                        damage = min(troop.health, enemy.health)
+                        killed_troop = troop.take_damage(damage)
+                        killed_enemy = enemy.damage(damage)
+                        if killed_troop:
+                            killed_troop.kill(grid)
+                            troops.pop(killed_troop.num)
+                        if killed_enemy:
+                            health -= enemy.health
+                            enemy.kill(grid)
+                            to_remove.append(k)
                 pygame.draw.rect(screen, enemy.color, enemy.rect)
             
         if not placing and not tower_info_menu:
@@ -403,6 +566,10 @@ def game_screen(screen: pygame.Surface, map: Map, selected_towers: list[Tower], 
             for enemy in enemies.values():
                 if enemy.rect.collidepoint(mouse_pos):
                     draw_enemy_bar(screen, enemy, fonts)
+            for troop in troops.values():
+                if troop.rect.collidepoint(mouse_pos):
+                    draw_enemy_bar(screen, troop, fonts)
+                    draw_circle_alpha(screen, COLOR.CAN_PLACE, (troop.x*CELL_SIZE, troop.y*CELL_SIZE), troop.range*CELL_SIZE)
 
         
         for k in to_remove:
@@ -453,7 +620,7 @@ def game_screen(screen: pygame.Surface, map: Map, selected_towers: list[Tower], 
 
             # Check if the placement is valid (not on the track and no overlap with existing towers)
             # Implement your own validation logic
-            valid,grids = validate_tower_placement(mouse_pos, tower, grid)
+            valid,grids = validate_tower_placement(mouse_pos, tower, grid, path_coords)
 
             # Draw tower in red if placement is not valid
             if not valid:
@@ -502,6 +669,7 @@ def game_screen(screen: pygame.Surface, map: Map, selected_towers: list[Tower], 
 
     # trackers
     tower_num = 0
+    troop_num = 0
     enemy_num = 0
     towers = dict()
     enemies = dict()

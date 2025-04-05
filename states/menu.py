@@ -21,7 +21,7 @@ def menu_screen(screen):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if play_button.collidepoint(event.pos):
                     # Transition to the WORLDS screen when "Play" is clicked
-                    return GameState.SELECTION
+                    return GameState.MAP_SELECTION
                 elif collection_button.collidepoint(event.pos):
                     return GameState.COLLECTION
                 elif achievements_button.collidepoint(event.pos):

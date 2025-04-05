@@ -601,7 +601,7 @@ class Farm(Tower):
         self.damage = 0
         self.attack_delay = -1
         self.range = 3
-        self.color = COLOR.WHITE
+        self.color = COLOR.LIGHT
         self.text_color = COLOR.BLACK
         self.id = 8
         self.upgrade_cost = 150
@@ -773,6 +773,306 @@ class Electrocutioner(Tower):
         self.stun_delay = 20
         self.range = 22
         self.attack_sound = pygame.mixer.Sound('sounds/strong_laser.ogg')
+
+class Bard(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Bard"
+        self.cost = 1500
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_TEAL
+        self.attack_color = COLOR.TEAL
+        self.id = 10
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+class Mage(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Mage"
+        self.cost = 600
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_TEAL
+        self.attack_color = COLOR.TEAL
+        self.id = 11
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+class Artisan(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Artisan"
+        self.cost = 900
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_TEAL
+        self.attack_color = COLOR.TEAL
+        self.id = 12
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+class General(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "General"
+        self.cost = 2
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_TEAL
+        self.attack_color = COLOR.TEAL
+        self.id = 13
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+        self.total_spawn_delay = 300
+        self.current_spawn_delay = self.total_spawn_delay
+
+class Troop(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Troop"
+        self.total_walk_delay = 5
+        self.current_walk_delay = self.total_walk_delay
+        self.max_health = 10
+        self.health = self.max_health
+        self.damage = 1
+        self.attack_delay = 30
+        self.range = 10
+        self.color = COLOR.DARK_TEAL
+        self.attack_color = COLOR.TEAL
+        self.id = 14
+        self.attack_sound = pygame.mixer.Sound('sounds/pistol1.ogg')
+
+    def set_progress(self, path) -> None:
+        self.path_progress = len(path) - 1
+
+    def walk(self, grid, selected_map) -> bool:
+        if self.current_walk_delay <= 0:
+            if self.x == selected_map.start[0] and self.y == selected_map.start[1] or self.path_progress == -1:
+                print("Troop has reached the end of the path")
+                return False
+            grid[self.y:self.y+self.height+1, self.x:self.x+self.width+1] = 0
+            self.x -= selected_map.path[self.path_progress][0]
+            self.y -= selected_map.path[self.path_progress][1]
+            grid[self.y:self.y+self.height+1, self.x:self.x+self.width+1] = self.id
+            self.current_walk_delay = self.total_walk_delay
+            self.path_progress -= 1
+            print("Troop has moved to", self.x, self.y)
+            return True
+        self.current_walk_delay -= 1
+        self.rect.topleft = (self.x * CELL_SIZE, self.y * CELL_SIZE)
+        return True
+    
+    def kill(self, grid):
+        grid[self.y:self.y+self.height+1, self.x:self.x+self.width+1] = 0
+
+    def take_damage(self, amount):
+        self.health -= amount
+        if self.health <= 0:
+            return self
+        else:
+            return None
+
+class Infantry(Troop):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Infantry"
+
+class Alchemist(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Alchemist"
+        self.cost = 1100
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_PURPLE
+        self.attack_color = COLOR.PURPLE
+        self.id = 15
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+class PlagueDoctor(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Plague Doctor"
+        self.cost = 1300
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_PURPLE
+        self.attack_color = COLOR.PURPLE
+        self.id = 14
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+class Toxicologist(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Toxicologist"
+        self.cost = 1500
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_PURPLE
+        self.attack_color = COLOR.PURPLE
+        self.id = 15
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+class Pyromancer(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Pyromancer"
+        self.cost = 1200
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.ORANGE
+        self.attack_color = COLOR.LIGHT_ORANGE
+        self.id = 16
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+class Hypnotist(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Hypnotist"
+        self.cost = 700
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.PINK
+        self.attack_color = COLOR.LIGHT_PURPLE
+        self.id = 15
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+class Butcher(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Butcher"
+        self.cost = 900
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_RED
+        self.attack_color = COLOR.RED
+        self.id = 17
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+class Blacksmith(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Blacksmith"
+        self.cost = 1100
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_RED
+        self.attack_color = COLOR.RED
+        self.id = 18
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+class Miner(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Miner"
+        self.cost = 450
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.BROWN
+        self.attack_color = COLOR.DARK_ORANGE
+        self.id = 16
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+class Detonator(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Detonator"
+        self.cost = 800
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_ORANGE
+        self.attack_color = COLOR.ORANGE
+        self.id = 17
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
 
 if __name__ == "__main__":
     # print(Warrior().color)
