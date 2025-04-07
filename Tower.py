@@ -11,31 +11,52 @@ class Tower:
     """
 
     def __init__(self) -> None:
-        self.name = 'Warrior'           # name
-        self.cost = 250                 # game currency
+        self.name = 'Warrior'
+        self.cost = 250
         self.total_cost = self.cost
+
+        # flags
+        self.invisible_flag = False
+        self.metal_flag = False
+        self.air_flag = False
+        self.boss_multiplier = 0
+
+        # stats
         self.damage = 1                 # health ticks
-        self.attack_delay = 20           # milliseconds
+        self.attack_delay = 20          # frames between attacks
         self.range = 20                 # grid squares
-        self.invisible_flag = False     # camo
-        self.metal_flag = False         # lead
-        self.air_flag = False           # flying
-        self.boss_multiplier = 0          # blimp
+        
+        # display
         self.color = COLOR.GREEN        # look
         self.text_color = COLOR.WHITE   # text display color
-        self.current_delay = self.attack_delay # attack delay counter
         self.width = 3                  # number of cells wide
         self.height = 3                 # number of cells tall
+
+        # tracking
         self.id = 1                     # ID number for grid
-        self.targeting = Targeting.FIRST   
-        self.attack_color = COLOR.BLACK
-        self.attack_type = 0
-        self.upgrade_level = 0
-        self.upgrade_cost = 0
         self.rect = pygame.Rect(0, 0, self.width * CELL_SIZE, self.height * CELL_SIZE)
         self.total_damage = 0
+
+        # configuration
+        self.targeting = Targeting.FIRST   
+        self.upgrade_level = 0
+        self.upgrade_cost = 0
+
+        # attack
+        self.current_delay = self.attack_delay # attack delay counter
+        self.attack_color = COLOR.BLACK
+        self.attack_type = 0
         self.attack_size = 2
         self.attack_sound = pygame.mixer.Sound('sounds/throw.ogg')
+
+        # secondary attacks
+        self.secondary_damages = []
+        self.secondary_attack_delays = []
+        self.current_secondary_delays = self.secondary_attack_delays
+        self.secondary_attack_sounds = []
+        self.secondary_attack_colors = []
+        self.secondary_attack_sizes = []
+        self.secondary_attack_radii = []
 
     @property
     def info(self):
@@ -73,6 +94,20 @@ class Tower:
             return [killed]
         return None
     
+    def secondary_attack(self, idx, screen, enemy: Enemy) -> None:
+        start_pos = ((self.x+0.5)*CELL_SIZE, self.y*CELL_SIZE)
+        end_pos = ((enemy.x + 0.5 + enemy.width // 2)*CELL_SIZE, (enemy.y + enemy.height // 2)*CELL_SIZE)
+        self.secondary_attack_sounds[idx].play()
+        pygame.draw.line(screen, self.secondary_attack_colors[idx], start_pos, end_pos, self.secondary_attack_sizes[idx])
+        self.current_secondary_delays[idx] = self.secondary_attack_delays[idx]
+        damage = self.secondary_damages[idx]
+        if enemy.boss_flag:
+            damage *= self.boss_multiplier
+        killed = enemy.damage(damage)
+        if killed:
+            return [killed]
+        return None
+
     def can_attack(self, enemy: Enemy):
         if enemy.invisible_flag and not self.invisible_flag:
             return False
@@ -831,11 +866,13 @@ class Artisan(Tower):
         self.upgrade_cost = 250
         self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
 
+    
+
 class General(Tower):
     def __init__(self) -> None:
         super().__init__()
         self.name = "General"
-        self.cost = 2
+        self.cost = 2 # 2000
         self.total_cost = self.cost
         self.damage = 1
         self.attack_delay = 60
@@ -845,12 +882,69 @@ class General(Tower):
         self.range = 15
         self.metal_flag = True
         self.color = COLOR.DARK_TEAL
-        self.attack_color = COLOR.TEAL
+        self.attack_color = COLOR.DARK_GRAY
         self.id = 13
-        self.upgrade_cost = 250
-        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
-        self.total_spawn_delay = 300
-        self.current_spawn_delay = self.total_spawn_delay
+        self.upgrade_cost = 1 # 1000
+        self.attack_sound = pygame.mixer.Sound('sounds/pistol1.ogg')
+        # Infantry
+        self.total_infantry_spawn_delay = 450
+        self.current_infantry_spawn_delay = self.total_infantry_spawn_delay
+        self.spawn_infantry = True
+        self.infantry_level = 1
+        # Armored Infantry
+        self.total_armored_infantry_spawn_delay = 600
+        self.current_armored_infantry_spawn_delay = self.total_armored_infantry_spawn_delay
+        self.spawn_armored_infantry = False
+        self.armored_infantry_level = 1
+        # Artillery
+        self.total_artillery_spawn_delay = 900
+        self.current_artillery_spawn_delay = self.total_artillery_spawn_delay
+        self.spawn_artillery = False
+        self.artillery_level = 1
+        # Combat Aviation
+        self.total_combat_aviation_spawn_delay = 1200
+        self.current_combat_aviation_spawn_delay = self.total_combat_aviation_spawn_delay
+        self.spawn_combat_aviation = False
+        self.combat_aviation_level = 1
+
+    def upgrade1(self):
+        super().upgrade1()
+        self.upgrade_cost = 1 # 2000
+        self.attack_delay = 50
+        self.spawn_armored_infantry = True
+        self.total_infantry_spawn_delay = 300
+        self.infantry_level = 2
+
+    def upgrade2(self):
+        super().upgrade2()
+        self.upgrade_cost = 1 # 5000
+        self.attack_delay = 40
+        self.damage = 2
+        self.spawn_artillery = True
+
+    def upgrade3(self):
+        super().upgrade3()
+        self.upgrade_cost = 1 # 10000
+        self.attack_delay = 30
+        self.spawn_combat_aviation = True
+        self.total_infantry_spawn_delay = 200
+        self.total_armored_infantry_spawn_delay = 400
+        self.infantry_level = 3
+        self.armored_infantry_level = 2
+
+    def upgrade4(self):
+        super().upgrade4()
+        self.upgrade_cost = 0
+        self.attack_delay = 20
+        self.damage = 5
+        self.total_infantry_spawn_delay = 150
+        self.total_armored_infantry_spawn_delay = 300
+        self.total_artillery_spawn_delay = 600
+        self.total_combat_aviation_spawn_delay = 800
+        self.infantry_level = 4
+        self.armored_infantry_level = 3
+        self.artillery_level = 2
+        self.combat_aviation_level = 2
 
 class Troop(Tower):
     def __init__(self) -> None:
@@ -862,9 +956,11 @@ class Troop(Tower):
         self.health = self.max_health
         self.damage = 1
         self.attack_delay = 30
+        self.current_delay = self.attack_delay
         self.range = 10
+        self.invisible_flag = True
         self.color = COLOR.DARK_TEAL
-        self.attack_color = COLOR.TEAL
+        self.attack_color = COLOR.DARK_GRAY
         self.id = 14
         self.attack_sound = pygame.mixer.Sound('sounds/pistol1.ogg')
 
@@ -882,7 +978,6 @@ class Troop(Tower):
             grid[self.y:self.y+self.height+1, self.x:self.x+self.width+1] = self.id
             self.current_walk_delay = self.total_walk_delay
             self.path_progress -= 1
-            print("Troop has moved to", self.x, self.y)
             return True
         self.current_walk_delay -= 1
         self.rect.topleft = (self.x * CELL_SIZE, self.y * CELL_SIZE)
@@ -899,9 +994,118 @@ class Troop(Tower):
             return None
 
 class Infantry(Troop):
-    def __init__(self) -> None:
+    def __init__(self, level) -> None:
         super().__init__()
         self.name = "Infantry"
+        self.max_health = 10+10*(level - 1)
+        self.health = self.max_health
+        self.damage = 1*level
+        self.attack_delay = 30-3*(level - 1)
+        self.current_delay = self.attack_delay
+        self.range = 10+2*(level - 1)
+        self.color = COLOR.LIGHT
+
+class ArmoredInfantry(Troop):
+    def __init__(self, level) -> None:
+        super().__init__()
+        self.name = "Armored Infantry"
+        self.max_health = 35+35*(level - 1)
+        self.health = self.max_health
+        self.damage = 2*level
+        self.total_walk_delay = 8
+        self.current_walk_delay = self.total_walk_delay
+        self.attack_delay = 30-3*(level - 1)
+        self.current_delay = self.attack_delay
+        self.range = 10+2*(level - 1)
+        self.color = COLOR.DARK_GRAY
+
+class Artillery(Troop):
+    def __init__(self, level) -> None:
+        super().__init__()
+        self.name = "Artillery"
+        self.damage = 50+25*(level - 1)
+        self.attack_delay = 100-10*(level - 1)
+        self.current_delay = self.attack_delay
+        self.max_health = 100+60*(level - 1)
+        self.total_walk_delay = 12
+        self.range = 30
+        self.current_walk_delay = self.total_walk_delay
+        self.health = self.max_health
+        self.metal_flag = True
+        self.air_flag = True
+        self.color = COLOR.DARK_GREEN
+
+class CombatAviation(Troop):
+    def __init__(self, level) -> None:
+        super().__init__()
+        self.name = "Combat Aviation"
+        self.damage = 25+15*(level - 1)
+        self.attack_delay = 10-1*(level - 1)
+        self.current_delay = self.attack_delay
+        self.range = 25
+        self.total_walk_delay = 3
+        self.current_walk_delay = self.total_walk_delay
+        self.metal_flag = True
+        self.air_flag = True
+        self.color = COLOR.GRAY
+
+        self.secondary_damages = [200+100*(level - 1)]
+        self.secondary_attack_delays = [50-3*(level - 1)]
+        self.current_secondary_delays = self.secondary_attack_delays
+        self.secondary_attack_sounds = [pygame.mixer.Sound('sounds/firework.ogg')]
+        self.secondary_attack_colors = [COLOR.RED]
+        self.secondary_attack_sizes = [4]
+        self.secondary_attack_radii = [5]
+
+    def secondary_attack(self, idx, screen, enemies: list) -> None:
+        enemy = enemies[0]
+        start_pos = ((self.x+0.5)*CELL_SIZE, self.y*CELL_SIZE)
+        end_pos = ((enemy.x + 0.5 + enemy.width // 2)*CELL_SIZE, (enemy.y + enemy.height // 2)*CELL_SIZE)
+        pygame.draw.line(screen, self.secondary_attack_colors[idx], start_pos, end_pos, 2)
+        self.secondary_attack_sounds[idx].play()
+        draw_circle_alpha(screen, self.secondary_attack_colors[idx], end_pos, self.secondary_attack_radii[idx]*CELL_SIZE)
+        self.current_secondary_delays[idx] = self.secondary_attack_delays[idx]
+        killed_list = []
+        for enemy in enemies:
+            killed = enemy.damage(self.secondary_damages[idx])
+            if killed:
+                killed_list.append(killed)
+        return killed_list
+    
+    def secondary_find_target(self, idx, screen, enemies):
+        distances = {
+            k: sqrt(((max(enemy.x, min(self.x, enemy.x + enemy.width))) - self.x) ** 2 +
+                    ((max(enemy.y, min(self.y, enemy.y + enemy.height))) - self.y) ** 2)
+            for k, enemy in enemies.items()
+        }
+        target = None
+
+        targets_in_range = [k for k, distance in distances.items() if distance <= self.range and self.can_attack(enemies[k])]
+        if targets_in_range:
+            if self.targeting == Targeting.FIRST:
+                target_key = max(targets_in_range, key=lambda k: enemies[k].x)
+            elif self.targeting == Targeting.STRONG:
+                target_key = max(targets_in_range, key=lambda k: enemies[k].health)
+            elif self.targeting == Targeting.LAST:
+                target_key = min(targets_in_range, key=lambda k: enemies[k].x)
+            elif self.targeting == Targeting.WEAK:
+                target_key = min(targets_in_range, key=lambda k: enemies[k].health)
+            else:
+                target_key = choice(targets_in_range)
+            target = enemies[target_key]
+        if target:
+            targets = [target]
+            targetx = target.x + target.width // 2
+            targety = target.y + target.height // 2
+            new_distances = {
+                k: sqrt(((max(enemy.x, min(targetx, enemy.x + enemy.width))) - targetx) ** 2 +
+                        ((max(enemy.y, min(targety, enemy.y + enemy.height))) - targety) ** 2)
+                for k, enemy in enemies.items()
+            }
+            new_targets_in_range = [k for k, distance in new_distances.items() if distance <= self.secondary_attack_radii[idx] and k != target.num]
+            return targets + [enemies[k] for k in new_targets_in_range]
+
+        return None  # No target found within the tower's range
 
 class Alchemist(Tower):
     def __init__(self) -> None:

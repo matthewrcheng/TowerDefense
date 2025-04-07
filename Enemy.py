@@ -42,9 +42,7 @@ class Enemy:
             self.y += selected_map.path[self.path_progress][1]
             grid[self.y:self.y+self.height+1, self.x:self.x+self.width+1] = self.id
             # rotate self.rect if direction is up or down
-            if self.direction == Direction.up:
-                self.rect = pygame.Rect(self.x * CELL_SIZE, self.y * CELL_SIZE, self.width * CELL_SIZE, self.height * CELL_SIZE)
-            elif self.direction == Direction.down:
+            if self.direction == (0, -1) or self.direction == (0, 1):
                 self.rect = pygame.Rect(self.x * CELL_SIZE, self.y * CELL_SIZE, self.width * CELL_SIZE, self.height * CELL_SIZE)
             self.current_delay = self.speed_delay
             self.path_progress += 1

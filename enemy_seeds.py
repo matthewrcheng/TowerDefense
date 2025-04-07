@@ -5,6 +5,7 @@ easy = {
     "name": "Easy",
     "color": COLOR.LIGHT_GREEN,
     "text_color": COLOR.WHITE,
+    "final_level": 10,
     1: [(Pirate, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60)],
     2: [(Pirate, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60)],
     3: [(Pirate, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60)],
@@ -21,6 +22,7 @@ normal = {
     "name": "Normal",
     "color": COLOR.GREEN,
     "text_color": COLOR.WHITE,
+    "final_level": 25,
     1: [(Pirate, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60)],
     2: [(Pirate, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60)],
     3: [(Pirate, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60)],
@@ -52,6 +54,7 @@ hard = {
     "name": "Hard",
     "color": COLOR.DARK_GREEN,
     "text_color": COLOR.WHITE,
+    "final_level": 1,
     1: [(Pirate, 90), (PirateGunner, 30), (PirateMate, 30), (PirateCaptain, 30), (DreadPirate, 30)]
 }
 
@@ -59,6 +62,7 @@ extreme = {
     "name": "Extreme",
     "color": COLOR.DARK_PURPLE,
     "text_color": COLOR.WHITE,
+    "final_level": 1,
     1: [(Pirate, 90), (PirateGunner, 30), (PirateMate, 30), (PirateCaptain, 30), (DreadPirate, 30)]
 }
 
@@ -66,6 +70,7 @@ impossible = {
     "name": "Impossible",
     "color": COLOR.BLACK,
     "text_color": COLOR.WHITE,
+    "final_level": 1,
     1: [(Pirate, 90), (PirateGunner, 30), (PirateMate, 30), (PirateCaptain, 30), (DreadPirate, 30)]
 }
 
@@ -73,6 +78,7 @@ hell = {
     "name": "Hell",
     "color": COLOR.DARK_RED,
     "text_color": COLOR.YELLOW,
+    "final_level": 1,
     1: [(Pirate, 90), (PirateGunner, 30), (PirateMate, 30), (PirateCaptain, 30), (DreadPirate, 30)]
 }
 
@@ -80,6 +86,7 @@ drowned = {
     "name": "Drowned",
     "color": COLOR.DARK_BLUE,
     "text_color": COLOR.TEAL,
+    "final_level": 1,
     1: [(Pirate, 100)]
 }
 
@@ -87,5 +94,6 @@ corrupted = {
     "name": "Corrupted",
     "color": COLOR.GOLD,
     "text_color": COLOR.LIGHT_PURPLE,
+    "final_level": 1,
     1: [(TrojanHorse, 100)]
 }

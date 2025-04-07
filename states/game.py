@@ -3,7 +3,7 @@ import numpy as np
 import random
 from constants import GRID_HEIGHT,GRID_WIDTH,CELL_SIZE,SIDEBAR_WIDTH,FPS
 from utils import COLOR, GameState, Map, Targeting, Unicode, draw_circle_alpha, draw_polygon_alpha, draw_rect_alpha
-from Tower import Tower, Gunslinger, Farm, General, Infantry
+from Tower import Tower, Gunslinger, Farm, General, Infantry, ArmoredInfantry, Artillery, CombatAviation
 from Enemy import TrojanHorse, Infiltrator
 # from Enemy import Enemy, , Speedy, Slow, Tough
 
@@ -269,10 +269,8 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                     if tower_info_menu:
                         if tower_info_exit_button.collidepoint(event.pos):
                             tower_info_menu = False
-                            print("Closed info menu")
                         elif tower_info_upgrade_button.collidepoint(event.pos):
                             cost = tower_info_menu.upgrade_next(money)
-                            print("Attempted to upgrade")
                             if cost:
                                 money -= cost
                                 print("Upgraded successfully")
@@ -288,7 +286,6 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                         for tower in towers.values():
                             if tower.rect.collidepoint(event.pos):
                                 tower_info_menu = tower
-                                print("Opened info menu")
                                 break
                     
             elif event.type == pygame.KEYDOWN:
@@ -474,16 +471,46 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
             else:
                 tower.current_delay -= 1
             if type(tower) == General:
-                if tower.current_spawn_delay <= 0:
-                    infantry = Infantry()
+                if tower.current_infantry_spawn_delay <= 0 and tower.spawn_infantry:
+                    infantry = Infantry(tower.infantry_level)
                     troops[troop_num] = infantry
                     place_tower(selected_map.end, grid, infantry, troop_num)
                     troop_num += 1
                     infantry.set_progress(selected_map.path)
                     print(f"{infantry.name} spawned at {infantry.x},{infantry.y}")
-                    tower.current_spawn_delay = tower.total_spawn_delay
+                    tower.current_infantry_spawn_delay = tower.total_infantry_spawn_delay
                 else:
-                    tower.current_spawn_delay -= 1
+                    tower.current_infantry_spawn_delay -= 1
+                if tower.current_armored_infantry_spawn_delay <= 0 and tower.spawn_armored_infantry:
+                    armored_infantry = ArmoredInfantry(tower.armored_infantry_level)
+                    troops[troop_num] = armored_infantry
+                    place_tower(selected_map.end, grid, armored_infantry, troop_num)
+                    troop_num += 1
+                    armored_infantry.set_progress(selected_map.path)
+                    print(f"{armored_infantry.name} spawned at {armored_infantry.x},{armored_infantry.y}")
+                    tower.current_armored_infantry_spawn_delay = tower.total_armored_infantry_spawn_delay
+                else:
+                    tower.current_armored_infantry_spawn_delay -= 1
+                if tower.current_artillery_spawn_delay <= 0 and tower.spawn_artillery:
+                    artillery = Artillery(tower.artillery_level)
+                    troops[troop_num] = artillery
+                    place_tower(selected_map.end, grid, artillery, troop_num)
+                    troop_num += 1
+                    artillery.set_progress(selected_map.path)
+                    print(f"{artillery.name} spawned at {artillery.x},{artillery.y}")
+                    tower.current_artillery_spawn_delay = tower.total_artillery_spawn_delay
+                else:
+                    tower.current_artillery_spawn_delay -= 1
+                if tower.current_combat_aviation_spawn_delay <= 0 and tower.spawn_combat_aviation:
+                    combat_aviation = CombatAviation(tower.combat_aviation_level)
+                    troops[troop_num] = combat_aviation
+                    place_tower(selected_map.end, grid, combat_aviation, troop_num)
+                    troop_num += 1
+                    combat_aviation.set_progress(selected_map.path)
+                    print(f"{combat_aviation.name} spawned at {combat_aviation.x},{combat_aviation.y}")
+                    tower.current_combat_aviation_spawn_delay = tower.total_combat_aviation_spawn_delay
+                else:
+                    tower.current_combat_aviation_spawn_delay -= 1    
 
         to_remove = []
         for k,troop in troops.items():
@@ -511,16 +538,42 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                             enemies.pop(killed.num)
             else:
                 troop.current_delay -= 1
+            if troop.secondary_damages:
+                for i in range(len(troop.secondary_damages)):
+                    if troop.current_secondary_delays[i] <= 0 and troop.secondary_damages[i]:
+                        target = troop.secondary_find_target(i, screen, enemies)
+                        if target:
+                            print(f"{troop.name} attacks {target}")
+                            if type(target) is list:
+                                total_damage = sum(min(troop.secondary_damages[i], t.health) for t in target)                            
+                            else:
+                                total_damage = min(troop.secondary_damages[i], target.health)
+                            money += total_damage
+                            killed_list = troop.secondary_attack(i, screen, target)
+                            troop.total_damage += total_damage
+                            if killed_list:
+                                for killed in killed_list:
+                                    killed.kill(grid)
+                                    # special case for TrojanHorse
+                                    if type(killed) == TrojanHorse:
+                                        for i in range(3):
+                                            new_enemy = Infiltrator()
+                                            new_enemy.place((killed.x-i+1,GRID_HEIGHT//2), grid, enemy_num)
+                                            enemies[enemy_num] = new_enemy
+                                            enemy_num += 1
+                                    enemies.pop(killed.num)
+                    else:
+                        troop.current_secondary_delays[i] = troop.current_secondary_delays[i] - 1
             if not target:
                 success = troop.walk(grid, selected_map)
                 if not success:
                     print(f"{troop.name} died")
                     to_remove.append(k)
-                    killed_troop.kill(grid)
+                    troop.kill(grid)
                 else:
                     # if a troop runs into an enemy
                     for enemy in enemies.values():
-                        if troop.rect.colliderect(enemy.rect):
+                        if troop.rect.colliderect(enemy.rect) and type(troop) != CombatAviation:
                             print(f"{troop.name} runs into {enemy.name}")
                             damage = min(troop.health, enemy.health)
                             killed_troop = troop.take_damage(damage)
@@ -533,7 +586,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                                 enemies.pop(killed_enemy.num)
 
         for k in to_remove:
-            troops.pop(k.num)
+            troops.pop(k)
 
         to_remove = []
         for k,enemy in enemies.items():
@@ -545,7 +598,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
             else:
                 # if an enemy runs into a troop
                 for troop in troops.values():
-                    if troop.rect.colliderect(enemy.rect):
+                    if troop.rect.colliderect(enemy.rect) and type(troop) != CombatAviation:
                         damage = min(troop.health, enemy.health)
                         killed_troop = troop.take_damage(damage)
                         killed_enemy = enemy.damage(damage)
@@ -647,7 +700,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
             money += 100 + int(level**1.5) + sum(farm.money for farm in farms)
             enemy_spawn_time = None
 
-        if level == 26:
+        if level == seed.get("final_level")+1:
             won = True
 
         pygame.display.flip()
