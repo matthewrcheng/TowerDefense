@@ -7,6 +7,7 @@ from Tower import Tower, Gunslinger, Farm, General, Infantry, ArmoredInfantry, A
 from Enemy import TrojanHorse, Infiltrator
 # from Enemy import Enemy, , Speedy, Slow, Tough
 
+# region Helper Functions
 def draw_enemy_bar(screen, enemy, font):
     enemy_name_text = font.render(enemy.name, True, COLOR.WHITE)
     screen.blit(enemy_name_text, (enemy.x * CELL_SIZE, enemy.y * CELL_SIZE - 20))
@@ -105,8 +106,11 @@ def place_tower(grids, grid, selected_tower, num):
     selected_tower.place(gridx,gridy,num)
 
     grid[gridy-extray:gridy+extray+1, gridx-extrax:gridx+extrax+1] = selected_tower.id
+# endregion
 
 def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Tower], seed: dict, WIDTH: int, HEIGHT: int):
+
+    # region Setup
     cur = selected_map.start
     path_coords = {cur}
     for i in range(0, len(selected_map.path)): 
@@ -210,8 +214,10 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
     # conversion
     tower_color = {0: selected_map.background, 1:COLOR.GREEN, 2:COLOR.RED, 3:COLOR.PURPLE, 4:COLOR.BLUE, 5:COLOR.BLACK,
                    101:COLOR.DARK_GREEN, 102:COLOR.DARK_BLUE, 103:COLOR.DARK_RED}
+    # endregion
 
     while not won:
+        # region Handle Input
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -315,7 +321,9 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                 elif event.key == pygame.K_8:
                     placing = True
                     selected_tower = selected_towers["Tower8"]
-
+        # endregion
+        
+        # region Game Logic
         if health <= 0:
             # States
             game_over = False
@@ -441,35 +449,35 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
 
         for tower in towers.values():
             pygame.draw.rect(screen, tower.color, tower.rect)
-        for troop in troops.values():
-            pygame.draw.rect(screen, troop.color, troop.rect)
 
+        # region Tower Logic
         for tower in towers.values():
-            if tower.current_delay <= 0 and tower.damage:
-                target = tower.find_target(screen, enemies)
-                if target:
-                    if type(target) is list:
-                        total_damage = sum(min(tower.damage, t.health) for t in target)                            
-                    else:
-                        total_damage = min(tower.damage, target.health)
-                    money += total_damage
-                    if type(tower) == Gunslinger:
-                        money += tower.money
-                    killed_list = tower.attack(screen, target)
-                    tower.total_damage += total_damage
-                    if killed_list:
-                        for killed in killed_list:
-                            killed.kill(grid)
-                            # special case for TrojanHorse
-                            if type(killed) == TrojanHorse:
-                                for i in range(3):
-                                    new_enemy = Infiltrator()
-                                    new_enemy.place((killed.x-i+1,GRID_HEIGHT//2), grid, enemy_num)
-                                    enemies[enemy_num] = new_enemy
-                                    enemy_num += 1
-                            enemies.pop(killed.num)
-            else:
-                tower.current_delay -= 1
+            for i in range(len(tower.attack_names)):
+                if tower.current_delays[i] <= 0 and tower.damages[i]:
+                    target = tower.find_target(i, enemies, screen)
+                    if target:
+                        if type(target) is list:
+                            total_damage = sum(min(tower.damages[i], t.health) for t in target)                            
+                        else:
+                            total_damage = min(tower.damages[i], target.health)
+                        money += total_damage
+                        if type(tower) == Gunslinger:
+                            money += tower.money
+                        killed_list = tower.attack(i, screen, target)
+                        tower.total_damage += total_damage
+                        if killed_list:
+                            for killed in killed_list:
+                                killed.kill(grid)
+                                # special case for TrojanHorse
+                                if type(killed) == TrojanHorse:
+                                    for i in range(3):
+                                        new_enemy = Infiltrator()
+                                        new_enemy.place((killed.x-i+1,GRID_HEIGHT//2), grid, enemy_num)
+                                        enemies[enemy_num] = new_enemy
+                                        enemy_num += 1
+                                enemies.pop(killed.num)
+                else:
+                    tower.current_delays[i] -= 1
             if type(tower) == General:
                 if tower.current_infantry_spawn_delay <= 0 and tower.spawn_infantry:
                     infantry = Infantry(tower.infantry_level)
@@ -511,83 +519,62 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                     tower.current_combat_aviation_spawn_delay = tower.total_combat_aviation_spawn_delay
                 else:
                     tower.current_combat_aviation_spawn_delay -= 1    
+        # endregion
 
+        # region Troop Logic
         to_remove = []
         for k,troop in troops.items():
-            target = troop.find_target(screen, enemies)
-            if troop.current_delay <= 0 and troop.damage:
-                if target:
-                    print(f"{troop.name} attacks {target}")
-                    if type(target) is list:
-                        total_damage = sum(min(troop.damage, t.health) for t in target)                            
-                    else:
-                        total_damage = min(troop.damage, target.health)
-                    money += total_damage
-                    killed_list = troop.attack(screen, target)
-                    troop.total_damage += total_damage
-                    if killed_list:
-                        for killed in killed_list:
-                            killed.kill(grid)
-                            # special case for TrojanHorse
-                            if type(killed) == TrojanHorse:
-                                for i in range(3):
-                                    new_enemy = Infiltrator()
-                                    new_enemy.place((killed.x-i+1,GRID_HEIGHT//2), grid, enemy_num)
-                                    enemies[enemy_num] = new_enemy
-                                    enemy_num += 1
-                            enemies.pop(killed.num)
-            else:
-                troop.current_delay -= 1
-            if troop.secondary_damages:
-                for i in range(len(troop.secondary_damages)):
-                    if troop.current_secondary_delays[i] <= 0 and troop.secondary_damages[i]:
-                        target = troop.secondary_find_target(i, screen, enemies)
-                        if target:
-                            print(f"{troop.name} attacks {target}")
-                            if type(target) is list:
-                                total_damage = sum(min(troop.secondary_damages[i], t.health) for t in target)                            
-                            else:
-                                total_damage = min(troop.secondary_damages[i], target.health)
-                            money += total_damage
-                            killed_list = troop.secondary_attack(i, screen, target)
-                            troop.total_damage += total_damage
-                            if killed_list:
-                                for killed in killed_list:
-                                    killed.kill(grid)
-                                    # special case for TrojanHorse
-                                    if type(killed) == TrojanHorse:
-                                        for i in range(3):
-                                            new_enemy = Infiltrator()
-                                            new_enemy.place((killed.x-i+1,GRID_HEIGHT//2), grid, enemy_num)
-                                            enemies[enemy_num] = new_enemy
-                                            enemy_num += 1
-                                    enemies.pop(killed.num)
-                    else:
-                        troop.current_secondary_delays[i] = troop.current_secondary_delays[i] - 1
-            if not target:
-                success = troop.walk(grid, selected_map)
-                if not success:
-                    print(f"{troop.name} died")
-                    to_remove.append(k)
-                    troop.kill(grid)
+            for i in range(len(troop.attack_names)):
+                target = troop.find_target(screen, enemies)
+                if troop.current_delays[i] <= 0 and troop.damages[i]:
+                    if target:
+                        if type(target) is list:
+                            total_damage = sum(min(troop.damages[i], t.health) for t in target)                            
+                        else:
+                            total_damage = min(troop.damages[i], target.health)
+                        money += total_damage
+                        killed_list = troop.attack(i, screen, target)
+                        troop.total_damage += total_damage
+                        if killed_list:
+                            for killed in killed_list:
+                                killed.kill(grid)
+                                # special case for TrojanHorse
+                                if type(killed) == TrojanHorse:
+                                    for i in range(3):
+                                        new_enemy = Infiltrator()
+                                        new_enemy.place((killed.x-i+1,GRID_HEIGHT//2), grid, enemy_num)
+                                        enemies[enemy_num] = new_enemy
+                                        enemy_num += 1
+                                enemies.pop(killed.num)
                 else:
-                    # if a troop runs into an enemy
-                    for enemy in enemies.values():
-                        if troop.rect.colliderect(enemy.rect) and type(troop) != CombatAviation:
-                            print(f"{troop.name} runs into {enemy.name}")
-                            damage = min(troop.health, enemy.health)
-                            killed_troop = troop.take_damage(damage)
-                            killed_enemy = enemy.damage(damage)
-                            if killed_troop:
-                                to_remove.append(k)
-                                killed_troop.kill(grid)
-                            if killed_enemy:
-                                killed_enemy.kill(grid)
-                                enemies.pop(killed_enemy.num)
+                    troop.current_delays[i] -= 1
+                if not target:
+                    success = troop.walk(grid, selected_map)
+                    if not success:
+                        print(f"{troop.name} died")
+                        to_remove.append(k)
+                        troop.kill(grid)
+                    else:
+                        # if a troop runs into an enemy
+                        for enemy in enemies.values():
+                            if troop.rect.colliderect(enemy.rect) and (type(troop) != CombatAviation or (type(troop) == CombatAviation and not enemy.air_flag)):
+                                print(f"{troop.name} runs into {enemy.name}")
+                                damage = min(troop.health, enemy.health)
+                                killed_troop = troop.take_damage(damage)
+                                killed_enemy = enemy.damage(damage)
+                                if killed_troop:
+                                    to_remove.append(k)
+                                    killed_troop.kill(grid)
+                                if killed_enemy:
+                                    killed_enemy.kill(grid)
+                                    enemies.pop(killed_enemy.num)
+                        pygame.draw.rect(screen, troop.color, troop.rect)
 
         for k in to_remove:
             troops.pop(k)
+        # endregion
 
+        # region Enemy Logic
         to_remove = []
         for k,enemy in enemies.items():
             success = enemy.walk(grid, selected_map)
@@ -598,7 +585,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
             else:
                 # if an enemy runs into a troop
                 for troop in troops.values():
-                    if troop.rect.colliderect(enemy.rect) and type(troop) != CombatAviation:
+                    if troop.rect.colliderect(enemy.rect) and (type(troop) != CombatAviation or (type(troop) == CombatAviation and not enemy.air_flag)):
                         damage = min(troop.health, enemy.health)
                         killed_troop = troop.take_damage(damage)
                         killed_enemy = enemy.damage(damage)
@@ -610,24 +597,28 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                             enemy.kill(grid)
                             to_remove.append(k)
                 pygame.draw.rect(screen, enemy.color, enemy.rect)
+        for k in to_remove:
+            enemies.pop(k)
+
+        enemy_timer-=1
+        # endregion
             
+        # region Hover Logic
         if not placing and not tower_info_menu:
             mouse_pos = pygame.mouse.get_pos()
             for tower in towers.values():
                 if tower.rect.collidepoint(mouse_pos):
-                    draw_circle_alpha(screen, COLOR.CAN_PLACE, (tower.x*CELL_SIZE, tower.y*CELL_SIZE), tower.range*CELL_SIZE)
+                    draw_circle_alpha(screen, COLOR.CAN_PLACE, (tower.x*CELL_SIZE, tower.y*CELL_SIZE), tower.ranges[0]*CELL_SIZE)
             for enemy in enemies.values():
                 if enemy.rect.collidepoint(mouse_pos):
                     draw_enemy_bar(screen, enemy, fonts)
             for troop in troops.values():
                 if troop.rect.collidepoint(mouse_pos):
                     draw_enemy_bar(screen, troop, fonts)
-                    draw_circle_alpha(screen, COLOR.CAN_PLACE, (troop.x*CELL_SIZE, troop.y*CELL_SIZE), troop.range*CELL_SIZE)
+                    draw_circle_alpha(screen, COLOR.CAN_PLACE, (troop.x*CELL_SIZE, troop.y*CELL_SIZE), troop.ranges[0]*CELL_SIZE)
+        # endregion
 
-        
-        for k in to_remove:
-            enemies.pop(k)
-
+        # region Tower Info
         if tower_info_menu:
             draw_rect_alpha(screen, COLOR.FADE, darken_screen_rect)
             pygame.draw.rect(screen, COLOR.BROWN, menu_rect)
@@ -647,7 +638,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                 screen.blit(attribute_text, (menu_rect.x + 10, menu_rect.y + 35 + i*20))
             tower_text = fontm.render(f"{tower_info_menu.name} Level {tower_info_menu.upgrade_level}", True, COLOR.WHITE)
             screen.blit(tower_text, (menu_rect.x + 10, menu_rect.y + 10))
-            upgrade_text = fonts.render(f"UPGRADE", True, COLOR.BLACK)
+            upgrade_text = fonts.render(tower_info_menu.upgrade_name, True, COLOR.BLACK)
             cost_display_text = f"Cost: {tower_info_menu.upgrade_cost}" if tower_info_menu.upgrade_cost else "Max Upgrade"
             cost_text = fonts.render(cost_display_text, True, COLOR.BLACK)
             screen.blit(upgrade_text, (tower_info_upgrade_button.x + 5, tower_info_upgrade_button.y + 5))
@@ -659,11 +650,9 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
             screen.blit(total_damage_text, (tower_display_rect.x, tower_display_rect.y + 100))
             sell_text = fonts.render(f"Sell ${tower_info_menu.total_cost//2}", True, COLOR.BLACK)
             screen.blit(sell_text, (tower_info_sell_button.x + 5, tower_info_sell_button.y + 5))
+        # endregion
 
-
-        enemy_timer-=1
-
-
+        # region Tower Placement
         if placing:
             mouse_pos = pygame.mouse.get_pos()
             placing_tower_rect.topleft = (mouse_pos[0] - placing_tower_rect.width // 2,
@@ -677,9 +666,9 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
 
             # Draw tower in red if placement is not valid
             if not valid:
-                draw_circle_alpha(screen, COLOR.CANT_PLACE, mouse_pos, tower.range*CELL_SIZE)
+                draw_circle_alpha(screen, COLOR.CANT_PLACE, mouse_pos, tower.ranges[0]*CELL_SIZE)
             else:
-                draw_circle_alpha(screen, COLOR.CAN_PLACE, mouse_pos, tower.range*CELL_SIZE)
+                draw_circle_alpha(screen, COLOR.CAN_PLACE, mouse_pos, tower.ranges[0]*CELL_SIZE)
             draw_rect_alpha(screen, tower.color, placing_tower_rect)
 
             # Check if the left mouse button is released to place the tower
@@ -694,7 +683,8 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                     print(f"Placed new tower: {tower.name}, tower count: {len(towers)}")
 
                 placing = False
-
+        # endregion
+        # region Level Logic
         if not seed.get(level) and not enemies:
             level += 1
             money += 100 + int(level**1.5) + sum(farm.money for farm in farms)
@@ -702,23 +692,24 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
 
         if level == seed.get("final_level")+1:
             won = True
+        # endregion
 
         pygame.display.flip()
         clock.tick(FPS)
     
     # States
-    game_over = False
-    won = False
-    paused = False
-    placing = False
-    tower_info_menu = None
-    selected_tower = None
-    level = 1
-    enemy_timer = 0
-    enemy_spawn_time = None
-    autorun = False
-    health = 100
-    money = 500
+    # game_over = False
+    # won = False
+    # paused = False
+    # placing = False
+    # tower_info_menu = None
+    # selected_tower = None
+    # level = 1
+    # enemy_timer = 0
+    # enemy_spawn_time = None
+    # autorun = False
+    # health = 100
+    # money = 500
 
     # trackers
     tower_num = 0

@@ -381,7 +381,7 @@ def difficulty_selection_screen(screen):
     corrupted_button = pygame.Rect(300, 300, 200, 50)
 
     # selected difficulty seed
-    selection = {}
+    selection = easy
 
     while True:
         for event in pygame.event.get():

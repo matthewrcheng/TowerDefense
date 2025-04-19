@@ -15,7 +15,7 @@ easy = {
     7: [(Thug, 60), (Thug, 60), (Thug, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60), (Bandit, 60), (Bandit, 60), (Bandit, 60)],
     8: [(Brute, 30)],
     9: [(Thug, 60), (Thug, 60), (Brute, 30), (Bandit, 60)],
-    10: [(Bandit, 60), (Bandit, 60), (Bandit, 60), (Bandit, 60), (Bandit, 60), (Pirate, 30), (Pirate, 60), (Pirate, 60), (Pirate, 60), (Pirate, 60)],
+    10: [(Bandit, 60), (Bandit, 60), (Bandit, 60), (Bandit, 60), (Bandit, 60), (Brute, 30), (Brute, 60), (Brute, 60), (Brute, 60), (Brute, 60)],
 }
 
 normal = {
