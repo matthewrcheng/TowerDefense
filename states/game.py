@@ -278,7 +278,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                         elif tower_info_upgrade_button.collidepoint(event.pos):
                             cost = tower_info_menu.upgrade_next(money)
                             if cost:
-                                money -= cost
+                                money = int(money - cost)
                                 print("Upgraded successfully")
                                 if type(tower_info_menu) == Artisan or type(tower_info_menu) == Bard:
                                     print("Initializing effects")
