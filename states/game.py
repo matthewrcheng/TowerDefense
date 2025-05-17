@@ -3,7 +3,7 @@ import numpy as np
 import random
 from constants import GRID_HEIGHT,GRID_WIDTH,CELL_SIZE,SIDEBAR_WIDTH,FPS
 from utils import COLOR, GameState, Map, Targeting, Unicode, draw_circle_alpha, draw_polygon_alpha, draw_rect_alpha
-from Tower import Artisan, Tower, Gunslinger, Farm, General, Infantry, ArmoredInfantry, Artillery, CombatAviation
+from Tower import Artisan, Bard, Tower, Gunslinger, Farm, General, Infantry, ArmoredInfantry, Artillery, CombatAviation
 from Enemy import TrojanHorse, Infiltrator
 # from Enemy import Enemy, , Speedy, Slow, Tough
 
@@ -280,7 +280,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                             if cost:
                                 money -= cost
                                 print("Upgraded successfully")
-                                if type(tower_info_menu) == Artisan:
+                                if type(tower_info_menu) == Artisan or type(tower_info_menu) == Bard:
                                     print("Initializing effects")
                                     tower_info_menu.init_effects(towers)
                         elif tower_info_target_button.collidepoint(event.pos):
@@ -464,7 +464,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                             total_damage = sum(min(tower.damages[i], t.health) for t in target)                            
                         else:
                             total_damage = min(tower.damages[i], target.health)
-                        money += total_damage
+                        money += (total_damage * tower.money_multiplier)
                         if type(tower) == Gunslinger or (type(tower) == Artisan and tower.attack_names[i] == "Coin Toss"):
                             money += tower.money
                         killed_list = tower.attack(i, screen, target)
@@ -481,7 +481,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                                         enemy_num += 1
                                 enemies.pop(killed.num)
                 else:
-                    tower.current_delays[i] -= 1
+                    tower.current_delays[i] -= (1 * tower.attack_speed_multiplier)
             if type(tower) == General:
                 if tower.current_infantry_spawn_delay <= 0 and tower.spawn_infantry:
                     infantry = Infantry(tower.infantry_level)
@@ -684,8 +684,9 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                     tower_num += 1
                     if type(tower) == Farm:
                         farms.append(tower)
-                    elif type(tower) == Artisan:
-                        tower.init_effects(towers)
+                    for other_tower in towers.values():
+                        if type(other_tower) == Artisan or type(other_tower) == Bard:
+                            other_tower.init_effects(towers)
                     print(f"Placed new tower: {tower.name}, tower count: {len(towers)}")
 
                 placing = False

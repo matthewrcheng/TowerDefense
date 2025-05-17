@@ -61,6 +61,13 @@ class Tower:
 
         # misc
         self.needs_screen = False
+
+        # modifiers
+        self.attack_speed_multiplier = 1.05
+        self.attack_range_multiplier = 1.0
+        self.attack_damage_boost_addend = 0
+        self.attack_damage_boost_multiplier = 1.0
+        self.money_multiplier = 1.0
         self.discount_multiplier = 1
 
     def set_name(self, name: str):
@@ -164,7 +171,7 @@ class Tower:
             first_line += Unicode.boss
         if first_line:
             first_line += "\n"
-        return f"{first_line}{Unicode.damage} {self.damages[0]}\n{Unicode.delay} {round(self.attack_delays[0]/FPS, 2)}\n{Unicode.range} {self.ranges[0]}"
+        return f"{first_line}{Unicode.damage} {round((self.damages[0]*self.attack_damage_boost_multiplier)+self.attack_damage_boost_addend)}\n{Unicode.delay} {round((self.attack_delays[0]/self.attack_speed_multiplier)/FPS, 2)}\n{Unicode.range} {(round(self.ranges[0]*self.attack_range_multiplier, 2))}"
 
     def place(self, x: int, y: int, num: int) -> None:
         self.x = x
@@ -185,6 +192,8 @@ class Tower:
         damage = self.damages[idx]
         if enemy.boss_flag:
             damage *= self.boss_multiplier
+        damage *= self.attack_damage_boost_multiplier
+        damage += self.attack_damage_boost_addend
         killed = enemy.damage(damage)
         if killed:
             return [killed]
@@ -203,6 +212,8 @@ class Tower:
             damage = self.damages[idx]
             if enemy.boss_flag:
                 damage *= self.boss_multiplier
+            damage *= self.attack_damage_boost_multiplier
+            damage += self.attack_damage_boost_addend
             killed = enemy.damage(damage)
             if killed:
                 killed_list.append(killed)
@@ -220,6 +231,8 @@ class Tower:
             damage = self.damages[idx]
             if enemy.boss_flag:
                 damage *= self.boss_multiplier
+            damage *= self.attack_damage_boost_multiplier
+            damage += self.attack_damage_boost_addend
             killed = enemy.damage(damage)
             if killed:
                 killed_list.append(killed)
@@ -239,7 +252,7 @@ class Tower:
 
         killed_list = []
         for enemy in enemies:
-            killed = enemy.damage(self.damages[idx])
+            killed = enemy.damage((self.damages[idx]*self.attack_damage_boost_multiplier) + self.attack_damage_boost_addend)
             if killed:
                 killed_list.append(killed)
         return killed_list
@@ -265,7 +278,7 @@ class Tower:
             for k, enemy in enemies.items()
         }
 
-        targets_in_range = [k for k, distance in distances.items() if distance <= self.ranges[idx] and self.can_attack(enemies[k])]
+        targets_in_range = [k for k, distance in distances.items() if distance <= (self.ranges[idx]*self.attack_range_multiplier) and self.can_attack(enemies[k])]
         if targets_in_range:
             if self.targeting == Targeting.FIRST:
                 target_key = max(targets_in_range, key=lambda k: enemies[k].x)
@@ -289,7 +302,7 @@ class Tower:
         }
         target = None
 
-        targets_in_range = [k for k, distance in distances.items() if distance <= self.ranges[idx] and self.can_attack(enemies[k])]
+        targets_in_range = [k for k, distance in distances.items() if distance <= (self.ranges[idx]*self.attack_range_multiplier) and self.can_attack(enemies[k])]
         if targets_in_range:
             if self.targeting == Targeting.FIRST:
                 target_key = max(targets_in_range, key=lambda k: enemies[k].x)
@@ -325,7 +338,7 @@ class Tower:
         }
         target = None
 
-        targets_in_range = [k for k, distance in distances.items() if distance <= self.ranges[idx] and self.can_attack(enemies[k])]
+        targets_in_range = [k for k, distance in distances.items() if distance <= (self.ranges[idx]*self.attack_range_multiplier) and self.can_attack(enemies[k])]
         if targets_in_range:
             if self.targeting == Targeting.FIRST:
                 target_key = max(targets_in_range, key=lambda k: enemies[k].x)
@@ -366,7 +379,7 @@ class Tower:
     
     def berserker_find_target(self, idx: int, screen: pygame.Surface, enemies: dict[int, Enemy]):
         targets_in_range = [enemy for k, enemy in enemies.items() if self.can_attack(enemy) and sqrt(((max(enemy.x, min(self.x, enemy.x + enemy.width))) - self.x) ** 2 +
-                    ((max(enemy.y, min(self.y, enemy.y + enemy.height))) - self.y) ** 2) <= self.ranges[idx]]
+                    ((max(enemy.y, min(self.y, enemy.y + enemy.height))) - self.y) ** 2) <= (self.ranges[idx]*self.attack_range_multiplier)]
 
         if targets_in_range:
             return targets_in_range
@@ -592,7 +605,7 @@ class Berserker(Tower):
             first_line += Unicode.boss
         if first_line:
             first_line += "\n"
-        return f"{first_line}{Unicode.damage} {self.damages[0]}\n{Unicode.delay} {round(self.base_delay/FPS, 2)}\n{Unicode.range} {self.ranges[0]}\n{Unicode.pulse_range} {len(self.delay_changes)}"
+        return f"{first_line}{Unicode.damage} {round((self.damages[0]*self.attack_damage_boost_multiplier)+self.attack_damage_boost_addend)}\n{Unicode.delay} {round((self.base_delay/self.attack_speed_multiplier)/FPS, 2)}\n{Unicode.range} {round(self.ranges[0]*self.attack_range_multiplier, 2)}\n{Unicode.pulse_range} {len(self.delay_changes)}"
 
     def upgrade1(self):
         super().upgrade1()
@@ -707,7 +720,7 @@ class Gunslinger(Tower):
             first_line += Unicode.boss
         if first_line:
             first_line += "\n"
-        return f"{first_line}{Unicode.damage} {self.damages[0]}\n{Unicode.delay} {round(self.attack_delay/FPS, 2)}\n{Unicode.range} {self.range}\n{Unicode.dollar} {self.money}"
+        return f"{first_line}{Unicode.damage} {round((self.damages[0]*self.attack_damage_boost_multiplier)+self.attack_damage_boost_addend)}\n{Unicode.delay} {round((self.attack_delays[0]/self.attack_speed_multiplier)/FPS, 2)}\n{Unicode.range} {(round(self.ranges[0]*self.attack_range_multiplier, 2))}\n{Unicode.dollar} {self.money}"
 
     def upgrade1(self):
         super().upgrade1()
@@ -788,7 +801,7 @@ class Dragoon(Tower):
             first_line += Unicode.boss
         if first_line:
             first_line += "\n"
-        return f"{first_line}{Unicode.damage} {self.damages[0]}\n{Unicode.delay} {round(self.attack_delay/FPS, 2)}\n{Unicode.range} {self.ranges[0]}\n{Unicode.explosion} {self.attack_radii[0]}"
+        return f"{first_line}{Unicode.damage} {round((self.damages[0]*self.attack_damage_boost_multiplier)+self.attack_damage_boost_addend)}\n{Unicode.delay} {round((self.attack_delays[0]/self.attack_speed_multiplier)/FPS, 2)}\n{Unicode.range} {(round(self.ranges[0]*self.attack_range_multiplier, 2))}\n{Unicode.explosion} {self.attack_radii[0]}"
 
     def upgrade1(self):
         super().upgrade1()
@@ -918,7 +931,7 @@ class Electrocutioner(Tower):
             first_line += Unicode.boss
         if first_line:
             first_line += "\n"
-        return f"{first_line}{Unicode.damage} {self.damages[0]}\n{Unicode.delay} {round(self.attack_delays[0]/FPS, 2)}\n{Unicode.range} {self.ranges[0]}\n{Unicode.link} {self.max_targets}\n{Unicode.targets} {self.attack_radii[0]}\n{Unicode.stun} {round(self.stun_delay/FPS, 2)}s"
+        return f"{first_line}{Unicode.damage} {round((self.damages[0]*self.attack_damage_boost_multiplier)+self.attack_damage_boost_addend)}\n{Unicode.delay} {round((self.attack_delays[0]/self.attack_speed_multiplier)/FPS, 2)}\n{Unicode.range} {(round(self.ranges[0]*self.attack_range_multiplier, 2))}\n{Unicode.link} {self.max_targets}\n{Unicode.targets} {self.attack_radii[0]}\n{Unicode.stun} {round(self.stun_delay/FPS, 2)}s"
 
     def upgrade1(self):
         super().upgrade1()
@@ -1024,6 +1037,36 @@ class Bard(Tower):
         self.attack_damage_boost_percent = 1.1
         self.attack_range_boost = 1.2
         self.money_boost = 1.1
+
+    def init_effects(self, towers: dict[int, Tower]):
+        distances = {
+            k: sqrt(((tower.x - self.x) ** 2) +
+                    ((tower.y - self.y) ** 2))
+            for k, tower in towers.items()
+        }
+
+        towers_in_range = [k for k, distance in distances.items() if distance <= (self.ranges[0]*self.attack_range_multiplier)]
+
+        for tower in towers_in_range:
+            if type(towers[tower]) != Bard:
+                towers[tower].attack_speed_multiplier = max(towers[tower].attack_speed_multiplier, self.attack_speed_boost)
+                towers[tower].attack_range_multiplier = max(towers[tower].attack_range_multiplier, self.attack_range_boost)
+                towers[tower].attack_damage_boost_addend = max(towers[tower].attack_damage_boost_addend, self.attack_damage_boost_flat)
+                towers[tower].attack_damage_boost_multiplier = max(towers[tower].attack_damage_boost_multiplier, self.attack_damage_boost_percent)
+                towers[tower].money_multiplier = max(towers[tower].money_multiplier, self.money_boost)
+
+    def remove_effects(self, towers: dict[int, Tower]):
+        for tower in towers.values():
+            towers[tower].attack_speed_multiplier = 1
+            towers[tower].attack_range_multiplier = 1
+            towers[tower].attack_damage_boost_addend = 0
+            towers[tower].attack_damage_boost_multiplier = 1
+            towers[tower].money_multiplier = 1
+
+        # in case other artisans are nearby
+        for tower in towers.values():
+            if type(tower) == Bard:
+                tower.init_effects(towers)
 # endregion
 
 # region Mage
@@ -1232,7 +1275,7 @@ class Artisan(Tower):
             for k, tower in towers.items()
         }
 
-        towers_in_range = [k for k, distance in distances.items() if distance <= self.ranges[0]]
+        towers_in_range = [k for k, distance in distances.items() if distance <= (self.ranges[0]*self.attack_range_multiplier)]
 
         print(self.id)
         for tower in towers_in_range:
@@ -1242,20 +1285,11 @@ class Artisan(Tower):
                 towers[tower].discount_multiplier = min(1-self.discount, towers[tower].discount_multiplier)
 
     def remove_effects(self, towers: dict[int, Tower]):
-        distances = {
-            k: sqrt(((tower.x - self.x) ** 2) +
-                    ((tower.y - self.y) ** 2))
-            for k, tower in towers.items()
-        }
-
-        towers_in_range = [k for k, distance in distances.items() if distance <= self.ranges[0]]
-
-        for tower in towers_in_range:
-            print(f"Removed {towers[tower].name}'s discount multiplier")
+        for tower in towers.values():
             towers[tower].discount_multiplier = 1
 
         # in case other artisans are nearby
-        for k,tower in towers.items():
+        for tower in towers.values():
             if type(tower) == Artisan:
                 tower.init_effects(towers)
     
