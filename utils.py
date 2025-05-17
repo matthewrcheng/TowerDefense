@@ -84,6 +84,7 @@ class COLOR:
     BROWN = (145, 110, 50)
     MAROON = (128, 0, 0)
     MAGENTA = (128, 0, 128)
+    BLUE_PURPLE = (104, 0, 208)
 
     # Light colors
     LIGHT = (200, 200, 0)
@@ -107,6 +108,7 @@ class COLOR:
     DARK_YELLOW = (64, 64, 0)
     DARK_PINK = (125, 90, 125)
     DARK_BROWN = (120, 85, 40)
+    DARK_BLUE_PURPLE = (52, 0, 104)
 
     # Alt colors
     FAINT_BLUE = (0, 0, 128, 80)

@@ -3,7 +3,7 @@ import numpy as np
 import random
 from constants import GRID_HEIGHT,GRID_WIDTH,CELL_SIZE,SIDEBAR_WIDTH,FPS
 from utils import COLOR, GameState, Map, Targeting, Unicode, draw_circle_alpha, draw_polygon_alpha, draw_rect_alpha
-from Tower import Tower, Gunslinger, Farm, General, Infantry, ArmoredInfantry, Artillery, CombatAviation
+from Tower import Artisan, Tower, Gunslinger, Farm, General, Infantry, ArmoredInfantry, Artillery, CombatAviation
 from Enemy import TrojanHorse, Infiltrator
 # from Enemy import Enemy, , Speedy, Slow, Tough
 
@@ -199,7 +199,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
     enemy_spawn_time = None
     autorun = False
     health = 100
-    money = 500 # 500
+    money = 5000 # 500
     time = 0
 
     # trackers
@@ -280,6 +280,9 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                             if cost:
                                 money -= cost
                                 print("Upgraded successfully")
+                                if type(tower_info_menu) == Artisan:
+                                    print("Initializing effects")
+                                    tower_info_menu.init_effects(towers)
                         elif tower_info_target_button.collidepoint(event.pos):
                             tower_info_menu.targeting = target_cycle.get(tower_info_menu.targeting)
                             print("Changing targeting")
@@ -287,6 +290,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                             towers.pop(tower_info_menu.num)
                             money += tower_info_menu.total_cost//2
                             tower_info_menu = False
+                            tower_info_menu.remove_effects(towers)
                             print("Sold tower")
                     elif not placing:
                         for tower in towers.values():
@@ -461,7 +465,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                         else:
                             total_damage = min(tower.damages[i], target.health)
                         money += total_damage
-                        if type(tower) == Gunslinger:
+                        if type(tower) == Gunslinger or (type(tower) == Artisan and tower.attack_names[i] == "Coin Toss"):
                             money += tower.money
                         killed_list = tower.attack(i, screen, target)
                         tower.total_damage += total_damage
@@ -639,7 +643,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
             tower_text = fontm.render(f"{tower_info_menu.name} Level {tower_info_menu.upgrade_level}", True, COLOR.WHITE)
             screen.blit(tower_text, (menu_rect.x + 10, menu_rect.y + 10))
             upgrade_text = fonts.render(tower_info_menu.upgrade_name, True, COLOR.BLACK)
-            cost_display_text = f"Cost: {tower_info_menu.upgrade_cost}" if tower_info_menu.upgrade_cost else "Max Upgrade"
+            cost_display_text = f"Cost: {int(tower_info_menu.upgrade_cost*tower_info_menu.discount_multiplier)}" if tower_info_menu.upgrade_cost else "Max Upgrade"
             cost_text = fonts.render(cost_display_text, True, COLOR.BLACK)
             screen.blit(upgrade_text, (tower_info_upgrade_button.x + 5, tower_info_upgrade_button.y + 5))
             screen.blit(cost_text, (tower_info_upgrade_button.x + 5, tower_info_upgrade_button.y + 17))
@@ -676,10 +680,12 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                 if valid and tower.cost <= money:
                     money -= tower.cost
                     towers[tower_num] = tower
-                    if type(tower) == Farm:
-                        farms.append(tower)
                     place_tower(grids, grid, tower, tower_num)
                     tower_num += 1
+                    if type(tower) == Farm:
+                        farms.append(tower)
+                    elif type(tower) == Artisan:
+                        tower.init_effects(towers)
                     print(f"Placed new tower: {tower.name}, tower count: {len(towers)}")
 
                 placing = False

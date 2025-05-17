@@ -8,12 +8,17 @@ def map_selection_screen(screen):
     fonts = pygame.font.Font(None, 36)
 
     # Map buttons
+    # column 1
     field_button = pygame.Rect(50, 150, 200, 50)
     beach_button = pygame.Rect(50, 225, 200, 50)
     moon_button = pygame.Rect(50, 300, 200, 50)
+
+    # column 2
     desert_button = pygame.Rect(300, 150, 200, 50)
     arctic_button = pygame.Rect(300, 225, 200, 50)
     jungle_button = pygame.Rect(300, 300, 200, 50)
+
+    # column 3
     volcano_button = pygame.Rect(550, 150, 200, 50)
 
     # util buttons 
@@ -135,12 +140,19 @@ def tower_selection_screen(screen):
     selection_blocks = [pygame.Rect(300+50*i, 25, 50, 50) for i in range(8)] 
 
     # tower buttons
+    # column 1
     warrior_button = pygame.Rect(50, 100, 250, 50)
     archer_button = pygame.Rect(50, 175, 250, 50)
     deadeye_button = pygame.Rect(50, 250, 250, 50)
     berserker_button = pygame.Rect(50, 325, 250, 50)
     assassin_button = pygame.Rect(50, 400, 250, 50)
+    # column 2
     gunslinger_button = pygame.Rect(350, 100, 250, 50)
+    bard_button = pygame.Rect(350, 175, 250, 50)
+    mage_button = pygame.Rect(350, 250, 250, 50)
+    artisan_button = pygame.Rect(350, 325, 250, 50)
+    alchemist_button = pygame.Rect(350, 400, 250, 50)
+    # column 3
     dragoon_button = pygame.Rect(650, 100, 250, 50)
     farm_button = pygame.Rect(650, 175, 250, 50)
     electro_button = pygame.Rect(650, 250, 250, 50)
@@ -158,6 +170,10 @@ def tower_selection_screen(screen):
     farm = Farm()
     electro = Electrocutioner()
     general = General()
+    bard = Bard()
+    mage = Mage()
+    artisan = Artisan()
+    alchemist = Alchemist()
     # add others as needed
     
     # tower selection
@@ -274,6 +290,42 @@ def tower_selection_screen(screen):
                         towers.append(General)
                         # highlight general button
                         pass
+                elif bard_button.collidepoint(event.pos):
+                    if Bard in towers:
+                        towers.remove(Bard)
+                        # unhighlight bard button
+                        pass
+                    elif len(towers) < 8:
+                        towers.append(Bard)
+                        # highlight bard button
+                        pass
+                elif mage_button.collidepoint(event.pos):
+                    if Mage in towers:
+                        towers.remove(Mage)
+                        # unhighlight mage button
+                        pass
+                    elif len(towers) < 8:
+                        towers.append(Mage)
+                        # highlight mage button
+                        pass
+                elif artisan_button.collidepoint(event.pos):
+                    if Artisan in towers:
+                        towers.remove(Artisan)
+                        # unhighlight artisan button
+                        pass
+                    elif len(towers) < 8:
+                        towers.append(Artisan)
+                        # highlight artisan button
+                        pass
+                elif alchemist_button.collidepoint(event.pos):
+                    if Alchemist in towers:
+                        towers.remove(Alchemist)
+                        # unhighlight alchemist button
+                        pass
+                    elif len(towers) < 8:
+                        towers.append(Alchemist)
+                        # highlight alchemist button
+                        pass
                 elif default_button.collidepoint(event.pos):  # Handle the "Default" button
                     towers = [Warrior, Archer, Deadeye, Berserker, Assassin, Gunslinger, Dragoon, Farm]
                 elif quit_button.collidepoint(event.pos):  # Handle the "Quit" button
@@ -351,6 +403,22 @@ def tower_selection_screen(screen):
         pygame.draw.rect(screen, general.color if General in towers else COLOR.LIGHT_GRAY, general_button)
         general_text = fonts.render(general.name, True, general.text_color if General in towers else COLOR.DARK_GRAY)
         screen.blit(general_text, (general_button.x + 20, general_button.y + 10))
+
+        pygame.draw.rect(screen, bard.color if Bard in towers else COLOR.LIGHT_GRAY, bard_button)
+        bard_text = fonts.render(bard.name, True, bard.text_color if Bard in towers else COLOR.DARK_GRAY)
+        screen.blit(bard_text, (bard_button.x + 20, bard_button.y + 10))
+        
+        pygame.draw.rect(screen, mage.color if Mage in towers else COLOR.LIGHT_GRAY, mage_button)
+        mage_text = fonts.render(mage.name, True, mage.text_color if Mage in towers else COLOR.DARK_GRAY)
+        screen.blit(mage_text, (mage_button.x + 20, mage_button.y + 10))
+
+        pygame.draw.rect(screen, artisan.color if Artisan in towers else COLOR.LIGHT_GRAY, artisan_button)
+        artisan_text = fonts.render(artisan.name, True, artisan.text_color if Artisan in towers else COLOR.DARK_GRAY)
+        screen.blit(artisan_text, (artisan_button.x + 20, artisan_button.y + 10))
+
+        pygame.draw.rect(screen, alchemist.color if Alchemist in towers else COLOR.LIGHT_GRAY, alchemist_button)
+        alchemist_text = fonts.render(alchemist.name, True, alchemist.text_color if Alchemist in towers else COLOR.DARK_GRAY)
+        screen.blit(alchemist_text, (alchemist_button.x + 20, alchemist_button.y + 10))
 
         pygame.display.flip()
 

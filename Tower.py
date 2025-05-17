@@ -61,6 +61,7 @@ class Tower:
 
         # misc
         self.needs_screen = False
+        self.discount_multiplier = 1
 
     def set_name(self, name: str):
         self.name = name
@@ -116,12 +117,12 @@ class Tower:
     def set_attack_delay(self, delay: int, idx: int=0):
         self.attack_delays[idx] = delay
 
-    def set_range(self, range: int, idx: int=0):
-        self.ranges[idx] = range
+    def set_range(self, new_range: int, idx: int=0):
+        self.ranges[idx] = new_range
 
-    def set_ranges(self, range: int):
+    def set_ranges(self, new_range: int):
         for i in range(len(self.ranges)):
-            self.ranges[i] = range
+            self.ranges[i] = new_range
 
     def set_attack_color(self, color: tuple, idx: int=0):
         self.attack_colors[idx] = color
@@ -135,7 +136,7 @@ class Tower:
     def set_attack_radius(self, radius: int, idx: int=0):
         self.attack_radii[idx] = radius
 
-    def add_attack(self, attack: callable, targeting: callable, name: str='Normal', type: str=Attacking.MELEE, damage: int=1, delay: int=20, range: int=10,
+    def add_attack(self, attack: callable, targeting: callable, name: str='Normal', type: str=Attacking.MELEE, damage: int=1, delay: int=20, attack_range: int=10,
                    color: tuple=COLOR.BLACK, size: int=1, sound: pygame.mixer.Sound=pygame.mixer.Sound('sounds/boop.ogg'), radius: int=0):
         self.attack_names.append(name)
         self.attack_types.append(type)
@@ -144,7 +145,7 @@ class Tower:
         self.damages.append(damage)
         self.attack_delays.append(delay)
         self.current_delays.append(0)
-        self.ranges.append(range)
+        self.ranges.append(attack_range)
         self.attack_colors.append(color)
         self.attack_sizes.append(size)
         self.attack_sounds.append(sound)
@@ -223,7 +224,7 @@ class Tower:
             if killed:
                 killed_list.append(killed)
             start_pos = end_pos
-        self.current_delays = self.attack_delays[idx]
+        self.current_delays[idx] = self.attack_delays[idx]
         return killed_list
     
     def berserker_attack_round(self, idx: int, screen: pygame.Surface):
@@ -379,51 +380,60 @@ class Tower:
         self.targeting = targeting
 
     def upgrade_next(self, money: int):
-        if self.upgrade_level == 0 and 0 < self.upgrade_cost <= money:
-            cost = self.upgrade_cost
+        upgrade_cost = int(self.upgrade_cost*self.discount_multiplier)
+        if self.upgrade_level == 0 and 0 < upgrade_cost <= money:
+            cost = upgrade_cost
             self.upgrade1()
             return cost
-        elif self.upgrade_level == 1 and 0 < self.upgrade_cost <= money:
-            cost = self.upgrade_cost
+        elif self.upgrade_level == 1 and 0 < upgrade_cost <= money:
+            cost = upgrade_cost
             self.upgrade2()
             return cost
-        elif self.upgrade_level == 2 and 0 < self.upgrade_cost <= money:
-            cost = self.upgrade_cost
+        elif self.upgrade_level == 2 and 0 < upgrade_cost <= money:
+            cost = upgrade_cost
             self.upgrade3()
             return cost
-        elif self.upgrade_level == 3 and 0 < self.upgrade_cost <= money:
-            cost = self.upgrade_cost
+        elif self.upgrade_level == 3 and 0 < upgrade_cost <= money:
+            cost = upgrade_cost
             self.upgrade4()
             return cost
-        elif self.upgrade_level == 4 and 0 < self.upgrade_cost <= money:
-            cost = self.upgrade_cost
+        elif self.upgrade_level == 4 and 0 < upgrade_cost <= money:
+            cost = upgrade_cost
             self.upgrade5()
             return cost
         else:
             return 0
 
     def upgrade1(self):
-        self.total_cost += self.upgrade_cost
+        upgrade_cost = int(self.upgrade_cost*self.discount_multiplier)
+        self.total_cost += upgrade_cost
         self.upgrade_level = 1
 
     def upgrade2(self):
-        self.total_cost += self.upgrade_cost
+        upgrade_cost = int(self.upgrade_cost*self.discount_multiplier)
+        self.total_cost += upgrade_cost
         self.upgrade_level = 2
 
     def upgrade3(self):
-        self.total_cost += self.upgrade_cost
+        upgrade_cost = int(self.upgrade_cost*self.discount_multiplier)
+        self.total_cost += upgrade_cost
         self.upgrade_level = 3
 
     def upgrade4(self):
-        self.total_cost += self.upgrade_cost
+        upgrade_cost = int(self.upgrade_cost*self.discount_multiplier)
+        self.total_cost += upgrade_cost
         self.upgrade_level = 4
 
     def upgrade5(self):
-        self.total_cost += self.upgrade_cost
+        upgrade_cost = int(self.upgrade_cost*self.discount_multiplier)
+        self.total_cost += upgrade_cost
         self.upgrade_level = 5
 
     def __str__(self):
         return self.name
+    
+    def remove_effects(self, towers):
+        pass
 
 # endregion    
 # region Warrior
@@ -762,8 +772,8 @@ class Dragoon(Tower):
         self.set_upgrade_cost(750)
         self.set_upgrade_name("Shockpoint")
         self.set_attack_sound(pygame.mixer.Sound('sounds/firework.ogg'))
-        self.set_attack_function("multi_attack")  # Custom attack
-        self.set_targeting_function("find_multi_target")  # Custom targeting
+        self.set_attack_function(self.multi_attack)  # Custom attack
+        self.set_targeting_function(self.find_multi_target)  # Custom targeting
 
     @property
     def info(self):
@@ -964,8 +974,8 @@ class Bard(Tower):
         self.set_damage(0)
         self.set_attack_delay(-1)
         self.set_range(10)
-        self.set_color(COLOR.DARK_TEAL)
-        self.set_attack_color(COLOR.TEAL)
+        self.set_color(COLOR.DARK_ORANGE)
+        self.set_attack_color(COLOR.ORANGE)
         self.set_id(10)
         self.set_upgrade_cost(250)
         self.set_upgrade_name("Bardic Inspiration")
@@ -1026,8 +1036,8 @@ class Mage(Tower):
         self.set_damage(3)
         self.set_attack_delay(45)
         self.set_range(12)
-        self.set_color(COLOR.DARK_TEAL)
-        self.set_attack_color(COLOR.TEAL)
+        self.set_color(COLOR.DARK_BLUE_PURPLE)
+        self.set_attack_color(COLOR.BLUE_PURPLE)
         self.set_id(11)
         self.set_upgrade_cost(250)
         self.set_upgrade_name("Arcane Apprentice")
@@ -1041,8 +1051,8 @@ class Mage(Tower):
         self.set_ranges(13)
         self.set_damage(5)
         self.set_attack_delay(40)
-        self.add_attack(name='Arcane Bolt', damage=15, delay=120, attack_type=Attacking.CHAIN, attack= self.chain_attack, targeting=self.find_chain_target,
-                         sound=pygame.mixer.Sound('sounds/throw.ogg'), range=13, color=COLOR.LIGHT_GREEN, size=3, radius=1)
+        self.add_attack(name='Arcane Bolt', damage=15, delay=120, type=Attacking.CHAIN, attack= self.chain_attack, targeting=self.find_chain_target,
+                         sound=pygame.mixer.Sound('sounds/throw.ogg'), attack_range=13, color=COLOR.LIGHT_GREEN, size=3, radius=1)
         self.max_targets = 3
 
     def upgrade2(self):
@@ -1059,15 +1069,15 @@ class Mage(Tower):
         self.max_targets = 4
 
         # Fireball
-        self.add_attack(name='Fireball', damage=8, delay=30, attack_type=Attacking.AOE, attack=self.multi_attack, targeting=self.find_multi_target,
+        self.add_attack(name='Fireball', damage=8, delay=30, type=Attacking.AOE, attack=self.multi_attack, targeting=self.find_multi_target,
                          sound=pygame.mixer.Sound('sounds/fire.ogg'), color=COLOR.ORANGE, size=2, radius=3)
         
         # Ice Blast
-        self.add_attack(name='Ice Blast', damage=15, delay=60, attack_type=Attacking.AOE, attack=self.multi_attack, targeting=self.find_multi_target,
+        self.add_attack(name='Ice Blast', damage=15, delay=60, type=Attacking.AOE, attack=self.multi_attack, targeting=self.find_multi_target,
                          sound=pygame.mixer.Sound('sounds/ice3.ogg'), color=COLOR.LIGHT_BLUE, size=3, radius=5)
 
         # Lightning Bolt
-        self.add_attack(name='Lightning Bolt', damage=50, delay=120, attack_type=Attacking.RANGED, attack=self.normal_attack, targeting=self.find_single_target,
+        self.add_attack(name='Lightning Bolt', damage=50, delay=120, type=Attacking.RANGED, attack=self.normal_attack, targeting=self.find_single_target,
                          sound=pygame.mixer.Sound('sounds/electric_zap.ogg'), color=COLOR.YELLOW, size=4, radius=1)
 
         self.set_ranges(15)
@@ -1130,7 +1140,7 @@ class Mage(Tower):
         self.set_attack_delay(30)
         if self.selection == 0:
             # Radiation
-            self.add_attack(name='Radiation', damage=1, delay=0, attack_type=Attacking.RANGED, attack=self.normal_attack, targeting=self.find_single_target,
+            self.add_attack(name='Radiation', damage=1, delay=0, type=Attacking.RANGED, attack=self.normal_attack, targeting=self.find_single_target,
                             sound=pygame.mixer.Sound('sounds/fire.ogg'), color=COLOR.RED, size=1, radius=1)
 
             # Ice Blast
@@ -1141,7 +1151,7 @@ class Mage(Tower):
             
         elif self.selection == 1:
             # Blizzard Bomb
-            self.add_attack(name='Blizzard Bomb', damage=100, delay=45, attack_type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target,
+            self.add_attack(name='Blizzard Bomb', damage=100, delay=45, type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target,
                             sound=pygame.mixer.Sound('sounds/ice2.ogg'), color=COLOR.WHITE, size=10, radius=10)
 
             # Fireball
@@ -1152,7 +1162,7 @@ class Mage(Tower):
             
         elif self.selection == 2:
             # Superbolt
-            self.add_attack(name='Superbolt', damage=1000, delay=120, attack_type=Attacking.RANGED, attack=self.normal_attack, targeting=self.find_single_target,
+            self.add_attack(name='Superbolt', damage=1000, delay=120, type=Attacking.RANGED, attack=self.normal_attack, targeting=self.find_single_target,
                             sound=pygame.mixer.Sound('sounds/thunder2.ogg'), color=COLOR.DARK_YELLOW, size=6, radius=1)
 
             # Fireball
@@ -1172,8 +1182,9 @@ class Artisan(Tower):
         self.set_range(15)
         self.discount = 0.05
         self.set_metal_flag(True)
-        self.set_color(COLOR.DARK_TEAL)
-        self.set_attack_color(COLOR.TEAL)
+        self.set_color(COLOR.DARK_YELLOW)
+        self.set_attack_color(COLOR.LIGHT_BROWN)
+        self.set_upgrade_name("Efficient Production")
         self.set_id(12)
         self.set_upgrade_cost(1000)
         self.set_attack_sound(pygame.mixer.Sound('sounds/electric_buzz.ogg'))
@@ -1181,7 +1192,7 @@ class Artisan(Tower):
     def upgrade1(self):
         super().upgrade1()
         self.set_upgrade_cost(3000)
-        self.set_upgrade_name("Efficient Production")
+        self.set_upgrade_name("Mercantile Knowledge")
         self.set_attack_delay(50)
         self.set_damage(2)
         self.discount = 0.1
@@ -1189,15 +1200,16 @@ class Artisan(Tower):
     def upgrade2(self):
         super().upgrade2()
         self.set_upgrade_cost(7500)
-        self.set_upgrade_name("Mercantile Knowledge")
-        self.add_attack(name='Coin Toss', damage=5, delay=120, attack_type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target,
+        self.set_upgrade_name("Transparent Dealings")
+        self.money = 100  # Specific to this class, leave as assignment
+        self.add_attack(name='Coin Toss', damage=5, delay=120, type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target,
                         sound=pygame.mixer.Sound('sounds/boop.ogg'), color=COLOR.GOLD, size=3, radius=5)
         self.set_ranges(20)
 
     def upgrade3(self):
         super().upgrade3()
         self.set_upgrade_cost(20000)
-        self.set_upgrade_name("Transparent Dealings")
+        self.set_upgrade_name("Crafted Masterpiece")
         self.set_attack_delay(40)
         self.set_damage(4)
         self.set_ranges(23)
@@ -1207,12 +1219,45 @@ class Artisan(Tower):
     def upgrade4(self):
         super().upgrade4()
         self.set_upgrade_cost(0)
-        self.set_upgrade_name("Crafted Masterpiece")
         self.set_attack_delay(30)
         self.set_damage(6)
         self.set_range(25)
         self.discount = 0.25
         # reveal air and metal
+
+    def init_effects(self, towers: dict[int, Tower]):
+        distances = {
+            k: sqrt(((tower.x - self.x) ** 2) +
+                    ((tower.y - self.y) ** 2))
+            for k, tower in towers.items()
+        }
+
+        towers_in_range = [k for k, distance in distances.items() if distance <= self.ranges[0]]
+
+        print(self.id)
+        for tower in towers_in_range:
+            print(tower)
+            if type(towers[tower]) != Artisan:
+                print(f"Changed {towers[tower].name} discount multiplier from {towers[tower].discount_multiplier} to {min(1-self.discount, self.discount_multiplier)}")
+                towers[tower].discount_multiplier = min(1-self.discount, towers[tower].discount_multiplier)
+
+    def remove_effects(self, towers: dict[int, Tower]):
+        distances = {
+            k: sqrt(((tower.x - self.x) ** 2) +
+                    ((tower.y - self.y) ** 2))
+            for k, tower in towers.items()
+        }
+
+        towers_in_range = [k for k, distance in distances.items() if distance <= self.ranges[0]]
+
+        for tower in towers_in_range:
+            print(f"Removed {towers[tower].name}'s discount multiplier")
+            towers[tower].discount_multiplier = 1
+
+        # in case other artisans are nearby
+        for k,tower in towers.items():
+            if type(tower) == Artisan:
+                tower.init_effects(towers)
     
 
 class General(Tower):
@@ -1225,7 +1270,7 @@ class General(Tower):
         self.set_attack_delay(60)
         self.set_range(15)
         self.set_metal_flag(True)
-        self.set_color(COLOR.DARK_TEAL)
+        self.set_color(COLOR.DARK_BLUE)
         self.set_attack_color(COLOR.DARK_GRAY)
         self.set_id(13)
         self.set_upgrade_cost(1000)
@@ -1306,7 +1351,7 @@ class Troop(Tower):
         self.set_attack_delay(30)
         self.set_range(10)
         self.set_invisible_flag(True)
-        self.set_color(COLOR.DARK_TEAL)
+        self.set_color(COLOR.DARK_BLUE)
         self.set_attack_color(COLOR.DARK_GRAY)
         self.set_id(14)
         self.set_attack_sound(pygame.mixer.Sound('sounds/pistol1.ogg'))
@@ -1406,26 +1451,57 @@ class CombatAviation(Troop):
         self.set_color(COLOR.GRAY)
         self.set_attack_sound(pygame.mixer.Sound('sounds/firework.ogg'))
         self.add_attack(name="Missile", damage=200+100*(level - 1), delay=50-3*(level - 1), radius=5, color=COLOR.RED, sound=pygame.mixer.Sound('sounds/missile-blast.ogg'),
-                        attack_type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target, size=4)
+                        type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target, size=4)
 
-# class Alchemist(Tower):
-#     def __init__(self) -> None:
-#         super().__init__()
-#         self.name = "Alchemist"
-#         self.cost = 1100
-#         self.total_cost = self.cost
-#         self.damage = 1
-#         self.attack_delay = 60
-#         self.attack_radius = 3
-#         self.max_targets = 3
-#         self.stun_delay = 10
-#         self.range = 15
-#         self.metal_flag = True
-#         self.color = COLOR.DARK_PURPLE
-#         self.attack_color = COLOR.PURPLE
-#         self.id = 15
-#         self.upgrade_cost = 250
-#         self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+class Alchemist(Tower):
+    def __init__(self) -> None:
+        super().__init__()
+        self.set_name("Alchemist")
+        self.set_cost(1100)
+        self.set_total_cost(self.cost)
+        self.set_damage(6)
+        self.set_attack_delay(60)
+        self.set_attack_radius(3)
+        self.set_range(15)
+        self.set_metal_flag(True)
+        self.set_color(COLOR.DARK_PURPLE)
+        self.set_attack_color(COLOR.PURPLE)
+        self.set_id(15)
+        self.set_upgrade_name("Toxic Chemicals")
+        self.set_upgrade_cost(400)
+        self.set_attack_sound(pygame.mixer.Sound('sounds/shatter.ogg'))
+
+    def upgrade1(self):
+        super().upgrade1()
+        self.set_upgrade_name("Explosive Chemicals")
+        self.set_upgrade_cost(1200)
+        self.add_attack(name="Toxic Chemicals", damage=6, delay=60, radius=3, color=COLOR.DARK_GREEN, sound=pygame.mixer.Sound('sounds/shatter.ogg'),
+                        type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target, size=3)
+        self.set_ranges(17)
+
+    def upgrade2(self):
+        super().upgrade2()
+        self.set_upgrade_name("Mad Scientist")
+        self.set_upgrade_cost(2500)
+        self.add_attack(name="Explosive Chemicals", damage=20, delay=60, radius=5, color=COLOR.DARK_ORANGE, sound=pygame.mixer.Sound('sounds/shatter.ogg'),
+                        type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target, size=4)
+        self.set_ranges(20)
+
+    def upgrade3(self):
+        super().upgrade3()
+        self.set_upgrade_name("Regenerative Chemicals")
+        self.set_upgrade_cost(5000)
+        self.add_attack(name="Explosive Chemicals", damage=600, delay=60, radius=3, color=COLOR.DARK_GREEN, sound=pygame.mixer.Sound('sounds/shatter.ogg'),
+                        type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target, size=4)
+        self.set_ranges(25)
+
+    def upgrade4(self):
+        super().upgrade4()
+        self.set_upgrade_name("Chemical Warfare")
+        self.set_upgrade_cost(5000)
+        self.add_attack(name="Explosive Chemicals", damage=600, delay=60, radius=3, color=COLOR.DARK_GREEN, sound=pygame.mixer.Sound('sounds/shatter.ogg'),
+                        type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target, size=4)
+        self.set_ranges(30)
 
 # class PlagueDoctor(Tower):
 #     def __init__(self) -> None:
