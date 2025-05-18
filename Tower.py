@@ -3,6 +3,7 @@ import copy
 from numpy import sqrt
 from random import choice
 from Enemy import Enemy
+from Status import *
 from utils import COLOR,Targeting,draw_circle_alpha,Unicode,Attacking
 from constants import CELL_SIZE,FPS
 
@@ -45,6 +46,7 @@ class Tower:
         self.attack_names = ['Normal']
         self.attack_types = [Attacking.MELEE]
         self.attack_functions = [self.normal_attack]
+        self.attack_statuses = [None]
         self.targeting_functions = [self.find_single_target]
         self.damages = [1]                 # health ticks
         self.attack_delays = [20]          # frames between attacks
@@ -143,8 +145,11 @@ class Tower:
     def set_attack_radius(self, radius: int, idx: int=0):
         self.attack_radii[idx] = radius
 
+    def set_attack_status(self, status: Status, idx: int=0):
+        self.attack_statuses[idx] = status
+
     def add_attack(self, attack: callable, targeting: callable, name: str='Normal', type: str=Attacking.MELEE, damage: int=1, delay: int=20, attack_range: int=10,
-                   color: tuple=COLOR.BLACK, size: int=1, sound: pygame.mixer.Sound=pygame.mixer.Sound('sounds/boop.ogg'), radius: int=0):
+                   color: tuple=COLOR.BLACK, size: int=1, sound: pygame.mixer.Sound=pygame.mixer.Sound('sounds/boop.ogg'), radius: int=0, status=None):
         self.attack_names.append(name)
         self.attack_types.append(type)
         self.attack_functions.append(attack)
@@ -157,6 +162,7 @@ class Tower:
         self.attack_sizes.append(size)
         self.attack_sounds.append(sound)
         self.attack_radii.append(radius)
+        self.attack_statuses.append(status)
 
     @property
     def info(self):
@@ -197,6 +203,15 @@ class Tower:
         killed = enemy.damage(damage)
         if killed:
             return [killed]
+        elif self.attack_statuses[idx]:
+            # loop through enemy's statuses and determine if it already has this status
+            has_status = False
+            for status in enemy.status_effects:
+                if status.name == self.attack_statuses[idx].name:
+                    has_status = True
+                    break
+            if not has_status:
+                enemy.status_effects.append(copy.deepcopy(self.attack_statuses[idx]))
         return None
     
     def multi_attack(self, idx: int, screen: pygame.Surface, enemies: list[Enemy]):
@@ -217,6 +232,15 @@ class Tower:
             killed = enemy.damage(damage)
             if killed:
                 killed_list.append(killed)
+            elif self.attack_statuses[idx]:
+                # loop through enemy's statuses and determine if it already has this status
+                has_status = False
+                for status in enemy.status_effects:
+                    if status.name == self.attack_statuses[idx].name:
+                        has_status = True
+                        break
+                if not has_status:
+                    enemy.status_effects.append(self.attack_statuses[idx])
         return killed_list
     
     def chain_attack(self, idx: int, screen: pygame.Surface, enemies: list[Enemy]):
@@ -236,6 +260,15 @@ class Tower:
             killed = enemy.damage(damage)
             if killed:
                 killed_list.append(killed)
+            elif self.attack_statuses[idx]:
+                # loop through enemy's statuses and determine if it already has this status
+                has_status = False
+                for status in enemy.status_effects:
+                    if status.name == self.attack_statuses[idx].name:
+                        has_status = True
+                        break
+                if not has_status:
+                    enemy.status_effects.append(self.attack_statuses[idx])
             start_pos = end_pos
         self.current_delays[idx] = self.attack_delays[idx]
         return killed_list
@@ -255,6 +288,15 @@ class Tower:
             killed = enemy.damage((self.damages[idx]*self.attack_damage_boost_multiplier) + self.attack_damage_boost_addend)
             if killed:
                 killed_list.append(killed)
+            elif self.attack_statuses[idx]:
+                # loop through enemy's statuses and determine if it already has this status
+                has_status = False
+                for status in enemy.status_effects:
+                    if status.name == self.attack_statuses[idx].name:
+                        has_status = True
+                        break
+                if not has_status:
+                    enemy.status_effects.append(self.attack_statuses[idx])
         return killed_list
 
     def can_attack(self, enemy: Enemy):
@@ -1113,11 +1155,26 @@ class Mage(Tower):
 
         # Fireball
         self.add_attack(name='Fireball', damage=8, delay=30, type=Attacking.AOE, attack=self.multi_attack, targeting=self.find_multi_target,
-                         sound=pygame.mixer.Sound('sounds/fire.ogg'), color=COLOR.ORANGE, size=2, radius=3)
+                         sound=pygame.mixer.Sound('sounds/fire.ogg'), color=COLOR.ORANGE, size=2, radius=3, 
+                         status=Burn(
+                             name='Burn',
+                             frequency=30,
+                             duration=90,
+                             effect=1,
+                             color=COLOR.ORANGE,
+                             damage=1
+                         ))
         
         # Ice Blast
         self.add_attack(name='Ice Blast', damage=15, delay=60, type=Attacking.AOE, attack=self.multi_attack, targeting=self.find_multi_target,
-                         sound=pygame.mixer.Sound('sounds/ice3.ogg'), color=COLOR.LIGHT_BLUE, size=3, radius=5)
+                         sound=pygame.mixer.Sound('sounds/ice3.ogg'), color=COLOR.LIGHT_BLUE, size=3, radius=5, 
+                         status=Slow(
+                             name='Slow',
+                             frequency=1,
+                             duration=90,
+                             effect=1,
+                             color=COLOR.LIGHT_BLUE
+                         ))
 
         # Lightning Bolt
         self.add_attack(name='Lightning Bolt', damage=50, delay=120, type=Attacking.RANGED, attack=self.normal_attack, targeting=self.find_single_target,
@@ -1139,6 +1196,14 @@ class Mage(Tower):
 
         # Fireball
         self.set_damage(15, 2)
+        self.set_attack_status(Burn(
+                                name='Burn',
+                                frequency=20,
+                                duration=100,
+                                effect=1,
+                                color=COLOR.ORANGE,
+                                damage=1
+                            ), 2)
 
         # Ice Blast
         self.set_damage(25, 3)
@@ -1160,6 +1225,14 @@ class Mage(Tower):
             self.set_upgrade_name("Solar Radiation")
             self.set_damage(35, 2)
             self.set_attack_delay(10, 2)
+            self.set_attack_status(Burn(
+                                name='Burn',
+                                frequency=15,
+                                duration=105,
+                                effect=1,
+                                color=COLOR.ORANGE,
+                                damage=3
+                            ), 2)
 
         elif self.selection == 1:
             # Ice Path
@@ -1184,7 +1257,15 @@ class Mage(Tower):
         if self.selection == 0:
             # Radiation
             self.add_attack(name='Radiation', damage=1, delay=0, type=Attacking.RANGED, attack=self.normal_attack, targeting=self.find_single_target,
-                            sound=pygame.mixer.Sound('sounds/fire.ogg'), color=COLOR.RED, size=1, radius=1)
+                            sound=pygame.mixer.Sound('sounds/fire.ogg'), color=COLOR.RED, size=1, radius=1, 
+                            status=Burn(
+                                name='Harsh Burn',
+                                frequency=5,
+                                duration=120,
+                                effect=1,
+                                color=COLOR.ORANGE,
+                                damage=5
+                            ))
 
             # Ice Blast
             self.set_damage(25, 3)

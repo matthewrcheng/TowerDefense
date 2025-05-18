@@ -21,8 +21,12 @@ class Enemy:
         self.height = 2
         self.width = 3
         self.id = 101
-        self.rect = pygame.Rect(0, 0, self.width * CELL_SIZE, self.height * CELL_SIZE)
+        self.set_rect()
+        self.status_effects = []
         self.path_progress = 0
+
+    def set_rect(self):
+        self.rect = pygame.Rect(0, 0, self.width * CELL_SIZE, self.height * CELL_SIZE)
 
     def place(self, location, grid, num) -> None:
         self.x = location[0]
@@ -266,6 +270,7 @@ class PirateGunner(Enemy):
         self.id = 118
         self.height = 3
         self.width = 4
+        self.set_rect()
 
 class PirateMate(Enemy):
     def __init__(self) -> None:
@@ -278,6 +283,7 @@ class PirateMate(Enemy):
         self.id = 119
         self.height = 4
         self.width = 5
+        self.set_rect()
 
 class PirateCaptain(Enemy):
     def __init__(self) -> None:
@@ -290,6 +296,7 @@ class PirateCaptain(Enemy):
         self.id = 120
         self.height = 4
         self.width = 6
+        self.set_rect()
 
 class DreadPirate(Enemy):
     def __init__(self) -> None:
@@ -303,6 +310,7 @@ class DreadPirate(Enemy):
         self.id = 121
         self.height = 5
         self.width = 7
+        self.set_rect()
 
 class GhostPirate(Enemy):
     def __init__(self) -> None:
@@ -316,6 +324,7 @@ class GhostPirate(Enemy):
         self.id = 122
         self.height = 3
         self.width = 4
+        self.set_rect()
 
 class BruteEnforcer(Enemy):
     def __init__(self) -> None:
@@ -329,6 +338,7 @@ class BruteEnforcer(Enemy):
         self.id = 123
         self.height = 3
         self.width = 4
+        self.set_rect()
 
 class Infiltrator(Enemy):
     def __init__(self) -> None:

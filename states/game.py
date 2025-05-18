@@ -5,6 +5,7 @@ from constants import GRID_HEIGHT,GRID_WIDTH,CELL_SIZE,SIDEBAR_WIDTH,FPS
 from utils import COLOR, GameState, Map, Targeting, Unicode, draw_circle_alpha, draw_polygon_alpha, draw_rect_alpha
 from Tower import Artisan, Bard, Tower, Gunslinger, Farm, General, Infantry, ArmoredInfantry, Artillery, CombatAviation
 from Enemy import TrojanHorse, Infiltrator
+from Status import *
 # from Enemy import Enemy, , Speedy, Slow, Tough
 
 # region Helper Functions
@@ -602,6 +603,20 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                             to_remove.append(k)
                 pygame.draw.rect(screen, enemy.color, enemy.rect)
         for k in to_remove:
+            enemies.pop(k)
+        
+        to_remove_enemy = []
+        for k,enemy in enemies.items():
+            to_remove_status = []
+            for status in enemy.status_effects:
+                killed = status.game_tick(screen, enemy)
+                if killed:
+                    to_remove_enemy.append(k)
+                elif status.duration <= 0:
+                    to_remove_status.append(status)
+            for status in to_remove_status:
+                enemy.status_effects.remove(status)
+        for k in to_remove_enemy:
             enemies.pop(k)
 
         enemy_timer-=1
