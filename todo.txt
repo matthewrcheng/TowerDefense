@@ -3,8 +3,37 @@
 3. Create more enemies
 4. Create more difficulty seeds
 5. Playtest
-6. Add upgrades to existing towers through electrocutioner
+6. Add upgrades to existing towers (Warrior through electrocutioner)
 7. Fix enemy health bars
 8. Add tower character images
 9. Add collections and achievements
 10. Add play button and pause button and time in between levels
+11. Santa's Workshop
+12. Haunted Mansion
+13. Types of towers:
+    - full support (no direct damage)
+        - money
+        - attack damage
+        - attack speed
+        - enemy detection
+    - single target low damage, fast attack
+    - single target high damage, slow attack
+    - single target medium damage, medium attack
+    - single target melee
+    - single target range
+    - single target mixed melee/range
+    - multi target low damage, fast attack
+    - multi target high damage, slow attack
+    - multi target medium damage, medium attack
+    - multi target melee
+    - multi target range
+    - multi target mixed melee/range
+    - multi target high damage one target, low damage to nearby enemies
+    - multi target high damage to all targets
+    - indirect target 
+        - lays traps
+        - strong attack with no specific target (can miss)
+    - mixed targeting
+    - player controlled targetting
+    
+    

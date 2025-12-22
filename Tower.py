@@ -731,11 +731,11 @@ class Assassin(Tower):
         self.set_attack_delay(3)
 # endregion
 
-# region Gunslinger
-class Gunslinger(Tower):
+# region Bounty Hunter
+class BountyHunter(Tower):
     def __init__(self) -> None:
         super().__init__()
-        self.name = 'Gunslinger'
+        self.name = 'Bounty Hunter'
         self.cost = 600
         self.total_cost = self.cost
         self.set_damage(5)
@@ -1767,6 +1767,44 @@ class Alchemist(Tower):
 #         self.color = COLOR.DARK_ORANGE
 #         self.attack_color = COLOR.ORANGE
 #         self.id = 17
+#         self.upgrade_cost = 250
+#         self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+# class Harvester(Tower):
+#     def __init__(self) -> None:
+#         super().__init__()
+#         self.name = "Harvester"
+#         self.cost = 1200
+#         self.total_cost = self.cost
+#         self.damage = 1
+#         self.attack_delay = 60
+#         self.attack_radius = 3
+#         self.max_targets = 3
+#         self.stun_delay = 10
+#         self.range = 15
+#         self.metal_flag = True
+#         self.color = COLOR.DARK_GREEN
+#         self.attack_color = COLOR.GREEN
+#         self.id = 18
+#         self.upgrade_cost = 250
+#         self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+# class IceSoldier(Tower):
+#     def __init__(self) -> None:
+#         super().__init__()
+#         self.name = "Ice Soldier"
+#         self.cost = 1300
+#         self.total_cost = self.cost
+#         self.damage = 1
+#         self.attack_delay = 60
+#         self.attack_radius = 3
+#         self.max_targets = 3
+#         self.stun_delay = 10
+#         self.range = 15
+#         self.metal_flag = True
+#         self.color = COLOR.DARK_BLUE
+#         self.attack_color = COLOR.BLUE
+#         self.id = 19
 #         self.upgrade_cost = 250
 #         self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
 

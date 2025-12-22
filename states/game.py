@@ -3,7 +3,7 @@ import numpy as np
 import random
 from constants import GRID_HEIGHT,GRID_WIDTH,CELL_SIZE,SIDEBAR_WIDTH,FPS
 from utils import COLOR, GameState, Map, Targeting, Unicode, draw_circle_alpha, draw_polygon_alpha, draw_rect_alpha
-from Tower import Artisan, Bard, Tower, Gunslinger, Farm, General, Infantry, ArmoredInfantry, Artillery, CombatAviation
+from Tower import Artisan, Bard, Tower, BountyHunter, Farm, General, Infantry, ArmoredInfantry, Artillery, CombatAviation
 from Enemy import TrojanHorse, Infiltrator
 from Status import *
 # from Enemy import Enemy, , Speedy, Slow, Tough
@@ -466,7 +466,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                         else:
                             total_damage = min(tower.damages[i], target.health)
                         money += (total_damage * tower.money_multiplier)
-                        if type(tower) == Gunslinger or (type(tower) == Artisan and tower.attack_names[i] == "Coin Toss"):
+                        if type(tower) == BountyHunter or (type(tower) == Artisan and tower.attack_names[i] == "Coin Toss"):
                             money += tower.money
                         killed_list = tower.attack(i, screen, target)
                         tower.total_damage += total_damage

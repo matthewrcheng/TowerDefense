@@ -97,3 +97,19 @@ corrupted = {
     "final_level": 1,
     1: [(TrojanHorse, 100)]
 }
+
+santas_workshop = {
+    "name": "Santa's Workshop",
+    "color": COLOR.LIGHT_GREEN,
+    "text_color": COLOR.WHITE,
+    "final_level": 1,
+    1: [(Pirate, 100)]
+}
+
+haunted_mansion = {
+    "name": "Haunted Mansion",
+    "color": COLOR.DARK_GREEN,
+    "text_color": COLOR.WHITE,
+    "final_level": 1,
+    1: [(Pirate, 100)]
+}

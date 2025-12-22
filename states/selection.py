@@ -147,7 +147,7 @@ def tower_selection_screen(screen):
     berserker_button = pygame.Rect(50, 325, 250, 50)
     assassin_button = pygame.Rect(50, 400, 250, 50)
     # column 2
-    gunslinger_button = pygame.Rect(350, 100, 250, 50)
+    bountyhunter_button = pygame.Rect(350, 100, 250, 50)
     bard_button = pygame.Rect(350, 175, 250, 50)
     mage_button = pygame.Rect(350, 250, 250, 50)
     artisan_button = pygame.Rect(350, 325, 250, 50)
@@ -165,7 +165,7 @@ def tower_selection_screen(screen):
     deadeye = Deadeye()
     berserker = Berserker()
     assassin = Assassin()
-    gunslinger = Gunslinger()
+    bountyhunter = BountyHunter()
     dragoon = Dragoon()
     farm = Farm()
     electro = Electrocutioner()
@@ -245,14 +245,14 @@ def tower_selection_screen(screen):
                         towers.append(Assassin)
                         # highlight assassin button
                         pass
-                elif gunslinger_button.collidepoint(event.pos):
-                    if Gunslinger in towers:
-                        towers.remove(Gunslinger)
-                        # unhighlight gunslinger button
+                elif bountyhunter_button.collidepoint(event.pos):
+                    if BountyHunter in towers:
+                        towers.remove(BountyHunter)
+                        # unhighlight bountyhunter button
                         pass
                     elif len(towers) < 8:
-                        towers.append(Gunslinger)
-                        # highlight gunslinger button
+                        towers.append(BountyHunter)
+                        # highlight bountyhunter button
                         pass
                 elif dragoon_button.collidepoint(event.pos):
                     if Dragoon in towers:
@@ -327,7 +327,7 @@ def tower_selection_screen(screen):
                         # highlight alchemist button
                         pass
                 elif default_button.collidepoint(event.pos):  # Handle the "Default" button
-                    towers = [Warrior, Archer, Deadeye, Berserker, Assassin, Gunslinger, Dragoon, Farm]
+                    towers = [Warrior, Archer, Deadeye, Berserker, Assassin, BountyHunter, Dragoon, Farm]
                 elif quit_button.collidepoint(event.pos):  # Handle the "Quit" button
                     return None, GameState.MENU
                 elif back_button.collidepoint(event.pos):  # Handle the "Back" button
@@ -384,9 +384,9 @@ def tower_selection_screen(screen):
         assassin_text = fonts.render(assassin.name, True, assassin.text_color if Assassin in towers else COLOR.DARK_GRAY)
         screen.blit(assassin_text, (assassin_button.x + 20, assassin_button.y + 10))
 
-        pygame.draw.rect(screen, gunslinger.color if Gunslinger in towers else COLOR.LIGHT_GRAY, gunslinger_button)
-        gunslinger_text = fonts.render(gunslinger.name, True, gunslinger.text_color if Gunslinger in towers else COLOR.DARK_GRAY)
-        screen.blit(gunslinger_text, (gunslinger_button.x + 20, gunslinger_button.y + 10))
+        pygame.draw.rect(screen, bountyhunter.color if BountyHunter in towers else COLOR.LIGHT_GRAY, bountyhunter_button)
+        bountyhunter_text = fonts.render(bountyhunter.name, True, bountyhunter.text_color if BountyHunter in towers else COLOR.DARK_GRAY)
+        screen.blit(bountyhunter_text, (bountyhunter_button.x + 20, bountyhunter_button.y + 10))
 
         pygame.draw.rect(screen, dragoon.color if Dragoon in towers else COLOR.LIGHT_GRAY, dragoon_button)
         dragoon_text = fonts.render(dragoon.name, True, dragoon.text_color if Dragoon in towers else COLOR.DARK_GRAY)

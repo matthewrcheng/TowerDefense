@@ -9,12 +9,14 @@ class Enemy:
     def __init__(self) -> None:
         self.name = "Pirate"
         self.speed_delay = 5
-        self.max_health = 5
-        self.health = self.max_health
+        self.max_health = 5                     # unchangable health, base health
+        self.game_max_health = self.max_health  # max health in game, can be lowered by permanent damage from Butcher tower
+        self.health = self.max_health           # current health
         self.invisible_flag = False
         self.metal_flag = False
         self.air_flag = False
         self.boss_flag = False
+        self.defense = 0.0                      # 0.0-1.0
         self.current_delay = self.speed_delay
         self.color = COLOR.DARK_GREEN
         self.direction = Direction.right
@@ -23,6 +25,7 @@ class Enemy:
         self.id = 101
         self.set_rect()
         self.status_effects = []
+        self.shield = 0
         self.path_progress = 0
 
     def set_rect(self):
@@ -56,7 +59,12 @@ class Enemy:
         return True
     
     def damage(self, amount):
-        self.health -= amount
+        if self.shield > 0:
+            self.shield -= amount
+            if self.shield <= 0:
+                self.shield = 0
+            return None
+        self.health -= (1 - self.defense) * amount
         if self.health <= 0:
             return self
         else:
@@ -417,7 +425,7 @@ class AbyssalKing(Enemy):
         self.max_health = 8
         self.health = self.max_health
         self.color = COLOR.DARK_RED
-        self.id = 103
+        self.id = 205
 
 class MonsterOfTheDeep(Enemy):
     def __init__(self) -> None:
@@ -427,7 +435,7 @@ class MonsterOfTheDeep(Enemy):
         self.max_health = 8
         self.health = self.max_health
         self.color = COLOR.DARK_RED
-        self.id = 103
+        self.id = 206
         
 ################################################################################
 #                                  Hell                                        #
@@ -446,7 +454,7 @@ class HellHound(Enemy):
         self.max_health = 8
         self.health = self.max_health
         self.color = COLOR.DARK_RED
-        self.id = 103
+        self.id = 303
 
 class FallenAngel(Enemy):
     pass
@@ -465,7 +473,7 @@ class Cerberus(Enemy):
         self.max_health = 8
         self.health = self.max_health
         self.color = COLOR.DARK_RED
-        self.id = 103  
+        self.id = 304  
 
 class Conquest(Enemy):
     def __init__(self) -> None:
@@ -475,7 +483,7 @@ class Conquest(Enemy):
         self.max_health = 8
         self.health = self.max_health
         self.color = COLOR.WHITE
-        self.id = 103
+        self.id = 305
 
 class War(Enemy):
     def __init__(self) -> None:
@@ -485,7 +493,7 @@ class War(Enemy):
         self.max_health = 8
         self.health = self.max_health
         self.color = COLOR.RED
-        self.id = 103
+        self.id = 306
 
 class Famine(Enemy):
     def __init__(self) -> None:
@@ -495,7 +503,7 @@ class Famine(Enemy):
         self.max_health = 8
         self.health = self.max_health
         self.color = COLOR.BLACK
-        self.id = 103
+        self.id = 307
 
 class Death(Enemy):
     def __init__(self) -> None:
@@ -505,7 +513,7 @@ class Death(Enemy):
         self.max_health = 8
         self.health = self.max_health
         self.color = COLOR.FAINT
-        self.id = 103
+        self.id = 308
 
 class DemonPriest(Enemy):
     def __init__(self) -> None:
@@ -515,7 +523,7 @@ class DemonPriest(Enemy):
         self.max_health = 8
         self.health = self.max_health
         self.color = COLOR.DARK_RED
-        self.id = 103
+        self.id = 309
 
 class DemonPrince(Enemy):
     def __init__(self) -> None:
@@ -525,7 +533,7 @@ class DemonPrince(Enemy):
         self.max_health = 8
         self.health = self.max_health
         self.color = COLOR.DARK_RED
-        self.id = 103
+        self.id = 310
 
 class Hades(Enemy):
     def __init__(self) -> None:
@@ -535,7 +543,7 @@ class Hades(Enemy):
         self.max_health = 8
         self.health = self.max_health
         self.color = COLOR.DARK_RED
-        self.id = 103
+        self.id = 311
         
 ################################################################################
 #                                Corrupted                                     #
@@ -548,7 +556,7 @@ class Corrupted(Enemy):
         self.max_health = 8
         self.health = self.max_health
         self.color = COLOR.DARK_RED
-        self.id = 103
+        self.id = 400
 
 class Diseased(Enemy):
     pass
@@ -564,3 +572,412 @@ class Abomination(Enemy):
 
 class Pestilence(Enemy):
     pass
+
+################################################################################
+#                            Santa's Workshop                                  #
+################################################################################
+
+class Elf(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Elf"
+        self.speed_delay = 5
+        self.max_health = 8
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_GREEN
+        self.id = 500
+
+class GingerbreadMan(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Gingerbread Man"
+        self.speed_delay = 3
+        self.max_health = 10
+        self.health = self.max_health
+        self.color = COLOR.BROWN
+        self.id = 501
+
+class Snowman(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Snowman"
+        self.speed_delay = 8
+        self.max_health = 30
+        self.health = self.max_health
+        self.color = COLOR.WHITE
+        self.id = 502
+
+class Deer(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Deer"
+        self.speed_delay = 3
+        self.max_health = 50
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_BROWN
+        self.id = 503
+
+class MallSanta(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Mall Santa"
+        self.speed_delay = 8
+        self.max_health = 100
+        self.health = self.max_health
+        self.color = COLOR.RED
+        self.id = 504
+        self.defense = 0.3
+
+class SnowAngel(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Snow Angel"
+        self.speed_delay = 5
+        self.max_health = 30
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_BLUE
+        self.id = 505
+        self.air_flag = True
+
+class ChristmasTree(Enemy): # 4 elves holding a tree like a battering ram, turns into 4 elves after health reaches 0
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Christmas Tree"
+        self.speed_delay = 3
+        self.max_health = 1000
+        self.health = self.max_health
+        self.color = COLOR.DARK_GREEN
+        self.id = 506
+
+class Reindeer(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Reindeer"
+        self.speed_delay = 3
+        self.max_health = 200
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_BROWN
+        self.id = 507
+        self.air_flag = True
+
+class PolarBear(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Polar Bear"
+        self.speed_delay = 5
+        self.max_health = 500
+        self.health = self.max_health
+        self.color = COLOR.WHITE
+        self.id = 508
+        self.defense = 0.2
+
+class FrozenOmegaBull(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Frozen Omega Bull"
+        self.speed_delay = 3
+        self.max_health = 1000
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_BLUE
+        self.id = 509
+
+class Yeti(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Yeti"
+        self.speed_delay = 8
+        self.max_health = 2000
+        self.health = self.max_health
+        self.color = COLOR.BROWN
+        self.id = 510
+        self.defense = 0.4
+
+class SantasSleigh(Enemy): # 8 reindeer emerge when health reaches 0
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Santa's Sleigh"
+        self.speed_delay = 8
+        self.max_health = 1000
+        self.health = self.max_health
+        self.color = COLOR.RED
+        self.id = 511
+        self.air_flag = True
+
+class Grinch(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Grinch"
+        self.speed_delay = 8
+        self.max_health = 3000
+        self.health = self.max_health
+        self.color = COLOR.GREEN
+        self.id = 512
+        self.boss_flag = True
+
+class AbominableSnowman(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Abominable Snowman"
+        self.speed_delay = 12
+        self.max_health = 5000
+        self.health = self.max_health
+        self.color = COLOR.WHITE
+        self.id = 513
+        self.defense = 0.5
+
+class Rudolph(Enemy): # drops to the ground when health reaches 2500
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Rudolph"
+        self.speed_delay = 5
+        self.max_health = 5000
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_BROWN
+        self.id = 514
+        self.air_flag = True
+        self.boss_flag = True
+
+class SantaClaus(Enemy): # summons minions (elf, reindeer, snowman, etc.)
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Santa Claus"
+        self.speed_delay = 12
+        self.max_health = 100000
+        self.health = self.max_health
+        self.color = COLOR.RED
+        self.id = 515
+        self.boss_flag = True
+
+################################################################################
+#                            Haunted Mansion                                   #
+################################################################################
+
+class Zombie(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Zombie"
+        self.speed_delay = 5
+        self.max_health = 18
+        self.health = self.max_health
+        self.color = COLOR.DARK_GREEN
+        self.id = 600
+
+class Skeleton(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Skeleton"
+        self.speed_delay = 3
+        self.max_health = 12
+        self.health = self.max_health
+        self.color = COLOR.WHITE
+        self.id = 601
+
+class HauntedMansionGhost(Enemy): # name already in use for regular levels
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Ghost"
+        self.speed_delay = 5
+        self.max_health = 30
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_BLUE
+        self.id = 602
+        self.invisible_flag = True
+
+class Witch(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Witch"
+        self.speed_delay = 8
+        self.max_health = 50
+        self.health = self.max_health
+        self.color = COLOR.PURPLE
+        self.id = 603
+
+class Bat(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Bat"
+        self.speed_delay = 2
+        self.max_health = 10
+        self.health = self.max_health
+        self.color = COLOR.BLACK
+        self.id = 604
+        self.air_flag = True
+
+class Vampire(Enemy): # summons bats
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Vampire"
+        self.speed_delay = 8
+        self.max_health = 150
+        self.health = self.max_health
+        self.color = COLOR.DARK_PURPLE
+        self.id = 605
+
+class Wolf(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Wolf"
+        self.speed_delay = 3
+        self.max_health = 50
+        self.health = self.max_health
+        self.color = COLOR.BROWN
+        self.id = 606
+
+class Gravedigger(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Gravedigger"
+        self.speed_delay = 8
+        self.max_health = 100
+        self.health = self.max_health
+        self.color = COLOR.GRAY
+        self.id = 607
+        self.defense = 0.3
+
+class Scarecrow(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Scarecrow"
+        self.speed_delay = 5
+        self.max_health = 200
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_BROWN
+        self.id = 608
+
+class Necromancer(Enemy): # summons zombies
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Necromancer"
+        self.speed_delay = 12
+        self.max_health = 500
+        self.health = self.max_health
+        self.color = COLOR.PURPLE
+        self.id = 609
+
+class JackOLantern(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Jack O' Lantern"
+        self.speed_delay = 5
+        self.max_health = 500
+        self.health = self.max_health
+        self.color = COLOR.ORANGE
+        self.id = 610
+        self.defense = 0.3
+
+class BroomWitch(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Witch"
+        self.speed_delay = 8
+        self.max_health = 500
+        self.health = self.max_health
+        self.color = COLOR.PURPLE
+        self.id = 611
+        self.air_flag = True
+
+class Wraith(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Wraith"
+        self.speed_delay = 5
+        self.max_health = 1000
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_GRAY
+        self.id = 612
+        self.air_flag = True
+
+class Reaper(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Reaper"
+        self.speed_delay = 5
+        self.max_health = 2000
+        self.health = self.max_health
+        self.color = COLOR.DARK_GRAY
+        self.id = 613
+        self.defense = 0.2
+
+class HauntedHayride(Enemy): # zombies, skeletons, scarecrows, etc. emerge when health reaches 0
+    def __init__(self) -> None: 
+        super().__init__()
+        self.name = "Haunted Hayride"
+        self.speed_delay = 12
+        self.max_health = 5000
+        self.health = self.max_health
+        self.color = COLOR.DARK_YELLOW
+        self.id = 614
+        self.defense = 0.3
+
+class Werewolf(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Werewolf"
+        self.speed_delay = 5
+        self.max_health = 1000
+        self.health = self.max_health
+        self.color = COLOR.BROWN
+        self.id = 615
+
+class BuriedSoul(Enemy): # emerges from the ground in the middle of the path instead of at the start
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Buried Soul"
+        self.speed_delay = 6
+        self.max_health = 250
+        self.health = self.max_health
+        self.color = COLOR.DARK_GRAY
+        self.id = 616
+
+class Frankenstein(Enemy): # regenerates Frankenstein's Monster's health over time, speed changes to 3 if monster dies
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Frankenstein"
+        self.speed_delay = 8
+        self.max_health = 200
+        self.health = self.max_health
+        self.color = COLOR.DARK_GRAY
+        self.id = 617
+
+class FrankensteinsMonster(Enemy): # speed changes to 12 if Frankenstein dies
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Frankenstein's Monster"
+        self.speed_delay = 8
+        self.max_health = 5000
+        self.health = self.max_health
+        self.color = COLOR.GREEN
+        self.id = 618
+        self.defense = 0.3
+
+class HeadlessHorseman(Enemy): # puts zombies, skeletons, scarecrows, witches, and vampires on horseback (speed changes to 3)
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Headless Horseman"
+        self.speed_delay = 3
+        self.max_health = 3000
+        self.health = self.max_health
+        self.color = COLOR.DARK_ORANGE
+        self.id = 619
+
+class GrimReaper(Enemy): # heals 500 hp and does swiping animation every 5 seconds
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Grim Reaper"
+        self.speed_delay = 8
+        self.max_health = 10000
+        self.health = self.max_health
+        self.color = COLOR.BLACK
+        self.id = 620
+
+class HauntedSpirit(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Haunted Spirit"
+        self.speed_delay = 5
+        self.max_health = 20000
+        self.health = self.max_health
+        self.color = COLOR.DARK_GRAY
+        self.id = 621
+        self.boss_flag = True
