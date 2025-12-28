@@ -12,26 +12,26 @@
 12. Haunted Mansion
 13. Types of towers:
     - full support (no direct damage)
-        - money
+        - money (farm)
         - attack damage
         - attack speed
         - enemy detection
     - single target low damage, fast attack
-    - single target high damage, slow attack
-    - single target medium damage, medium attack
-    - single target melee
-    - single target range
+    - single target high damage, slow attack (butcher)
+    - single target medium damage, medium attack (warrior)
+    - single target melee (warrior, plague doctor, butcher, miner)
+    - single target range (archer)
     - single target mixed melee/range
     - multi target low damage, fast attack
     - multi target high damage, slow attack
     - multi target medium damage, medium attack
-    - multi target melee
+    - multi target melee (assassin, harvester)
     - multi target range
     - multi target mixed melee/range
     - multi target high damage one target, low damage to nearby enemies
-    - multi target high damage to all targets
+    - multi target high damage to all targets (detonator)
     - indirect target 
-        - lays traps
+        - lays traps (miner)
         - strong attack with no specific target (can miss)
     - mixed targeting
     - player controlled targetting
