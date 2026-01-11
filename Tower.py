@@ -493,6 +493,23 @@ class Tower:
 # endregion    
 # region Warrior
 class Warrior(Tower):
+    """Warrior
+
+    A cheap, single target melee tower that deals low damage. Good for starting out or beginner players.
+
+    Placement Cost: 250 
+    Upgrade Cost: 750
+    Total Cost: 1000
+
+    Max DPS: 12 (4 damage every 10 frames at 30 frames per second)
+
+    Upgrade 1: Sharpened Focus (50)
+    Upgrade 2: Battle Hardened (200)
+    Upgrade 3: Elite Warrior (500)
+
+    Attributes:
+    - Hits invisible enemies (Upgrade 3)
+    """
     def __init__(self) -> None:
         super().__init__()
         self.set_upgrade_cost(50)
@@ -524,6 +541,23 @@ class Warrior(Tower):
 # endregion
 # region Archer
 class Archer(Tower):
+    """Archer
+
+    A relatively cheap ranged tower that deals medium damage. Good for beginning players.
+
+    Placement Cost: 350 
+    Upgrade Cost: 1500
+    Total Cost: 1850
+
+    Max DPS: 8.33 (25 damage every 45 frames at 30 frames per second)
+
+    Upgrade 1: Steady Aim (150)
+    Upgrade 2: Piercing Shot (350)
+    Upgrade 3: Deadly Marksman (1000)
+
+    Attributes:
+    - Hits air enemies
+    """
     def __init__(self) -> None:
         super().__init__()
         self.set_name('Archer')
@@ -563,6 +597,26 @@ class Archer(Tower):
 # endregion
 # region Deadeye
 class Deadeye(Tower):
+    """Deadeye
+
+    A moderate cost ranged tower that deals slow, but high damage.
+
+    Placement Cost: 600 
+    Upgrade Cost: 7400
+    Total Cost: 8000
+
+    Max DPS: 83.3 (250 damage every 90 frames at 30 frames per second)
+
+    Upgrade 1: Precision Rounds (400)
+    Upgrade 2: Ballistic Shot (1000)
+    Upgrade 3: Deadzone (2000)
+    Upgrade 4: Final Judgement (4000)
+
+    Attributes:
+    - Hits invisible enemies
+    - Hits air enemies
+    - Hits metal enemies (Upgrade 4)
+    """
     def __init__(self) -> None:
         super().__init__()
         self.set_name('Deadeye')
@@ -612,6 +666,26 @@ class Deadeye(Tower):
 
 # region Berserker
 class Berserker(Tower):
+    """Berserker
+
+    A unique tower that deals damage with energy waves, hitting all enemies in the area. Great for crowd control.
+
+    Placement Cost: 800
+    Upgrade Cost: 11200
+    Total Cost: 12000
+
+    Max DPS: 56.25 (5 damage x 15 waves every 40 frames at 30 frames per second)
+
+    Upgrade 1: Shock Wave (200)
+    Upgrade 2: Sonic Frenzy (500)
+    Upgrade 3: Shockstorm (3500)
+    Upgrade 4: Catacalysmic Pulse (7000)
+
+    Attributes:
+    - Hits air enemies (Upgrade 2)
+    - Hits metal enemies (Upgrade 3)
+    - Deals extra damage to bosses (Upgrade 4)
+    """
     def __init__(self) -> None:
         super().__init__()
         self.set_name('Berserker')
@@ -685,6 +759,25 @@ class Berserker(Tower):
 
 # region Assassin
 class Assassin(Tower):
+    """Assassin
+
+    A moderately priced melee tower that does low but rapid damage to enemies.
+
+    Placement Cost: 400
+    Upgrade Cost: 7600
+    Total Cost: 8000
+
+    Max DPS: 80 (8 damage every 3 frames at 30 frames per second)
+
+    Upgrade 1: Aerial Support (100)
+    Upgrade 2: Sharpened Silence (500)
+    Upgrade 3: Night Reaper (2000)
+    Upgrade 4: Apex Killer (5000)
+
+    Attributes:
+    - Hits invisible enemies
+    - Hits air enemies (Upgrade 1)
+    """
     def __init__(self) -> None:
         super().__init__()
         self.set_name('Assassin')
@@ -733,6 +826,27 @@ class Assassin(Tower):
 
 # region Bounty Hunter
 class BountyHunter(Tower):
+    """Bounty Hunter
+
+    An expensive ranged tower that earns money for each kill and deals massive damage to bosses.
+
+    Placement Cost: 600
+    Upgrade Cost: 14850
+    Total Cost: 15450
+
+    Max DPS: 30 (30 damage every 30 frames at 30 frames per second)
+
+    Upgrade 1: Payback (100)
+    Upgrade 2: Triggerhawk (250)
+    Upgrade 3: Elite Outlaw (2000)
+    Upgrade 4: The Collector (5000)
+    Upgrade 5: Wanted Dead or Alive (7500)
+
+    Attributes:
+    - Earns money per kill
+    - Deals extra damage to bosses
+    - Hits air enemies (Upgrade 2)
+    """
     def __init__(self) -> None:
         super().__init__()
         self.name = 'Bounty Hunter'
@@ -811,6 +925,26 @@ class BountyHunter(Tower):
 
 # region Dragoon
 class Dragoon(Tower):
+    """Dragoon
+
+    An extremely expensive ranged tower that hits multiple enemies with its large blast radius. It attacks slowly but deals high damage.
+
+    Placement Cost: 1500
+    Upgrade Cost: 39000
+    Total Cost: 40500
+
+    Max DPS: 66.67 (200 damage every 90 frames at 30 frames per second)
+
+    Upgrade 1: Shockpoint (750)
+    Upgrade 2: Blastframe (1500)
+    Upgrade 3: Ion Cannon (4000)
+    Upgrade 4: Devastating Impact (10000)
+    Upgrade 5: Event Horizon (25000)
+
+    Attributes:
+    - Hits metal enemies
+    - Hits air enemies (Upgrade 4)
+    """
     def __init__(self) -> None:
         super().__init__()
         self.name = 'Dragoon'
@@ -886,6 +1020,26 @@ class Dragoon(Tower):
 
 # region Farm
 class Farm(Tower):
+    """Farm
+
+    A support tower that does no damage to enemies, but generates money for the player each round.
+
+    Placement Cost: 200
+    Upgrade Cost: 11350
+    Total Cost: 11550
+
+    Max DPS: 0
+    Max Money: 2500
+
+    Upgrade 1: Cottage Crop (200)
+    Upgrade 2: Cropstead (400)
+    Upgrade 3: Golden Acres (750)
+    Upgrade 4: Overgrowth (2500)
+    Upgrade 5: Golden Empire (7500)
+
+    Attributes:
+    - Generates money at the end of each round
+    """
     def __init__(self) -> None:
         super().__init__()
         self.name = 'Farm'
@@ -937,6 +1091,28 @@ class Farm(Tower):
 
 # region Electrocutioner
 class Electrocutioner(Tower):
+    """Electrocutioner
+
+    A unique, expensive tower that stuns enemies, good for killing groups and supporting slow attacking towers.
+
+    Placement Cost: 750
+    Upgrade Cost: 31500
+    Total Cost: 32250
+
+    Max DPS: 10.91 (20 damage every 55 frames at 30 frames per second)
+
+    Upgrade 1: Tesla Coil (250) 
+    Upgrade 2: Charged Arc (750)
+    Upgrade 3: Lightning Rod (3000)
+    Upgrade 4: Circuit Overload (7500)
+    Upgrade 5: Power Surge (20000)
+
+    Attributes:
+    - Hits metal enemies
+    - Hits air enemies (Upgrade 2)
+    - Stuns enemies
+    - Attack chains until the next enemy is out of range or max targets is reached
+    """
     def __init__(self) -> None:
         super().__init__()
         self.set_name("Electrocutioner")
@@ -1021,6 +1197,28 @@ class Electrocutioner(Tower):
 
 # region Bard
 class Bard(Tower):
+    """Bard
+
+    A support tower that buffs nearby towers, increasing their attack speed, damage, range, and money earned.
+
+    Placement Cost: 1500
+    Upgrade Cost: 11500
+    Total Cost: 13000
+
+    Max DPS: 0
+
+    Upgrade 1: Bardic Inspiration (250)
+    Upgrade 2: Rhythm of War (750)
+    Upgrade 3: Ballad of the Hero (3000)
+    Upgrade 4: Symphony of Victory (7500)
+
+    Attributes:
+    - Increases attack speed of nearby towers
+    - Increases base damage of nearby towers (Upgrade 2)
+    - Increases damage multiplier of nearby towers
+    - Increases range of nearby towers
+    - Money earned by nearby towers
+    """
     def __init__(self) -> None:
         super().__init__()
         self.set_name("Bard")
@@ -1113,6 +1311,53 @@ class Bard(Tower):
 
 # region Mage
 class Mage(Tower):
+    """Mage
+
+    A unique tower with a wide range of magic attacks. At higher levels, the tower has three upgrade paths: fire, ice, and lightning.
+
+    Placement Cost: 600
+    Upgrade Cost: 31500
+    Total Cost: 32100
+
+    Max DPS (Fire): 239.17
+        - Basic Spell: 50 (50 damage every 30 frames at 30 frames per second)
+        - Arcane Bolt: 11.67 (35 damage every 90 frames at 30 frames per second)
+        - Fireball: 105 (35 damage damage every 10 frames at 30 frames per second)
+        - Ice Blast:  12.5 (25 damage every 60 frames at 30 frames per second)
+        - Lightning Bolt: 30 (120 damage every 120 frames at 30 frames per second)
+        - Radiation: 30 (1 damage every frame at 30 frames per second)
+    Max DPS (Ice): 248.34
+        - Basic Spell: 50 (50 damage every 30 frames at 30 frames per second)
+        - Arcane Bolt: 11.67 (35 damage every 90 frames at 30 frames per second)
+        - Fireball: 15 (15 damage every 30 frames at 30 frames per second)
+        - Ice Blast: 75 (50 damage every 20 frames at 30 frames per second)
+        - Lightning Bolt: 30 (120 damage every 120 frames at 30 frames per second)
+        - Blizzard Bomb: 66.67 (100 damage every 45 frames at 30 frames per second)
+    Max DPS (Lightning): 489.17
+        - Basic Spell: 50 (50 damage every 30 frames at 30 frames per second)
+        - Arcane Bolt: 11.67 (35 damage every 90 frames at 30 frames per second)
+        - Fireball: 15 (15 damage every 30 frames at 30 frames per second)
+        - Ice Blast: 12.5 (25 damage every 60 frames at 30 frames per second)
+        - Lightning Bolt: 150 (300 damage every 60 frames at 30 frames per second)
+        - Superbolt: 250 (1000 damage every 120 frames at 30 frames per second)
+
+    Upgrade 1: Arcane Apprentice (250)
+    Upgrade 2: Elemental Initiate (750)
+    Upgrade 3: Mystical Adept (3000)
+    Upgrade 4: 
+        - Fire Wizard (7500)
+        - Ice Wizard (7500)
+        - Lightning Wizard (7500)
+    Upgrade 5:
+        - Solar Radiation (20000) 
+        - Absolute Zero (20000)
+        - Overcharged Superbolt (20000)
+
+    Attributes:
+    - Burns enemies
+    - Deals multi-target damage
+    - Deals high single target damage
+    """
     def __init__(self) -> None:
         super().__init__()
         self.set_name("Mage")
@@ -1295,7 +1540,33 @@ class Mage(Tower):
             # Ice Blast
             self.set_damage(25, 3)
 
+# endregion
+# region Artisan
+
 class Artisan(Tower):
+    """Artisan
+
+    A utility tower that decreases the cost of and grants detection to nearby towers. It also earns extra money.
+
+    Placement Cost: 900
+    Upgrade Cost: 31500
+    Total Cost: 32400
+
+    Max DPS: 7.25
+        - Basic: 6 (6 damage every 30 frames at 30 frames per second)
+        - Coin Toss: 1.25 (5 damage every 120 frames at 30 frames per second)
+
+    Upgrade 1: Efficient Production (1000)
+    Upgrade 2: Mercantile Knowledge (3000)
+    Upgrade 3: Transparent Dealings (7500)
+    Upgrade 4: Crafted Masterpiece (20000)
+
+    Attributes:
+    - Hits metal enemies
+    - Decreases cost of nearby towers
+    - Reveals hidden, metal, and air enemies
+    - Earns money with a special coin attack
+    """
     def __init__(self) -> None:
         super().__init__()
         self.set_name("Artisan")
@@ -1374,8 +1645,29 @@ class Artisan(Tower):
             if type(tower) == Artisan:
                 tower.init_effects(towers)
     
+# endregion
+# region General
 
 class General(Tower):
+    """General
+
+    summary
+
+    Placement Cost: 2000
+    Upgrade Cost: 18000
+    Total Cost: 20000
+
+    Max DPS: 7.5 (5 damage every 20 frames at 30 frames per second)
+
+    Upgrade 1: Strategic Command (1000)
+    Upgrade 2: Heavy Arsenal (2000)
+    Upgrade 3: Aerial Dominance (5000)
+    Upgrade 4: Total Warfare (10000)
+
+    Attributes:
+    - Hits metal enemies
+    - Hits air enemies (Upgrade 3)
+    """
     def __init__(self) -> None:
         super().__init__()
         self.set_name("General")
@@ -1434,6 +1726,7 @@ class General(Tower):
         self.set_upgrade_cost(10000)
         self.set_upgrade_name("Total Warfare")
         self.set_attack_delay(30)
+        self.air_flag = True
         self.spawn_combat_aviation = True
         self.total_infantry_spawn_delay = 200
         self.total_armored_infantry_spawn_delay = 400
@@ -1455,6 +1748,9 @@ class General(Tower):
         self.combat_aviation_level = 2
 
 class Troop(Tower):
+    """
+    A special type of tower only spawned by other towers that walks backwards through the map.
+    """
     def __init__(self) -> None:
         super().__init__()
         self.set_name("Troop")
@@ -1513,6 +1809,16 @@ class Troop(Tower):
             return None
 
 class Infantry(Troop):
+    """Infantry
+
+    summary
+
+    Max Level: 
+    Max DPS:
+
+    Attributes:
+    - 
+    """
     def __init__(self, level) -> None:
         super().__init__()
         self.set_name("Infantry")
@@ -1524,6 +1830,16 @@ class Infantry(Troop):
         self.set_color(COLOR.LIGHT)
 
 class ArmoredInfantry(Troop):
+    """Armored Infantry
+
+    summary
+
+    Max Level: 
+    Max DPS:
+
+    Attributes:
+    - 
+    """
     def __init__(self, level) -> None:
         super().__init__()
         self.set_name("Armored Infantry")
@@ -1537,6 +1853,16 @@ class ArmoredInfantry(Troop):
         self.set_color(COLOR.DARK_GRAY)
 
 class Artillery(Troop):
+    """Artillery
+
+    summary
+
+    Max Level: 
+    Max DPS:
+
+    Attributes:
+    - 
+    """
     def __init__(self, level) -> None:
         super().__init__()
         self.set_name("Artillery")
@@ -1553,6 +1879,16 @@ class Artillery(Troop):
         self.set_attack_sound(pygame.mixer.Sound('sounds/cannon.wav'))
 
 class CombatAviation(Troop):
+    """Combat Aviation
+
+    summary
+
+    Max Level: 
+    Max DPS:
+
+    Attributes:
+    - 
+    """
     def __init__(self, level) -> None:
         super().__init__()
         self.set_name("Combat Aviation")
@@ -1568,7 +1904,28 @@ class CombatAviation(Troop):
         self.add_attack(name="Missile", damage=200+100*(level - 1), delay=50-3*(level - 1), radius=5, color=COLOR.RED, sound=pygame.mixer.Sound('sounds/missile-blast.ogg'),
                         type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target, size=4)
 
+# endregion
+# region Alchemist
+
 class Alchemist(Tower):
+    """name
+
+    summary
+
+    Placement Cost:
+    Upgrade Cost:
+    Total Cost:
+
+    Max DPS:
+
+    Upgrade 1:
+    Upgrade 2:
+    Upgrade 3:
+    ...
+
+    Attributes:
+    - 
+    """
     def __init__(self) -> None:
         super().__init__()
         self.set_name("Alchemist")
@@ -1618,195 +1975,407 @@ class Alchemist(Tower):
                         type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target, size=4)
         self.set_ranges(30)
 
-# class PlagueDoctor(Tower):
-#     def __init__(self) -> None:
-#         super().__init__()
-#         self.name = "Plague Doctor"
-#         self.cost = 1300
-#         self.total_cost = self.cost
-#         self.damage = 1
-#         self.attack_delay = 60
-#         self.attack_radius = 3
-#         self.max_targets = 3
-#         self.stun_delay = 10
-#         self.range = 15
-#         self.metal_flag = True
-#         self.color = COLOR.DARK_PURPLE
-#         self.attack_color = COLOR.PURPLE
-#         self.id = 14
-#         self.upgrade_cost = 250
-#         self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+# endregion
+# region Plague Doctor
 
-# class Toxicologist(Tower):
-#     def __init__(self) -> None:
-#         super().__init__()
-#         self.name = "Toxicologist"
-#         self.cost = 1500
-#         self.total_cost = self.cost
-#         self.damage = 1
-#         self.attack_delay = 60
-#         self.attack_radius = 3
-#         self.max_targets = 3
-#         self.stun_delay = 10
-#         self.range = 15
-#         self.metal_flag = True
-#         self.color = COLOR.DARK_PURPLE
-#         self.attack_color = COLOR.PURPLE
-#         self.id = 15
-#         self.upgrade_cost = 250
-#         self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+class PlagueDoctor(Tower):
+    """name
 
-# class Pyromancer(Tower):
-#     def __init__(self) -> None:
-#         super().__init__()
-#         self.name = "Pyromancer"
-#         self.cost = 1200
-#         self.total_cost = self.cost
-#         self.damage = 1
-#         self.attack_delay = 60
-#         self.attack_radius = 3
-#         self.max_targets = 3
-#         self.stun_delay = 10
-#         self.range = 15
-#         self.metal_flag = True
-#         self.color = COLOR.ORANGE
-#         self.attack_color = COLOR.LIGHT_ORANGE
-#         self.id = 16
-#         self.upgrade_cost = 250
-#         self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+    summary
 
-# class Hypnotist(Tower):
-#     def __init__(self) -> None:
-#         super().__init__()
-#         self.name = "Hypnotist"
-#         self.cost = 700
-#         self.total_cost = self.cost
-#         self.damage = 1
-#         self.attack_delay = 60
-#         self.attack_radius = 3
-#         self.max_targets = 3
-#         self.stun_delay = 10
-#         self.range = 15
-#         self.metal_flag = True
-#         self.color = COLOR.PINK
-#         self.attack_color = COLOR.LIGHT_PURPLE
-#         self.id = 15
-#         self.upgrade_cost = 250
-#         self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+    Placement Cost:
+    Upgrade Cost:
+    Total Cost:
 
-# class Butcher(Tower):
-#     def __init__(self) -> None:
-#         super().__init__()
-#         self.name = "Butcher"
-#         self.cost = 900
-#         self.total_cost = self.cost
-#         self.damage = 1
-#         self.attack_delay = 60
-#         self.attack_radius = 3
-#         self.max_targets = 3
-#         self.stun_delay = 10
-#         self.range = 15
-#         self.metal_flag = True
-#         self.color = COLOR.DARK_RED
-#         self.attack_color = COLOR.RED
-#         self.id = 17
-#         self.upgrade_cost = 250
-#         self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+    Max DPS:
 
-# class Blacksmith(Tower):
-#     def __init__(self) -> None:
-#         super().__init__()
-#         self.name = "Blacksmith"
-#         self.cost = 1100
-#         self.total_cost = self.cost
-#         self.damage = 1
-#         self.attack_delay = 60
-#         self.attack_radius = 3
-#         self.max_targets = 3
-#         self.stun_delay = 10
-#         self.range = 15
-#         self.metal_flag = True
-#         self.color = COLOR.DARK_RED
-#         self.attack_color = COLOR.RED
-#         self.id = 18
-#         self.upgrade_cost = 250
-#         self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+    Upgrade 1:
+    Upgrade 2:
+    Upgrade 3:
+    ...
 
-# class Miner(Tower):
-#     def __init__(self) -> None:
-#         super().__init__()
-#         self.name = "Miner"
-#         self.cost = 450
-#         self.total_cost = self.cost
-#         self.damage = 1
-#         self.attack_delay = 60
-#         self.attack_radius = 3
-#         self.max_targets = 3
-#         self.stun_delay = 10
-#         self.range = 15
-#         self.metal_flag = True
-#         self.color = COLOR.BROWN
-#         self.attack_color = COLOR.DARK_ORANGE
-#         self.id = 16
-#         self.upgrade_cost = 250
-#         self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+    Attributes:
+    - 
+    """
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Plague Doctor"
+        self.cost = 1300
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_PURPLE
+        self.attack_color = COLOR.PURPLE
+        self.id = 14
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
 
-# class Detonator(Tower):
-#     def __init__(self) -> None:
-#         super().__init__()
-#         self.name = "Detonator"
-#         self.cost = 800
-#         self.total_cost = self.cost
-#         self.damage = 1
-#         self.attack_delay = 60
-#         self.attack_radius = 3
-#         self.max_targets = 3
-#         self.stun_delay = 10
-#         self.range = 15
-#         self.metal_flag = True
-#         self.color = COLOR.DARK_ORANGE
-#         self.attack_color = COLOR.ORANGE
-#         self.id = 17
-#         self.upgrade_cost = 250
-#         self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+# endregion
+# region Toxicologist
 
-# class Harvester(Tower):
-#     def __init__(self) -> None:
-#         super().__init__()
-#         self.name = "Harvester"
-#         self.cost = 1200
-#         self.total_cost = self.cost
-#         self.damage = 1
-#         self.attack_delay = 60
-#         self.attack_radius = 3
-#         self.max_targets = 3
-#         self.stun_delay = 10
-#         self.range = 15
-#         self.metal_flag = True
-#         self.color = COLOR.DARK_GREEN
-#         self.attack_color = COLOR.GREEN
-#         self.id = 18
-#         self.upgrade_cost = 250
-#         self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+class Toxicologist(Tower):
+    """name
 
-# class IceSoldier(Tower):
-#     def __init__(self) -> None:
-#         super().__init__()
-#         self.name = "Ice Soldier"
-#         self.cost = 1300
-#         self.total_cost = self.cost
-#         self.damage = 1
-#         self.attack_delay = 60
-#         self.attack_radius = 3
-#         self.max_targets = 3
-#         self.stun_delay = 10
-#         self.range = 15
-#         self.metal_flag = True
-#         self.color = COLOR.DARK_BLUE
-#         self.attack_color = COLOR.BLUE
-#         self.id = 19
-#         self.upgrade_cost = 250
-#         self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+    summary
+
+    Placement Cost:
+    Upgrade Cost:
+    Total Cost:
+
+    Max DPS:
+
+    Upgrade 1:
+    Upgrade 2:
+    Upgrade 3:
+    ...
+
+    Attributes:
+    - 
+    """
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Toxicologist"
+        self.cost = 1500
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_PURPLE
+        self.attack_color = COLOR.PURPLE
+        self.id = 15
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+# endregion
+# region Pyromancer
+
+class Pyromancer(Tower):
+    """name
+
+    summary
+
+    Placement Cost:
+    Upgrade Cost:
+    Total Cost:
+
+    Max DPS:
+
+    Upgrade 1:
+    Upgrade 2:
+    Upgrade 3:
+    ...
+
+    Attributes:
+    - 
+    """
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Pyromancer"
+        self.cost = 1200
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.ORANGE
+        self.attack_color = COLOR.LIGHT_ORANGE
+        self.id = 16
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+# endregion
+# region Hypnotist
+
+class Hypnotist(Tower):
+    """name
+
+    summary
+
+    Placement Cost:
+    Upgrade Cost:
+    Total Cost:
+
+    Max DPS:
+
+    Upgrade 1:
+    Upgrade 2:
+    Upgrade 3:
+    ...
+
+    Attributes:
+    - 
+    """
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Hypnotist"
+        self.cost = 700
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.PINK
+        self.attack_color = COLOR.LIGHT_PURPLE
+        self.id = 15
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+# endregion
+# region Butcher
+
+class Butcher(Tower):
+    """name
+
+    summary
+
+    Placement Cost:
+    Upgrade Cost:
+    Total Cost:
+
+    Max DPS:
+
+    Upgrade 1:
+    Upgrade 2:
+    Upgrade 3:
+    ...
+
+    Attributes:
+    - 
+    """
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Butcher"
+        self.cost = 900
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_RED
+        self.attack_color = COLOR.RED
+        self.id = 17
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+# endregion
+# region Blacksmith
+
+class Blacksmith(Tower):
+    """name
+
+    summary
+
+    Placement Cost:
+    Upgrade Cost:
+    Total Cost:
+
+    Max DPS:
+
+    Upgrade 1:
+    Upgrade 2:
+    Upgrade 3:
+    ...
+
+    Attributes:
+    - 
+    """
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Blacksmith"
+        self.cost = 1100
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_RED
+        self.attack_color = COLOR.RED
+        self.id = 18
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+# endregion
+# region Miner
+
+class Miner(Tower):
+    """name
+
+    summary
+
+    Placement Cost:
+    Upgrade Cost:
+    Total Cost:
+
+    Max DPS:
+
+    Upgrade 1:
+    Upgrade 2:
+    Upgrade 3:
+    ...
+
+    Attributes:
+    - 
+    """
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Miner"
+        self.cost = 450
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.BROWN
+        self.attack_color = COLOR.DARK_ORANGE
+        self.id = 16
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+# endregion
+# region Detonator
+
+class Detonator(Tower):
+    """name
+
+    summary
+
+    Placement Cost:
+    Upgrade Cost:
+    Total Cost:
+
+    Max DPS:
+
+    Upgrade 1:
+    Upgrade 2:
+    Upgrade 3:
+    ...
+
+    Attributes:
+    - 
+    """
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Detonator"
+        self.cost = 800
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_ORANGE
+        self.attack_color = COLOR.ORANGE
+        self.id = 17
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+# endregion
+# region Harvester
+
+class Harvester(Tower):
+    """name
+
+    summary
+
+    Placement Cost:
+    Upgrade Cost:
+    Total Cost:
+
+    Max DPS:
+
+    Upgrade 1:
+    Upgrade 2:
+    Upgrade 3:
+    ...
+
+    Attributes:
+    - 
+    """
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Harvester"
+        self.cost = 1200
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_GREEN
+        self.attack_color = COLOR.GREEN
+        self.id = 18
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+# endregion
+# region Ice Soldier
+
+class IceSoldier(Tower):
+    """name
+
+    summary
+
+    Placement Cost:
+    Upgrade Cost:
+    Total Cost:
+
+    Max DPS:
+
+    Upgrade 1:
+    Upgrade 2:
+    Upgrade 3:
+    ...
+
+    Attributes:
+    - 
+    """
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Ice Soldier"
+        self.cost = 1300
+        self.total_cost = self.cost
+        self.damage = 1
+        self.attack_delay = 60
+        self.attack_radius = 3
+        self.max_targets = 3
+        self.stun_delay = 10
+        self.range = 15
+        self.metal_flag = True
+        self.color = COLOR.DARK_BLUE
+        self.attack_color = COLOR.BLUE
+        self.id = 19
+        self.upgrade_cost = 250
+        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+
+# endregion
 
 if __name__ == "__main__":
     # print(Warrior().color)
