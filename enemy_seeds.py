@@ -78,16 +78,34 @@ hell = {
     "name": "Hell",
     "color": COLOR.DARK_RED,
     "text_color": COLOR.YELLOW,
-    "final_level": 1,
-    1: [(Pirate, 90), (PirateGunner, 30), (PirateMate, 30), (PirateCaptain, 30), (DreadPirate, 30)]
+    "final_level": 40,
+    1: [(Undead, 100), (Undead, 30), (Undead, 30), (Undead, 30)],
+    2: [(Undead, 100), (Undead, 30), (Undead, 30), (Undead, 30), (Undead, 30), (Undead, 30), (Undead, 30)],
+    3: [(Demon, 100), (Demon, 50), (Demon, 50)],
+    # fill in more levels as needed
+    20: [(DemonPriest, 50)],
+    25: [(Cerberus, 100)], 
+    28: [(DemonPrince, 100)],
+    30: [(Titan, 100)],
+    39: [(Titan, 100), (Titan, 80), (Titan, 80), (Titan, 80)],
+    40: [(Conquest, 100), (War, 100), (Famine, 100), (Death, 100), (Cerberus, 95), (Hades, 5)]
 }
 
 drowned = {
     "name": "Drowned",
     "color": COLOR.DARK_BLUE,
     "text_color": COLOR.TEAL,
-    "final_level": 1,
-    1: [(Pirate, 100)]
+    "final_level": 35,
+    1: [(Drowned, 100), (Drowned, 30), (Drowned, 30), (Drowned, 30)],
+    2: [(Drowned, 100), (Drowned, 30), (Drowned, 30), (Drowned, 30), (Drowned, 30), (Drowned, 30), (Drowned, 30)],
+    3: [(Mermaid, 100)],
+    10: [(DrownedGunner, 100)],
+    13: [(Siren, 100)],
+    15: [(HardHatDiver, 100)],
+    20: [(DrownedMate, 100)],
+    25: [(DrownedCaptain, 100)],
+    30: [(AbyssalKing, 100)],
+    35: [(MonsterOfTheDeep, 100)],
 }
 
 corrupted = {
