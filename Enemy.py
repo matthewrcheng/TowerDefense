@@ -2,6 +2,8 @@ import pygame
 from constants import CELL_SIZE
 from utils import Direction, COLOR
 
+# region Base Enemy Class
+
 class Enemy:
     """Base Enemy Class
     """
@@ -69,6 +71,9 @@ class Enemy:
             return self
         else:
             return None
+        
+    def break_shield_effect(self):
+        pass
     
     def face_right(self) -> None:
         self.direction = Direction.right
@@ -90,6 +95,9 @@ class Enemy:
 
     def __str__(self):
         return self.name
+
+# endregion
+# region Regular Enemies
 
 class Pirate(Enemy):
     def __init__(self) -> None:
@@ -114,6 +122,7 @@ class Thug(Enemy):
         self.health = self.max_health
         self.color = COLOR.DARK_RED
         self.id = 103
+        self.defense = 0.1
 
 class Brute(Enemy):
     def __init__(self) -> None:
@@ -124,6 +133,7 @@ class Brute(Enemy):
         self.health = self.max_health
         self.color = COLOR.LIGHT
         self.id = 104
+        self.defense = 0.2
 
 class Ghost(Enemy):
     def __init__(self) -> None:
@@ -158,6 +168,7 @@ class Armored(Enemy):
         self.metal_flag = True
         self.color = COLOR.GRAY
         self.id = 107
+        self.defense = 0.4
 
 class Paratrooper(Enemy):
     def __init__(self) -> None:
@@ -206,6 +217,7 @@ class UFO(Enemy):
         self.air_flag = True
         self.color = COLOR.LIGHT_GRAY
         self.id = 111
+        self.defense = 0.3
 
 class Juggernaut(Enemy):
     def __init__(self) -> None:
@@ -216,6 +228,7 @@ class Juggernaut(Enemy):
         self.health = self.max_health
         self.color = COLOR.DARK_GREEN
         self.id = 112
+        self.defense = 0.5
 
 class Marauder(Enemy):
     def __init__(self) -> None:
@@ -271,7 +284,7 @@ class PirateGunner(Enemy):
     def __init__(self) -> None:
         super().__init__()
         self.name = "Pirate Gunner"
-        self.max_health = 100
+        self.max_health = 1000
         self.health = self.max_health
         self.boss_flag = True
         self.color = COLOR.DARK_GREEN
@@ -279,12 +292,13 @@ class PirateGunner(Enemy):
         self.height = 3
         self.width = 4
         self.set_rect()
+        self.defense = 0.2
 
 class PirateMate(Enemy):
     def __init__(self) -> None:
         super().__init__()
         self.name = "Pirate Mate"
-        self.max_health = 500
+        self.max_health = 5000
         self.health = self.max_health
         self.boss_flag = True
         self.color = COLOR.DARK_GREEN
@@ -292,12 +306,13 @@ class PirateMate(Enemy):
         self.height = 4
         self.width = 5
         self.set_rect()
+        self.defense = 0.2
 
 class PirateCaptain(Enemy):
     def __init__(self) -> None:
         super().__init__()
         self.name = "Pirate Captain"
-        self.max_health = 2500
+        self.max_health = 10000
         self.health = self.max_health
         self.boss_flag = True
         self.color = COLOR.DARK_GREEN
@@ -305,6 +320,7 @@ class PirateCaptain(Enemy):
         self.height = 4
         self.width = 6
         self.set_rect()
+        self.defense = 0.2
 
 class DreadPirate(Enemy):
     def __init__(self) -> None:
@@ -319,6 +335,7 @@ class DreadPirate(Enemy):
         self.height = 5
         self.width = 7
         self.set_rect()
+        self.defense = 0.2
 
 class GhostPirate(Enemy):
     def __init__(self) -> None:
@@ -347,6 +364,7 @@ class BruteEnforcer(Enemy):
         self.height = 3
         self.width = 4
         self.set_rect()
+        self.defense = 0.3
 
 class Infiltrator(Enemy):
     def __init__(self) -> None:
@@ -358,6 +376,12 @@ class Infiltrator(Enemy):
         self.health = self.max_health
         self.color = COLOR.LIGHT_GRAY
         self.id = 124
+        self.shield = 500
+        self.defense = 0.5
+
+    def break_shield_effect(self):
+        self.speed_delay = 5
+        self.defense = 0
 
 class TrojanHorse(Enemy):
     def __init__(self) -> None:
@@ -375,6 +399,9 @@ class TrojanHorse(Enemy):
 
 # TODO: witch and witchs' coven
 
+# endregion
+# region Drowned Enemies
+
 ################################################################################
 #                                 Drowned                                      #
 ################################################################################
@@ -389,20 +416,53 @@ class Drowned(Enemy):
         self.id = 201
 
 class DrownedGunner(Enemy):
-    pass
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Drowned Gunner"
+        self.max_health = 1500
+        self.health = self.max_health
+        self.boss_flag = True
+        self.color = COLOR.DARK_BLUE
+        self.id = 118
+        self.height = 3
+        self.width = 4
+        self.set_rect()
+        self.defense = 0.3
 
 class DrownedMate(Enemy):
-    pass
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Drowned Mate"
+        self.max_health = 7500
+        self.health = self.max_health
+        self.boss_flag = True
+        self.color = COLOR.DARK_BLUE
+        self.id = 119
+        self.height = 4
+        self.width = 5
+        self.set_rect()
+        self.defense = 0.3
 
 class DrownedCaptain(Enemy):
-    pass
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Drowned Captain"
+        self.max_health = 15000
+        self.health = self.max_health
+        self.boss_flag = True
+        self.color = COLOR.DARK_BLUE
+        self.id = 120
+        self.height = 4
+        self.width = 6
+        self.set_rect()
+        self.defense = 0.3
 
 class Mermaid(Enemy):
     def __init__(self) -> None:
         super().__init__()
         self.name = "Mermaid"
-        self.speed_delay = 8
-        self.max_health = 8
+        self.speed_delay = 3
+        self.max_health = 100
         self.health = self.max_health
         self.color = COLOR.DARK_BLUE
         self.id = 203
@@ -411,147 +471,261 @@ class Siren(Enemy):
     def __init__(self) -> None:
         super().__init__()
         self.name = "Siren"
-        self.speed_delay = 8
-        self.max_health = 8
+        self.speed_delay = 3
+        self.max_health = 500
         self.health = self.max_health
         self.color = COLOR.DARK_BLUE
         self.id = 204
+
+class HardHatDiver(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Hard Hat Diver"
+        self.speed_delay = 12
+        self.max_health = 2000
+        self.health = self.max_health
+        self.color = COLOR.DARK_GRAY
+        self.id = 202
+        self.defense = 0.5
 
 class AbyssalKing(Enemy):
     def __init__(self) -> None:
         super().__init__()
         self.name = "Abyssal King"
-        self.speed_delay = 8
-        self.max_health = 8
+        self.speed_delay = 10
+        self.max_health = 100000
+        self.boss_flag = True
         self.health = self.max_health
-        self.color = COLOR.DARK_RED
+        self.color = COLOR.DARK_BLUE
         self.id = 205
+        self.height = 5
+        self.width = 7
+        self.set_rect()
+        self.defense = 0.3
 
 class MonsterOfTheDeep(Enemy):
     def __init__(self) -> None:
         super().__init__()
         self.name = "Monster of the Deep"
-        self.speed_delay = 8
-        self.max_health = 8
+        self.speed_delay = 15
+        self.max_health = 250000
+        self.boss_flag = True
         self.health = self.max_health
-        self.color = COLOR.DARK_RED
+        self.color = COLOR.BLACK
         self.id = 206
-        
+        self.height = 6
+        self.width = 8
+        self.set_rect()
+        self.defense = 0.4
+
+# endregion
+# region Hell Enemies
+
 ################################################################################
 #                                  Hell                                        #
 ################################################################################
 class Undead(Enemy):
-    pass
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Undead"
+        self.speed_delay = 5
+        self.max_health = 10
+        self.health = self.max_health
+        self.color = COLOR.GRAY
+        self.id = 301
 
 class Demon(Enemy):
-    pass
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Demon"
+        self.speed_delay = 5
+        self.max_health = 40
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 302
 
 class HellHound(Enemy):
     def __init__(self) -> None:
         super().__init__()      
-        self.name = "Thug"
-        self.speed_delay = 8
-        self.max_health = 8
+        self.name = "Hell Hound"
+        self.speed_delay = 3
+        self.max_health = 60
         self.health = self.max_health
         self.color = COLOR.DARK_RED
         self.id = 303
 
 class FallenAngel(Enemy):
-    pass
-
-class Immortal(Enemy):
-    pass
-
-class Nightmare(Enemy):
-    pass
-
-class Cerberus(Enemy):
     def __init__(self) -> None:
         super().__init__()
-        self.name = "Thug"
+        self.name = "Fallen Angel"
+        self.speed_delay = 4
+        self.max_health = 80
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_GRAY
+        self.id = 312
+        self.air_flag = True
+
+class Immortal(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Immortal"
         self.speed_delay = 8
-        self.max_health = 8
+        self.max_health = 400
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_GRAY
+        self.id = 313
+
+class Nightmare(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Nightmare"
+        self.speed_delay = 6
+        self.max_health = 120
+        self.health = self.max_health
+        self.color = COLOR.DARK_GRAY
+        self.id = 314
+        self.invisible_flag = True
+
+class DoomBringer(Enemy): # summons demons periodically
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Doom Bringer"
+        self.speed_delay = 10
+        self.max_health = 2000
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 318
+        self.boss_flag = True
+        self.height = 3
+        self.width = 4
+        self.defense = 0.2
+
+class Cerberus(Enemy): # shoots fireballs, stunning towers for a few seconds
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Cerberus"
+        self.speed_delay = 5
+        self.max_health = 5000
         self.health = self.max_health
         self.color = COLOR.DARK_RED
         self.id = 304  
 
-class Conquest(Enemy):
-    def __init__(self) -> None:
-        super().__init__()
-        self.name = "Thug"
-        self.speed_delay = 8
-        self.max_health = 8
-        self.health = self.max_health
-        self.color = COLOR.WHITE
-        self.id = 305
-
-class War(Enemy):
-    def __init__(self) -> None:
-        super().__init__()
-        self.name = "Thug"
-        self.speed_delay = 8
-        self.max_health = 8
-        self.health = self.max_health
-        self.color = COLOR.RED
-        self.id = 306
-
-class Famine(Enemy):
-    def __init__(self) -> None:
-        super().__init__()
-        self.name = "Thug"
-        self.speed_delay = 8
-        self.max_health = 8
-        self.health = self.max_health
-        self.color = COLOR.BLACK
-        self.id = 307
-
-class Death(Enemy):
-    def __init__(self) -> None:
-        super().__init__()
-        self.name = "Thug"
-        self.speed_delay = 8
-        self.max_health = 8
-        self.health = self.max_health
-        self.color = COLOR.FAINT
-        self.id = 308
-
-class DemonPriest(Enemy):
+class DemonPriest(Enemy): # applies shields to other enemies periodically
     def __init__(self) -> None:
         super().__init__()
         self.name = "Demon Priest"
         self.speed_delay = 8
-        self.max_health = 8
+        self.max_health = 1000
         self.health = self.max_health
         self.color = COLOR.DARK_RED
         self.id = 309
+        self.boss_flag = True
+        self.height = 3
+        self.width = 4
 
 class DemonPrince(Enemy):
     def __init__(self) -> None:
         super().__init__()
         self.name = "Demon Prince"
-        self.speed_delay = 8
-        self.max_health = 8
+        self.speed_delay = 12
+        self.max_health = 8000
         self.health = self.max_health
         self.color = COLOR.DARK_RED
         self.id = 310
+        self.boss_flag = True
+        self.defense = 0.2
+        self.height = 4
+        self.width = 6
 
-class Hades(Enemy):
+class Titan(Enemy):
     def __init__(self) -> None:
         super().__init__()
-        self.name = "Thug"
+        self.name = "Titan"
+        self.speed_delay = 15
+        self.max_health = 15000
+        self.health = self.max_health
+        self.color = COLOR.DARK_GRAY
+        self.id = 315
+        self.height = 6
+        self.width = 8
+        self.defense = 0.3
+
+class CursedSoul(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Cursed Soul"
+        self.speed_delay = 2
+        self.max_health = 2500
+        self.health = self.max_health
+        self.color = COLOR.PURPLE
+        self.id = 316
+        self.shield = 1000
+
+    def break_shield_effect(self): # stuns nearby towers for a short duration when shield breaks
+        self.invisible_flag = True
+        self.speed_delay = 5
+
+class Conquest(Enemy): # first horseman of the apocalypse, shoots piercing arrows that stun towers for a short duration
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Conquest"
         self.speed_delay = 8
-        self.max_health = 8
+        self.max_health = 40000
+        self.health = self.max_health
+        self.color = COLOR.WHITE
+        self.id = 305
+
+class War(Enemy): # second horseman of the apocalypse, wields a sword that stuns nearby towers for a moderate duration
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "War"
+        self.speed_delay = 8
+        self.max_health = 40000
+        self.health = self.max_health
+        self.color = COLOR.RED
+        self.id = 306
+
+class Famine(Enemy): # third horseman of the apocalypse, holds a pair of scales, reduces tower attack speed temporarily
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Famine"
+        self.speed_delay = 8
+        self.max_health = 40000
+        self.health = self.max_health
+        self.color = COLOR.BLACK
+        self.id = 307
+
+class Death(Enemy): # fourth horseman of the apocalypse, wields a scythe that reduces tower damage temporarily
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Death"
+        self.speed_delay = 8
+        self.max_health = 40000
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_GREEN
+        self.id = 308
+
+class Hades(Enemy): # emerges after the horsemen, summons minions, shoots fireballs that stun towers for a moderate duration
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Hades"
+        self.speed_delay = 12
+        self.max_health = 500000
         self.health = self.max_health
         self.color = COLOR.DARK_RED
         self.id = 311
+        self.boss_flag = True
         
+# endregion
+# region Corrupted Enemies
+
 ################################################################################
 #                                Corrupted                                     #
 ################################################################################
 class Corrupted(Enemy):
     def __init__(self) -> None:
         super().__init__()
-        self.name = "Thug"
+        self.name = "Corrupted"
         self.speed_delay = 8
         self.max_health = 8
         self.health = self.max_health
@@ -572,6 +746,9 @@ class Abomination(Enemy):
 
 class Pestilence(Enemy):
     pass
+
+# endregion
+# region Santa's Workshop Enemies
 
 ################################################################################
 #                            Santa's Workshop                                  #
@@ -725,17 +902,58 @@ class AbominableSnowman(Enemy):
         self.id = 513
         self.defense = 0.5
 
+class GhostOfChristmasPast(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Ghost of Christmas Past"
+        self.speed_delay = 5
+        self.max_health = 2000
+        self.health = self.max_health
+        self.invisible_flag = True
+        self.color = COLOR.LIGHT_PURPLE
+        self.id = 516
+        self.boss_flag = True
+
+class GhostOfChristmasPresent(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Ghost of Christmas Present"
+        self.speed_delay = 8
+        self.max_health = 5000
+        self.health = self.max_health
+        self.invisible_flag = True
+        self.color = COLOR.LIGHT_GREEN
+        self.id = 517
+        self.boss_flag = True
+
+class GhostOfChristmasFuture(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Ghost of Christmas Future"
+        self.speed_delay = 12
+        self.max_health = 10000
+        self.health = self.max_health
+        self.invisible_flag = True
+        self.color = COLOR.DARK_GRAY
+        self.id = 518
+        self.boss_flag = True
+
 class Rudolph(Enemy): # drops to the ground when health reaches 2500
     def __init__(self) -> None:
         super().__init__()
         self.name = "Rudolph"
         self.speed_delay = 5
-        self.max_health = 5000
+        self.max_health = 2500
         self.health = self.max_health
         self.color = COLOR.LIGHT_BROWN
         self.id = 514
         self.air_flag = True
         self.boss_flag = True
+        self.shield = 2500
+
+    def break_shield_effect(self):
+        self.air_flag = False
+        self.speed_delay = 3
 
 class SantaClaus(Enemy): # summons minions (elf, reindeer, snowman, etc.)
     def __init__(self) -> None:
@@ -747,6 +965,9 @@ class SantaClaus(Enemy): # summons minions (elf, reindeer, snowman, etc.)
         self.color = COLOR.RED
         self.id = 515
         self.boss_flag = True
+
+# endregion
+# region Haunted Mansion Enemies
 
 ################################################################################
 #                            Haunted Mansion                                   #
@@ -981,3 +1202,5 @@ class HauntedSpirit(Enemy):
         self.color = COLOR.DARK_GRAY
         self.id = 621
         self.boss_flag = True
+
+# endregion
