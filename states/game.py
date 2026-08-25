@@ -290,8 +290,8 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
                         elif tower_info_sell_button.collidepoint(event.pos):
                             towers.pop(tower_info_menu.num)
                             money += tower_info_menu.total_cost//2
-                            tower_info_menu = False
                             tower_info_menu.remove_effects(towers)
+                            tower_info_menu = False
                             print("Sold tower")
                     elif not placing:
                         for tower in towers.values():
@@ -358,7 +358,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
         
         screen.fill(COLOR.WHITE)
 
-        money_text = fontm.render(str(money), True, COLOR.YELLOW)
+        money_text = fontm.render(str(int(money)), True, COLOR.YELLOW)
         heart_text = fontm.render(str(health), True, COLOR.RED)
 
         screen.blit(money_icon, money_pos)
