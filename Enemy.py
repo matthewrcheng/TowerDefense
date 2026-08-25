@@ -29,6 +29,7 @@ class Enemy:
         self.status_effects = []
         self.shield = 0
         self.path_progress = 0
+        self.grave_tether = None
 
     def set_rect(self):
         self.rect = pygame.Rect(0, 0, self.width * CELL_SIZE, self.height * CELL_SIZE)
@@ -61,6 +62,8 @@ class Enemy:
         return True
     
     def damage(self, amount):
+        if self.grave_tether:
+            return self.grave_tether.damage(amount)
         if self.shield > 0:
             self.shield -= amount
             if self.shield <= 0:
@@ -554,6 +557,18 @@ class HellHound(Enemy):
         self.color = COLOR.DARK_RED
         self.id = 303
 
+class Imp(Enemy): # explodes on death, stunning nearby towers for a short duration
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Imp"
+        self.speed_delay = 2
+        self.max_health = 20
+        self.health = self.max_health
+        self.color = COLOR.RED
+        self.id = 311
+        self.height = 1
+        self.width = 1
+
 class FallenAngel(Enemy):
     def __init__(self) -> None:
         super().__init__()
@@ -564,6 +579,24 @@ class FallenAngel(Enemy):
         self.color = COLOR.LIGHT_GRAY
         self.id = 312
         self.air_flag = True
+
+class BloodThrall(Enemy): # heals itself and nearby enemies periodically
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Blood Thrall"
+        self.speed_delay = 6
+        self.max_health = 150
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 317
+        self.range = 5
+
+    # TODO: implement periodic healing in game loop
+    def heal_nearby(self, enemies):
+        for enemy in enemies:
+            if abs(enemy.x - self.x) <= self.range and abs(enemy.y - self.y) <= self.range:
+                enemy.health = min(enemy.max_health, enemy.health + 10)
+        self.health = min(self.max_health, self.health + 10)
 
 class Immortal(Enemy):
     def __init__(self) -> None:
@@ -586,6 +619,100 @@ class Nightmare(Enemy):
         self.id = 314
         self.invisible_flag = True
 
+class HellfireMage(Enemy): # shoots fireballs that stun towers for a short duration
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Hellfire Mage"
+        self.speed_delay = 7
+        self.max_health = 250
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 310
+
+class HellboundCorpse(Enemy): # summons a RisenSkeleton in its place upon death
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Hellbound Corpse"
+        self.speed_delay = 10
+        self.max_health = 300
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_GREEN
+        self.id = 316
+        self.corpse = True
+
+    def become_risen_skeleton(self):
+        self.name = "Risen Skeleton"
+        self.speed_delay = 3
+        self.max_health = 50
+        self.health = self.max_health
+        self.color = COLOR.FAINT
+        self.id = 341
+
+    def damage(self, amount):
+        killed = super().damage(amount)
+        if killed and self.corpse:
+            self.become_risen_skeleton()
+            return None
+        return killed
+
+class HellKnight(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Hell Knight"
+        self.speed_delay = 10
+        self.max_health = 800
+        self.health = self.max_health
+        self.color = COLOR.DARK_GRAY
+        self.id = 315
+        self.defense = 0.3
+
+class InfernalSoldier(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Infernal Soldier"
+        self.speed_delay = 7
+        self.max_health = 600
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 308
+        self.defense = 0.2
+        self.metal_flag = True
+
+class HellBat(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Hell Bat"
+        self.speed_delay = 2
+        self.max_health = 30
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 305
+        self.air_flag = True
+
+class BoneGiant(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Bone Giant"
+        self.speed_delay = 12
+        self.max_health = 500
+        self.health = self.max_health
+        self.color = COLOR.FAINT
+        self.id = 319
+        self.height = 5
+        self.width = 6
+        self.defense = 0.6
+
+class ShadowDrifter(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Shadow Drifter"
+        self.speed_delay = 4
+        self.max_health = 150
+        self.health = self.max_health
+        self.color = COLOR.DARK_PURPLE
+        self.id = 324
+        self.invisible_flag = True
+
 class DoomBringer(Enemy): # summons demons periodically
     def __init__(self) -> None:
         super().__init__()
@@ -605,10 +732,20 @@ class Cerberus(Enemy): # shoots fireballs, stunning towers for a few seconds
         super().__init__()
         self.name = "Cerberus"
         self.speed_delay = 5
-        self.max_health = 5000
+        self.max_health = 25000
         self.health = self.max_health
         self.color = COLOR.DARK_RED
         self.id = 304  
+
+class Candlebearer(Enemy): # speeds up all enemies ahead of it by reducing their speed_delay by 1/3
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Candlebearer"
+        self.speed_delay = 6
+        self.max_health = 300
+        self.health = self.max_health
+        self.color = COLOR.LIGHT_YELLOW
+        self.id = 303
 
 class DemonPriest(Enemy): # applies shields to other enemies periodically
     def __init__(self) -> None:
@@ -623,6 +760,118 @@ class DemonPriest(Enemy): # applies shields to other enemies periodically
         self.height = 3
         self.width = 4
 
+class InfernalLegionnaire(Enemy): # gains speed as its health decreases
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Infernal Legionnaire"
+        self.speed_delay = 10
+        self.max_health = 2000
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 307
+        self.defense = 0.4
+
+    def walk(self, grid, selected_map) -> bool:
+        # adjust speed_delay based on current health
+        health_ratio = self.health / self.max_health
+        if health_ratio > 0.75:
+            self.speed_delay = 10
+        elif health_ratio > 0.5:
+            self.speed_delay = 8
+        elif health_ratio > 0.25:
+            self.speed_delay = 6
+        else:
+            self.speed_delay = 4
+        return super().walk(grid, selected_map)
+    
+class SinCollector(Enemy): # collects souls from defeated enemies, increasing its current and max health by 10% of the defeated enemy's max health
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Sin Collector"
+        self.speed_delay = 7
+        self.max_health = 1000
+        self.health = self.max_health
+        self.color = COLOR.DARK_PURPLE
+        self.id = 306
+
+class InfernalGuardian(Enemy): # gains a shield that absorbs 20% of its max health every 10 steps
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Infernal Guardian"
+        self.speed_delay = 10
+        self.steps_since_shield = 0
+        self.max_health = 1500
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 302
+        self.defense = 0.3
+        self.shield = 0.2 * self.max_health
+
+    def walk(self, grid, selected_map):
+        self.steps_since_shield += 1
+        if self.steps_since_shield >= 10:
+            self.shield = 0.2 * self.max_health
+            self.steps_since_shield = 0
+        return super().walk(grid, selected_map)
+
+class BoneColossus(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Bone Colossus"
+        self.speed_delay = 15
+        self.max_health = 3000
+        self.health = self.max_health
+        self.color = COLOR.FAINT
+        self.id = 320
+        self.height = 6
+        self.width = 8
+        self.defense = 0.75
+
+class Revenant(Enemy): # only takes a max of 10 damage from each attack
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Revenant"
+        self.speed_delay = 4
+        self.max_health = 600
+        self.health = self.max_health
+        self.color = COLOR.DARK_GRAY
+        self.id = 321
+        self.invisible_flag = True
+
+    def damage(self, amount):
+        limited_amount = min(amount, 10)
+        return super().damage(limited_amount)
+
+class GraveTether(Enemy): # links to another enemy, taking damage in its place
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Grave Tether"
+        self.speed_delay = 15
+        self.max_health = 10000
+        self.health = self.max_health
+        self.color = COLOR.DARK_GREEN
+        self.id = 322
+
+class SoulTether(Enemy): # links to another enemy, having all damage dealt to it redirected to the linked enemy
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Soul Tether"
+        self.speed_delay = 4
+        self.max_health = 30
+        self.health = self.max_health
+        self.color = COLOR.PURPLE
+        self.id = 323
+        self.linked_enemy = None
+
+    def damage(self, amount):
+        if self.linked_enemy:
+            killed = self.linked_enemy.damage(amount)
+            if killed:
+                self.linked_enemy = None
+            return killed
+        else:
+            return super().damage(amount)
+
 class DemonPrince(Enemy):
     def __init__(self) -> None:
         super().__init__()
@@ -636,6 +885,18 @@ class DemonPrince(Enemy):
         self.defense = 0.2
         self.height = 4
         self.width = 6
+
+class IronHellspawn(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Iron Hellspawn"
+        self.speed_delay = 10
+        self.max_health = 3000
+        self.health = self.max_health
+        self.color = COLOR.DARK_GRAY
+        self.id = 309
+        self.metal_flag = True
+        self.defense = 0.4
 
 class Titan(Enemy):
     def __init__(self) -> None:
@@ -664,6 +925,18 @@ class CursedSoul(Enemy):
     def break_shield_effect(self): # stuns nearby towers for a short duration when shield breaks
         self.invisible_flag = True
         self.speed_delay = 5
+
+class FallenVanguard(Enemy):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name = "Fallen Vanguard"
+        self.speed_delay = 5
+        self.max_health = 5000
+        self.health = self.max_health
+        self.color = COLOR.DARK_RED
+        self.id = 317
+        self.defense = 0.3
+        self.air_flag = True
 
 class Conquest(Enemy): # first horseman of the apocalypse, shoots piercing arrows that stun towers for a short duration
     def __init__(self) -> None:
