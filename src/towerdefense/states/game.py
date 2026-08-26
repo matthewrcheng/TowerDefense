@@ -1,11 +1,12 @@
 import pygame
 import numpy as np
+import os
 import random
-from constants import GRID_HEIGHT,GRID_WIDTH,CELL_SIZE,SIDEBAR_WIDTH,FPS
-from utils import COLOR, GameState, Map, Targeting, Unicode, draw_circle_alpha, draw_polygon_alpha, draw_rect_alpha
-from Tower import Artisan, Bard, Tower, BountyHunter, Farm, General, Infantry, ArmoredInfantry, Artillery, CombatAviation
-from Enemy import TrojanHorse, Infiltrator
-from Status import *
+from ..util.constants import GRID_HEIGHT,GRID_WIDTH,CELL_SIZE,SIDEBAR_WIDTH,FPS
+from ..util.utils import COLOR, GameState, Map, Targeting, Unicode, draw_circle_alpha, draw_polygon_alpha, draw_rect_alpha
+from ..entities.Tower import Artisan, Bard, Tower, BountyHunter, Farm, General, Infantry, ArmoredInfantry, Artillery, CombatAviation
+from ..entities.Enemy import TrojanHorse, Infiltrator
+from ..util.Status import *
 # from Enemy import Enemy, , Speedy, Slow, Tough
 
 # region Helper Functions
@@ -141,15 +142,17 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
     clock = pygame.time.Clock()
 
     # Constants for screen dimensions and fonts
+    _font_loc = os.path.join(os.path.dirname(os.path.abspath(__file__)),\
+                             "..", "resources", "fonts")
     fonts = pygame.font.Font(None, 18)
     fontm = pygame.font.Font(None, 36)
     fontl = pygame.font.Font(None, 72)
-    djvss = pygame.font.Font('DejaVuSans.ttf', 18)
-    djvsm = pygame.font.Font('DejaVuSans.ttf', 36)
-    djvsl = pygame.font.Font('DejaVuSans.ttf', 72)
-    emojis = pygame.font.Font('emoji.ttf', 18)
-    emojim = pygame.font.Font('emoji.ttf', 36)
-    emojil = pygame.font.Font('emoji.ttf', 72)
+    djvss = pygame.font.Font(os.path.join(_font_loc, 'DejaVuSans.ttf'), 18)
+    djvsm = pygame.font.Font(os.path.join(_font_loc, 'DejaVuSans.ttf'), 36)
+    djvsl = pygame.font.Font(os.path.join(_font_loc, 'DejaVuSans.ttf'), 72)
+    emojis = pygame.font.Font(os.path.join(_font_loc, 'emoji.ttf'), 18)
+    emojim = pygame.font.Font(os.path.join(_font_loc, 'emoji.ttf'), 36)
+    emojil = pygame.font.Font(os.path.join(_font_loc, 'emoji.ttf'), 72)
 
     # Buttons, text, and icons
     exit_button = pygame.Rect(WIDTH-30, 0, 30, 30)

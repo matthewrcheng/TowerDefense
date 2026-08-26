@@ -1,5 +1,5 @@
 import pygame
-from utils import COLOR, GameState
+from ..util.utils import COLOR, GameState
 
 def results_screen(screen: pygame.Surface, win: bool, levels: int = 0, time: int = 0):
 

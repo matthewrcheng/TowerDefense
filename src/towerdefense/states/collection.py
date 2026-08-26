@@ -1,7 +1,7 @@
 import pygame
-from utils import COLOR, GameState
+from ..util.utils import COLOR, GameState
 
-def achievements_screen(screen):
+def collection_screen(screen):
 
     # Constants for screen dimensions and fonts
     fonts = pygame.font.Font(None, 36)
@@ -18,7 +18,7 @@ def achievements_screen(screen):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return GameState.MENU
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 if play_button.collidepoint(event.pos):
                     # Transition to the WORLDS screen when "Play" is clicked
                     return GameState.MAP_SELECTION
@@ -31,11 +31,10 @@ def achievements_screen(screen):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return GameState.MENU
-
         screen.fill(COLOR.WHITE)
 
         # Display username at the top of the screen
-        title_text = fonts.render(f"ACHIEVEMENTS", True, COLOR.BLACK)
+        title_text = fonts.render(f"COLLECTION", True, COLOR.BLACK)
         screen.blit(title_text, (50, 50))
 
         # Draw the "Play" button

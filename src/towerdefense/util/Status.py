@@ -1,7 +1,7 @@
 import random
 import pygame
-from Enemy import Enemy
-from constants import CELL_SIZE
+from ..entities.Enemy import Enemy
+from .constants import CELL_SIZE
 
 
 class Status:

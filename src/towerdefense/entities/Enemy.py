@@ -1,6 +1,6 @@
 import pygame
-from constants import CELL_SIZE
-from utils import Direction, COLOR
+from ..util.constants import CELL_SIZE
+from ..util.utils import Direction, COLOR
 
 # region Base Enemy Class
 

@@ -1,13 +1,17 @@
+import os
 import pygame
 import copy
 from numpy import sqrt
 from random import choice
-from Enemy import Enemy
-from Status import *
-from utils import COLOR,Targeting,draw_circle_alpha,Unicode,Attacking
-from constants import CELL_SIZE,FPS
+from .Enemy import Enemy
+from ..util.Status import *
+from ..util.utils import COLOR,Targeting,draw_circle_alpha,Unicode,Attacking
+from ..util.constants import CELL_SIZE,FPS
 
 pygame.mixer.init(44100, -16,2,2048)
+
+_sound_loc = os.path.join(os.path.dirname(os.path.abspath(__file__)),\
+                           "..", "resources", "sounds")
 
 # region Base Tower
 class Tower:
@@ -54,7 +58,7 @@ class Tower:
         self.current_delays = [0]
         self.attack_colors = [COLOR.BLACK]
         self.attack_sizes = [2]
-        self.attack_sounds = [pygame.mixer.Sound('sounds/throw.ogg')]
+        self.attack_sounds = [pygame.mixer.Sound(os.path.join(_sound_loc, 'throw.ogg'))]
         self.attack_radii = [0]
         self.delay_changes = {}
         self.range_changes = {}
@@ -149,7 +153,7 @@ class Tower:
         self.attack_statuses[idx] = status
 
     def add_attack(self, attack: callable, targeting: callable, name: str='Normal', type: str=Attacking.MELEE, damage: int=1, delay: int=20, attack_range: int=10,
-                   color: tuple=COLOR.BLACK, size: int=1, sound: pygame.mixer.Sound=pygame.mixer.Sound('sounds/boop.ogg'), radius: int=0, status=None):
+                   color: tuple=COLOR.BLACK, size: int=1, sound: pygame.mixer.Sound=pygame.mixer.Sound(os.path.join(_sound_loc, 'boop.ogg')), radius: int=0, status=None):
         self.attack_names.append(name)
         self.attack_types.append(type)
         self.attack_functions.append(attack)
@@ -528,7 +532,7 @@ class Warrior(Tower):
         self.set_upgrade_name("Elite Warrior")
         self.set_damage(2)
         self.set_range(25)
-        self.set_attack_sound(pygame.mixer.Sound('sounds/metalimpact3.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'metalimpact3.ogg')))
 
     def upgrade3(self):
         super().upgrade3()
@@ -537,7 +541,7 @@ class Warrior(Tower):
         self.set_attack_delay(10)
         self.set_range(27)
         self.set_invisible_flag(True)
-        self.set_attack_sound(pygame.mixer.Sound('sounds/metalimpact1.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'metalimpact1.ogg')))
 # endregion
 # region Archer
 class Archer(Tower):
@@ -571,7 +575,7 @@ class Archer(Tower):
         self.set_id(2)
         self.set_upgrade_cost(150)
         self.set_upgrade_name("Steady Aim")
-        self.set_attack_sound(pygame.mixer.Sound('sounds/hit1.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'hit1.ogg')))
 
     def upgrade1(self):
         super().upgrade1()
@@ -593,7 +597,7 @@ class Archer(Tower):
         self.set_damage(25)
         self.set_attack_delay(45)
         self.set_range(35)
-        self.set_attack_sound(pygame.mixer.Sound('sounds/auto.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'auto.ogg')))
 # endregion
 # region Deadeye
 class Deadeye(Tower):
@@ -631,7 +635,7 @@ class Deadeye(Tower):
         self.set_id(3)
         self.set_upgrade_cost(400)
         self.set_upgrade_name("Precision Rounds")
-        self.set_attack_sound(pygame.mixer.Sound('sounds/hit3.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'hit3.ogg')))
 
     def upgrade1(self):
         super().upgrade1()
@@ -703,7 +707,7 @@ class Berserker(Tower):
         self.set_upgrade_cost(200)
         self.set_upgrade_name("Shock Wave")
         self.set_attack_color(COLOR.FAINT_BLUE)
-        self.set_attack_sound(pygame.mixer.Sound('sounds/electric_zap.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_zap.ogg')))
         self.attack_functions = [self.berserker_attack]
         self.targeting_functions = [self.berserker_find_target]
         self.needs_screen = True
@@ -746,7 +750,7 @@ class Berserker(Tower):
         self.delay_changes = {6: self.base_delay, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0, 14: 0, 15: 0} # {6: 30, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1, 15: 1}
         self.range_changes = {15: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11, 11: 12, 12: 13, 13: 14, 14: 15} # {30: 3, 3: 6, 6: 9, 9: 12, 12: 15, 15: 18, 18: 21, 21: 24, 24: 27, 27: 30}
         self.set_metal_flag(True)
-        self.set_attack_sound(pygame.mixer.Sound('sounds/missile-blast.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'missile-blast.ogg')))
 
     def upgrade4(self):
         super().upgrade4()
@@ -791,7 +795,7 @@ class Assassin(Tower):
         self.set_id(5)
         self.set_upgrade_cost(100)
         self.set_upgrade_name("Aerial Support")
-        self.set_attack_sound(pygame.mixer.Sound('sounds/hit4.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'hit4.ogg')))
 
     def upgrade1(self):
         super().upgrade1()
@@ -815,7 +819,7 @@ class Assassin(Tower):
         self.set_damage(4)
         self.set_range(20)
         self.set_attack_delay(7)
-        self.set_attack_sound(pygame.mixer.Sound('sounds/hit6.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'hit6.ogg')))
 
     def upgrade4(self):
         super().upgrade4()
@@ -861,7 +865,7 @@ class BountyHunter(Tower):
         self.set_id(6)
         self.set_upgrade_cost(100)
         self.set_upgrade_name("Payback")
-        self.set_attack_sound(pygame.mixer.Sound('sounds/pistol1.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'pistol1.ogg')))
 
     @property
     def info(self):
@@ -883,7 +887,7 @@ class BountyHunter(Tower):
         self.set_upgrade_cost(250)
         self.set_upgrade_name("Triggerhawk")
         self.money = 5  # Specific to this class
-        self.set_attack_sound(pygame.mixer.Sound('sounds/shotgun1.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'shotgun1.ogg')))
 
     def upgrade2(self):
         super().upgrade2()
@@ -892,7 +896,7 @@ class BountyHunter(Tower):
         self.set_air_flag(True)
         self.set_damage(7)
         self.set_boss_multiplier(3)
-        self.set_attack_sound(pygame.mixer.Sound('sounds/pistol2.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'pistol2.ogg')))
 
     def upgrade3(self):
         super().upgrade3()
@@ -902,7 +906,7 @@ class BountyHunter(Tower):
         self.set_attack_delay(40)
         self.set_range(23)
         self.set_boss_multiplier(5)
-        self.set_attack_sound(pygame.mixer.Sound('sounds/shotgunreload1.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'shotgunreload1.ogg')))
 
     def upgrade4(self):
         super().upgrade4()
@@ -910,7 +914,7 @@ class BountyHunter(Tower):
         self.set_upgrade_name("Wanted Dead or Alive")
         self.set_range(25)
         self.money = 15  # Specific to this class
-        self.set_attack_sound(pygame.mixer.Sound('sounds/shotgunreload2.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'shotgunreload2.ogg')))
 
     def upgrade5(self):
         super().upgrade5()
@@ -920,7 +924,7 @@ class BountyHunter(Tower):
         self.set_range(30)
         self.money = 30  # Specific to this class
         self.set_boss_multiplier(10)
-        self.set_attack_sound(pygame.mixer.Sound('sounds/shotgunreload3.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'shotgunreload3.ogg')))
 # endregion
 
 # region Dragoon
@@ -960,7 +964,7 @@ class Dragoon(Tower):
         self.set_id(7)
         self.set_upgrade_cost(750)
         self.set_upgrade_name("Shockpoint")
-        self.set_attack_sound(pygame.mixer.Sound('sounds/firework.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'firework.ogg')))
         self.set_attack_function(self.multi_attack)  # Custom attack
         self.set_targeting_function(self.find_multi_target)  # Custom targeting
 
@@ -999,7 +1003,7 @@ class Dragoon(Tower):
         self.set_upgrade_name("Devastating Impact")
         self.set_damage(45)
         self.set_range(38)
-        self.set_attack_sound(pygame.mixer.Sound('sounds/proton.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'proton.ogg')))
 
     def upgrade4(self):
         super().upgrade4()
@@ -1130,7 +1134,7 @@ class Electrocutioner(Tower):
         self.set_id(9)
         self.set_upgrade_cost(250)
         self.set_upgrade_name("Tesla Coil")
-        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+        self.attack_sound = pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_buzz.ogg'))
 
         # Custom targeting and attacking functions
         self.attack_func = self.chain_attack
@@ -1175,7 +1179,7 @@ class Electrocutioner(Tower):
         self.set_attack_radius(7)
         self.stun_delay = 15
         self.set_range(20)
-        self.attack_sound = pygame.mixer.Sound('sounds/laser.ogg')
+        self.attack_sound = pygame.mixer.Sound(os.path.join(_sound_loc, 'laser.ogg'))
 
     def upgrade4(self):
         super().upgrade4()
@@ -1192,7 +1196,7 @@ class Electrocutioner(Tower):
         self.max_targets = 10000
         self.stun_delay = 20
         self.set_range(22)
-        self.attack_sound = pygame.mixer.Sound('sounds/strong_laser.ogg')
+        self.attack_sound = pygame.mixer.Sound(os.path.join(_sound_loc, 'strong_laser.ogg'))
 # endregion
 
 # region Bard
@@ -1232,7 +1236,7 @@ class Bard(Tower):
         self.set_id(10)
         self.set_upgrade_cost(250)
         self.set_upgrade_name("Bardic Inspiration")
-        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+        self.attack_sound = pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_buzz.ogg'))
 
         # Custom buffing attributes
         self.attack_speed_boost = 1.05
@@ -1371,7 +1375,7 @@ class Mage(Tower):
         self.set_id(11)
         self.set_upgrade_cost(250)
         self.set_upgrade_name("Arcane Apprentice")
-        self.set_attack_sound(pygame.mixer.Sound('sounds/electric_buzz.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_buzz.ogg')))
         self.set_attack_name("Basic Spell")
 
     def upgrade1(self):
@@ -1382,7 +1386,7 @@ class Mage(Tower):
         self.set_damage(5)
         self.set_attack_delay(40)
         self.add_attack(name='Arcane Bolt', damage=15, delay=120, type=Attacking.CHAIN, attack= self.chain_attack, targeting=self.find_chain_target,
-                         sound=pygame.mixer.Sound('sounds/throw.ogg'), attack_range=13, color=COLOR.LIGHT_GREEN, size=3, radius=1)
+                         sound=pygame.mixer.Sound(os.path.join(_sound_loc, 'throw.ogg')), attack_range=13, color=COLOR.LIGHT_GREEN, size=3, radius=1)
         self.max_targets = 3
 
     def upgrade2(self):
@@ -1400,7 +1404,7 @@ class Mage(Tower):
 
         # Fireball
         self.add_attack(name='Fireball', damage=8, delay=30, type=Attacking.AOE, attack=self.multi_attack, targeting=self.find_multi_target,
-                         sound=pygame.mixer.Sound('sounds/fire.ogg'), color=COLOR.ORANGE, size=2, radius=3, 
+                         sound=pygame.mixer.Sound(os.path.join(_sound_loc, 'fire.ogg')), color=COLOR.ORANGE, size=2, radius=3, 
                          status=Burn(
                              name='Burn',
                              frequency=30,
@@ -1412,7 +1416,7 @@ class Mage(Tower):
         
         # Ice Blast
         self.add_attack(name='Ice Blast', damage=15, delay=60, type=Attacking.AOE, attack=self.multi_attack, targeting=self.find_multi_target,
-                         sound=pygame.mixer.Sound('sounds/ice3.ogg'), color=COLOR.LIGHT_BLUE, size=3, radius=5, 
+                         sound=pygame.mixer.Sound(os.path.join(_sound_loc, 'ice3.ogg')), color=COLOR.LIGHT_BLUE, size=3, radius=5, 
                          status=Slow(
                              name='Slow',
                              frequency=1,
@@ -1423,7 +1427,7 @@ class Mage(Tower):
 
         # Lightning Bolt
         self.add_attack(name='Lightning Bolt', damage=50, delay=120, type=Attacking.RANGED, attack=self.normal_attack, targeting=self.find_single_target,
-                         sound=pygame.mixer.Sound('sounds/electric_zap.ogg'), color=COLOR.YELLOW, size=4, radius=1)
+                         sound=pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_zap.ogg')), color=COLOR.YELLOW, size=4, radius=1)
 
         self.set_ranges(15)
 
@@ -1502,7 +1506,7 @@ class Mage(Tower):
         if self.selection == 0:
             # Radiation
             self.add_attack(name='Radiation', damage=1, delay=0, type=Attacking.RANGED, attack=self.normal_attack, targeting=self.find_single_target,
-                            sound=pygame.mixer.Sound('sounds/fire.ogg'), color=COLOR.RED, size=1, radius=1, 
+                            sound=pygame.mixer.Sound(os.path.join(_sound_loc, 'fire.ogg')), color=COLOR.RED, size=1, radius=1, 
                             status=Burn(
                                 name='Harsh Burn',
                                 frequency=5,
@@ -1521,7 +1525,7 @@ class Mage(Tower):
         elif self.selection == 1:
             # Blizzard Bomb
             self.add_attack(name='Blizzard Bomb', damage=100, delay=45, type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target,
-                            sound=pygame.mixer.Sound('sounds/ice2.ogg'), color=COLOR.WHITE, size=10, radius=10)
+                            sound=pygame.mixer.Sound(os.path.join(_sound_loc, 'ice2.ogg')), color=COLOR.WHITE, size=10, radius=10)
 
             # Fireball
             self.set_damage(15, 2)
@@ -1532,7 +1536,7 @@ class Mage(Tower):
         elif self.selection == 2:
             # Superbolt
             self.add_attack(name='Superbolt', damage=1000, delay=120, type=Attacking.RANGED, attack=self.normal_attack, targeting=self.find_single_target,
-                            sound=pygame.mixer.Sound('sounds/thunder2.ogg'), color=COLOR.DARK_YELLOW, size=6, radius=1)
+                            sound=pygame.mixer.Sound(os.path.join(_sound_loc, 'thunder2.ogg')), color=COLOR.DARK_YELLOW, size=6, radius=1)
 
             # Fireball
             self.set_damage(15, 2)
@@ -1582,7 +1586,7 @@ class Artisan(Tower):
         self.set_upgrade_name("Efficient Production")
         self.set_id(12)
         self.set_upgrade_cost(1000)
-        self.set_attack_sound(pygame.mixer.Sound('sounds/electric_buzz.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_buzz.ogg')))
 
     def upgrade1(self):
         super().upgrade1()
@@ -1598,7 +1602,7 @@ class Artisan(Tower):
         self.set_upgrade_name("Transparent Dealings")
         self.money = 100  # Specific to this class, leave as assignment
         self.add_attack(name='Coin Toss', damage=5, delay=120, type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target,
-                        sound=pygame.mixer.Sound('sounds/boop.ogg'), color=COLOR.GOLD, size=3, radius=5)
+                        sound=pygame.mixer.Sound(os.path.join(_sound_loc, 'boop.ogg')), color=COLOR.GOLD, size=3, radius=5)
         self.set_ranges(20)
 
     def upgrade3(self):
@@ -1682,7 +1686,7 @@ class General(Tower):
         self.set_id(13)
         self.set_upgrade_cost(1000)
         self.set_upgrade_name("Strategic Command")
-        self.set_attack_sound(pygame.mixer.Sound('sounds/pistol1.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'pistol1.ogg')))
         # Infantry
         self.total_infantry_spawn_delay = 450
         self.current_infantry_spawn_delay = self.total_infantry_spawn_delay
@@ -1765,7 +1769,7 @@ class Troop(Tower):
         self.set_color(COLOR.DARK_BLUE)
         self.set_attack_color(COLOR.DARK_GRAY)
         self.set_id(14)
-        self.set_attack_sound(pygame.mixer.Sound('sounds/pistol1.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'pistol1.ogg')))
 
     def set_total_walk_delay(self, delay) -> None:
         self.total_walk_delay = delay
@@ -1876,7 +1880,7 @@ class Artillery(Troop):
         self.set_metal_flag(True)
         self.set_air_flag(True)
         self.set_color(COLOR.DARK_GREEN)
-        self.set_attack_sound(pygame.mixer.Sound('sounds/cannon.wav'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'cannon.wav')))
 
 class CombatAviation(Troop):
     """Combat Aviation
@@ -1900,8 +1904,8 @@ class CombatAviation(Troop):
         self.set_metal_flag(True)
         self.set_air_flag(True)
         self.set_color(COLOR.GRAY)
-        self.set_attack_sound(pygame.mixer.Sound('sounds/firework.ogg'))
-        self.add_attack(name="Missile", damage=200+100*(level - 1), delay=50-3*(level - 1), radius=5, color=COLOR.RED, sound=pygame.mixer.Sound('sounds/missile-blast.ogg'),
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'firework.ogg')))
+        self.add_attack(name="Missile", damage=200+100*(level - 1), delay=50-3*(level - 1), radius=5, color=COLOR.RED, sound=pygame.mixer.Sound(os.path.join(_sound_loc, 'missile-blast.ogg')),
                         type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target, size=4)
 
 # endregion
@@ -1941,13 +1945,13 @@ class Alchemist(Tower):
         self.set_id(15)
         self.set_upgrade_name("Toxic Chemicals")
         self.set_upgrade_cost(400)
-        self.set_attack_sound(pygame.mixer.Sound('sounds/shatter.ogg'))
+        self.set_attack_sound(pygame.mixer.Sound(os.path.join(_sound_loc, 'shatter.ogg')))
 
     def upgrade1(self):
         super().upgrade1()
         self.set_upgrade_name("Explosive Chemicals")
         self.set_upgrade_cost(1200)
-        self.add_attack(name="Toxic Chemicals", damage=6, delay=60, radius=3, color=COLOR.DARK_GREEN, sound=pygame.mixer.Sound('sounds/shatter.ogg'),
+        self.add_attack(name="Toxic Chemicals", damage=6, delay=60, radius=3, color=COLOR.DARK_GREEN, sound=pygame.mixer.Sound(os.path.join(_sound_loc, 'shatter.ogg')),
                         type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target, size=3)
         self.set_ranges(17)
 
@@ -1955,7 +1959,7 @@ class Alchemist(Tower):
         super().upgrade2()
         self.set_upgrade_name("Mad Scientist")
         self.set_upgrade_cost(2500)
-        self.add_attack(name="Explosive Chemicals", damage=20, delay=60, radius=5, color=COLOR.DARK_ORANGE, sound=pygame.mixer.Sound('sounds/shatter.ogg'),
+        self.add_attack(name="Explosive Chemicals", damage=20, delay=60, radius=5, color=COLOR.DARK_ORANGE, sound=pygame.mixer.Sound(os.path.join(_sound_loc, 'shatter.ogg')),
                         type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target, size=4)
         self.set_ranges(20)
 
@@ -1963,7 +1967,7 @@ class Alchemist(Tower):
         super().upgrade3()
         self.set_upgrade_name("Regenerative Chemicals")
         self.set_upgrade_cost(5000)
-        self.add_attack(name="Explosive Chemicals", damage=600, delay=60, radius=3, color=COLOR.DARK_GREEN, sound=pygame.mixer.Sound('sounds/shatter.ogg'),
+        self.add_attack(name="Explosive Chemicals", damage=600, delay=60, radius=3, color=COLOR.DARK_GREEN, sound=pygame.mixer.Sound(os.path.join(_sound_loc, 'shatter.ogg')),
                         type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target, size=4)
         self.set_ranges(25)
 
@@ -1971,7 +1975,7 @@ class Alchemist(Tower):
         super().upgrade4()
         self.set_upgrade_name("Chemical Warfare")
         self.set_upgrade_cost(5000)
-        self.add_attack(name="Explosive Chemicals", damage=600, delay=60, radius=3, color=COLOR.DARK_GREEN, sound=pygame.mixer.Sound('sounds/shatter.ogg'),
+        self.add_attack(name="Explosive Chemicals", damage=600, delay=60, radius=3, color=COLOR.DARK_GREEN, sound=pygame.mixer.Sound(os.path.join(_sound_loc, 'shatter.ogg')),
                         type=Attacking.RANGED, attack=self.multi_attack, targeting=self.find_multi_target, size=4)
         self.set_ranges(30)
 
@@ -2013,7 +2017,7 @@ class PlagueDoctor(Tower):
         self.attack_color = COLOR.PURPLE
         self.id = 14
         self.upgrade_cost = 250
-        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+        self.attack_sound = pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_buzz.ogg'))
 
 # endregion
 # region Toxicologist
@@ -2053,7 +2057,7 @@ class Toxicologist(Tower):
         self.attack_color = COLOR.PURPLE
         self.id = 15
         self.upgrade_cost = 250
-        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+        self.attack_sound = pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_buzz.ogg'))
 
 # endregion
 # region Pyromancer
@@ -2093,7 +2097,7 @@ class Pyromancer(Tower):
         self.attack_color = COLOR.LIGHT_ORANGE
         self.id = 16
         self.upgrade_cost = 250
-        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+        self.attack_sound = pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_buzz.ogg'))
 
 # endregion
 # region Hypnotist
@@ -2133,7 +2137,7 @@ class Hypnotist(Tower):
         self.attack_color = COLOR.LIGHT_PURPLE
         self.id = 15
         self.upgrade_cost = 250
-        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+        self.attack_sound = pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_buzz.ogg'))
 
 # endregion
 # region Butcher
@@ -2173,7 +2177,7 @@ class Butcher(Tower):
         self.attack_color = COLOR.RED
         self.id = 17
         self.upgrade_cost = 250
-        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+        self.attack_sound = pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_buzz.ogg'))
 
 # endregion
 # region Blacksmith
@@ -2213,7 +2217,7 @@ class Blacksmith(Tower):
         self.attack_color = COLOR.RED
         self.id = 18
         self.upgrade_cost = 250
-        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+        self.attack_sound = pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_buzz.ogg'))
 
 # endregion
 # region Miner
@@ -2253,7 +2257,7 @@ class Miner(Tower):
         self.attack_color = COLOR.DARK_ORANGE
         self.id = 16
         self.upgrade_cost = 250
-        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+        self.attack_sound = pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_buzz.ogg'))
 
 # endregion
 # region Detonator
@@ -2293,7 +2297,7 @@ class Detonator(Tower):
         self.attack_color = COLOR.ORANGE
         self.id = 17
         self.upgrade_cost = 250
-        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+        self.attack_sound = pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_buzz.ogg'))
 
 # endregion
 # region Harvester
@@ -2333,7 +2337,7 @@ class Harvester(Tower):
         self.attack_color = COLOR.GREEN
         self.id = 18
         self.upgrade_cost = 250
-        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+        self.attack_sound = pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_buzz.ogg'))
 
 # endregion
 # region Ice Soldier
@@ -2373,7 +2377,7 @@ class IceSoldier(Tower):
         self.attack_color = COLOR.BLUE
         self.id = 19
         self.upgrade_cost = 250
-        self.attack_sound = pygame.mixer.Sound('sounds/electric_buzz.ogg')
+        self.attack_sound = pygame.mixer.Sound(os.path.join(_sound_loc, 'electric_buzz.ogg'))
 
 # endregion
 

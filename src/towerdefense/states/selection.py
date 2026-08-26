@@ -1,7 +1,7 @@
 import pygame
-from utils import COLOR, GameState, Map, draw_rect_alpha, GameState
-from Tower import *
-from enemy_seeds import easy, normal, hard, extreme, impossible, hell, drowned, corrupted
+from ..util.utils import COLOR, GameState, Map, draw_rect_alpha, GameState
+from ..entities.Tower import *
+from ..util.enemy_seeds import easy, normal, hard, extreme, impossible, hell, drowned, corrupted
 
 def map_selection_screen(screen):
     # Constants for screen dimensions and fonts

@@ -1,5 +1,5 @@
 import pygame
-from utils import COLOR, GameState
+from ..util.utils import COLOR, GameState
 
 def menu_screen(screen):
 

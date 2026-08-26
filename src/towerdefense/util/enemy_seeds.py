@@ -1,5 +1,5 @@
-from Enemy import *
-from utils import COLOR
+from ..entities.Enemy import *
+from .utils import COLOR
 
 easy = {
     "name": "Easy",

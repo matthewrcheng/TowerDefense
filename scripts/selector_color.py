@@ -61,33 +61,37 @@ def get_color():
     a = int((slider_positions["alpha"] - 50) * 255 / 300)
     return (r, g, b, a)
 
-# Game loop
-running = True
-while running:
-    screen.fill(WHITE)
+def main():
+    # Game loop
+        running = True
+        while running:
+            screen.fill(WHITE)
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = event.pos
+                    for color, pos_y in {"red": 50, "green": 120, "blue": 190, "alpha": 260}.items():
+                        if abs(y - pos_y) < 10 and 50 <= x <= 350:
+                            dragging = color
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    dragging = None
+                elif event.type == pygame.MOUSEMOTION and dragging:
+                    x, _ = event.pos
+                    slider_positions[dragging] = max(50, min(x, 350))
+            
+            draw_sliders()
     
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            x, y = event.pos
-            for color, pos_y in {"red": 50, "green": 120, "blue": 190, "alpha": 260}.items():
-                if abs(y - pos_y) < 10 and 50 <= x <= 350:
-                    dragging = color
-        elif event.type == pygame.MOUSEBUTTONUP:
-            dragging = None
-        elif event.type == pygame.MOUSEMOTION and dragging:
-            x, _ = event.pos
-            slider_positions[dragging] = max(50, min(x, 350))
+            # Draw the color preview box
+            pygame.draw.rect(screen, get_color(), (100, 320, 200, 50))
     
-    draw_sliders()
+            # Update display
+            pygame.display.flip()
+    
+        # Quit pygame
+        pygame.quit()
+        sys.exit()
 
-    # Draw the color preview box
-    pygame.draw.rect(screen, get_color(), (100, 320, 200, 50))
-
-    # Update display
-    pygame.display.flip()
-
-# Quit pygame
-pygame.quit()
-sys.exit()
+if __name__ == "__main__":
+    main()

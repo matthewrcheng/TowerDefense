@@ -1,0 +1,22 @@
+[project]
+name = "towerdefense"
+version = "0.1.0"
+authors = [
+    {name = "Matthew Cheng", email = "matthewrcheng@gmail.com"},
+]
+description = "A python tower defense game"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy==2.2.4",
+    "pygame==2.6.1",
+    "pygame-widgets==1.1.7",
+]
+
+[project.scripts]
+select-color = "scripts.selector_color:main"
+select-sounds = "scripts.selector_sound:main"
+
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
