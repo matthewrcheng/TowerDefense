@@ -152,7 +152,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
     emojil = pygame.font.Font('emoji.ttf', 72)
 
     # Buttons, text, and icons
-    exit_button = pygame.Rect(WIDTH-55, 25, 30, 30)
+    exit_button = pygame.Rect(WIDTH-30, 0, 30, 30)
     
     target_cycle = {Targeting.FIRST: Targeting.STRONG, Targeting.STRONG: Targeting.LAST, Targeting.LAST: Targeting.WEAK, Targeting.WEAK: Targeting.RANDOM, Targeting.RANDOM: Targeting.FIRST}
     money_icon = emojis.render(Unicode.money, True, COLOR.YELLOW)
@@ -665,7 +665,7 @@ def game_screen(screen: pygame.Surface, selected_map, selected_towers: list[Towe
             pygame.draw.rect(screen, COLOR.FAINT, tower_info_target_button)
             target_text = fonts.render(f"{tower_info_menu.targeting}", True, COLOR.BLACK)
             screen.blit(target_text, (tower_info_target_button.x + 5, tower_info_target_button.y + 5))
-            total_damage_text = fonts.render(f"Total Damage: {tower_info_menu.total_damage}", True, COLOR.BLACK)
+            total_damage_text = fonts.render(f"Total Damage: {int(tower_info_menu.total_damage)}", True, COLOR.BLACK)
             screen.blit(total_damage_text, (tower_display_rect.x, tower_display_rect.y + 100))
             sell_text = fonts.render(f"Sell ${tower_info_menu.total_cost//2}", True, COLOR.BLACK)
             screen.blit(sell_text, (tower_info_sell_button.x + 5, tower_info_sell_button.y + 5))

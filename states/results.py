@@ -1,20 +1,15 @@
 import pygame
-from utils import COLOR
+from utils import COLOR, GameState
 
-def results_screen(screen, win, levels = 0, time = 0):
-    
-    # if win, display "Victory!" and show some stats like time elapsed, coins earned, xp gained, and (not implemented yet) what was unlocked
-
-    # if not, display "Better luck next time..." with time elapsed, coins earned, and xp gained
-
-    # coins are earned based on how much of the game was completed (how many levels cleared)
-    # xp gained is a combination of levels completed and time elapsed, the less time elapsed, the more xp
+def results_screen(screen: pygame.Surface, win: bool, levels: int = 0, time: int = 0):
 
     # for now, nothing gets unlocked and coins and xp are displayed, but they do not do anything
     # Set up fonts
     pygame.font.init()
     font_large = pygame.font.Font(None, 60)
     font_medium = pygame.font.Font(None, 40)
+    background_rect = pygame.Rect(150, 50, 550, 450)
+    return_button = pygame.Rect(200, 350, 250, 70)
 
     # Calculate time elapsed (for demonstration purposes)
     if not time:
@@ -28,11 +23,29 @@ def results_screen(screen, win, levels = 0, time = 0):
     
     # Calculate XP gained based on levels completed and time elapsed
     xp_gained = (levels_cleared * 100) - int(time_elapsed)  # Adjust coefficients as needed
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return GameState.QUIT
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if return_button.collidepoint(event.pos):
+                    return GameState.MENU
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return GameState.MENU
+        
+        pygame.draw.rect(screen, COLOR.BLACK, background_rect)
     
-    # Display victory screen
-    if win:
-        victory_text = font_large.render("Victory!", True, COLOR.GOLD)
-        screen.blit(victory_text, (200, 100))
+        # Display victory screen
+        if win:
+            victory_text = font_large.render("Victory!", True, COLOR.GOLD)
+            screen.blit(victory_text, (200, 100))
+
+        # Display defeat screen
+        else:
+            defeat_text = font_large.render("Better luck next time...", True, COLOR.RED)
+            screen.blit(defeat_text, (100, 100))
 
         # Display statistics
         stats_text = font_medium.render(f"Time Elapsed: {time_elapsed:.2f} seconds", True, COLOR.WHITE)
@@ -44,19 +57,8 @@ def results_screen(screen, win, levels = 0, time = 0):
         stats_text = font_medium.render(f"XP Gained: {xp_gained}", True, COLOR.WHITE)
         screen.blit(stats_text, (200, 300))
 
-    # Display defeat screen
-    else:
-        defeat_text = font_large.render("Better luck next time...", True, COLOR.RED)
-        screen.blit(defeat_text, (100, 100))
+        pygame.draw.rect(screen, COLOR.RED, return_button)
+        return_text = font_medium.render("Return to Title", True, COLOR.WHITE)
+        screen.blit(return_text, (return_button.x + 20, return_button.y + 20))
 
-        # Display statistics
-        stats_text = font_medium.render(f"Time Elapsed: {time_elapsed:.2f} seconds", True, COLOR.WHITE)
-        screen.blit(stats_text, (200, 200))
-
-        stats_text = font_medium.render(f"Coins Earned: {coins_earned}", True, COLOR.WHITE)
-        screen.blit(stats_text, (200, 250))
-
-        stats_text = font_medium.render(f"XP Gained: {xp_gained}", True, COLOR.WHITE)
-        screen.blit(stats_text, (200, 300))
-
-    pygame.display.flip()
+        pygame.display.flip()
