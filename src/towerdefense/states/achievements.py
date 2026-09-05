@@ -43,15 +43,14 @@ def achievements_screen(screen: pygame.Surface):
                     scroll = 0
                 elif scroll >= len(achievements)-3:
                     scroll = len(achievements)-4
-                print(scroll)
 
         screen.fill(COLOR.BLACK)
 
-        # Display username at the top of the screen
+        # Display title at the top of the screen
         title_text = fontl.render(f"ACHIEVEMENTS", True, COLOR.WHITE)
         screen.blit(title_text, (50, 50))
 
-        # Draw the "Play" button
+        # Draw the "quit" button
         pygame.draw.rect(screen, COLOR.WHITE, quit_button) 
         quit_text = fonts.render("Main Menu", True, COLOR.BLACK)
         screen.blit(quit_text, (quit_button.x + 40, quit_button.y + 10))

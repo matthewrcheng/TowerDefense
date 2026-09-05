@@ -2381,6 +2381,11 @@ class IceSoldier(Tower):
 
 # endregion
 
+def get_all_towers() -> list[Tower]:
+    return [Warrior, Archer, Deadeye, Berserker, Assassin, BountyHunter, Dragoon, Farm, Electrocutioner, \
+            Bard, Mage, Artisan, General, Alchemist, PlagueDoctor, Toxicologist, Pyromancer, Hypnotist, \
+            Butcher, Blacksmith, Miner, Detonator, Harvester, IceSoldier]
+
 if __name__ == "__main__":
     # print(Warrior().color)
     print(Tower(), Warrior())
